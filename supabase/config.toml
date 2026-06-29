@@ -1,0 +1,8 @@
+# Supabase project config — apenas para configurações de Edge Functions.
+# Project ref: vmfhhwbbwnotugnrdjpm
+
+# Webhook do Digital Manager Guru — público (validamos via api_token no body).
+# Sem essa flag, o gateway do Supabase responde 401 antes da função executar
+# porque o Guru não envia header Authorization: Bearer <jwt>.
+[functions.guru-webhook]
+verify_jwt = false

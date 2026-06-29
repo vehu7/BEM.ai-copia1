@@ -1,0 +1,30 @@
+{
+  "name": "Bem.AI",
+  "short_name": "Bem.AI",
+  "description": "Seu companheiro de saude e bem-estar",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3F8848",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/mascots/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/mascots/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/mascots/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
