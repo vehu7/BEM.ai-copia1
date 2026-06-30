@@ -72,27 +72,45 @@ export function GamificationCard() {
             </button>
           </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-3">
           <div className="grid grid-cols-3 gap-2">
             {ACTIVITY_ORDER.map(activity => {
               const Icon = ACTIVITY_ICON[activity]
               const streak = gamification.streaks[activity]
+              const hasStreak = streak.currentStreak > 0
               return (
                 <button
                   key={activity}
                   onClick={() => setShowGallery(true)}
-                  className="flex flex-col items-center gap-1 rounded-xl bg-muted/50 hover:bg-accent p-3 transition-colors"
+                  className={`flex flex-col items-center gap-1.5 rounded-xl p-3 transition-all hover:scale-105 active:scale-95 ${
+                    hasStreak
+                      ? 'bg-primary/10 border border-primary/20 shadow-sm'
+                      : 'bg-muted/50 hover:bg-accent border border-transparent'
+                  }`}
                 >
-                  <Icon className="w-5 h-5 text-primary" />
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center ${hasStreak ? 'bg-primary/20' : 'bg-muted'}`}>
+                    <Icon className={`w-4 h-4 ${hasStreak ? 'text-primary' : 'text-muted-foreground'}`} />
+                  </div>
                   <span className="text-[11px] text-muted-foreground font-medium">{ACTIVITY_LABELS[activity]}</span>
-                  <span className="flex items-center gap-1 text-sm font-bold text-foreground">
-                    {streak.currentStreak > 0 && <Flame className="w-3.5 h-3.5 text-secondary" />}
+                  <span className={`flex items-center gap-0.5 text-base font-black leading-none ${hasStreak ? 'text-primary' : 'text-muted-foreground'}`}>
+                    {hasStreak && <Flame className="w-3.5 h-3.5 text-secondary" />}
                     {streak.currentStreak}
                   </span>
+                  {streak.currentStreak > 0 && (
+                    <span className="text-[9px] text-muted-foreground">
+                      recorde {streak.longestStreak}
+                    </span>
+                  )}
                 </button>
               )
             })}
           </div>
+          {/* Motivação para quem ainda tem streak zero */}
+          {gamification.unlockedAchievements.length === 0 && (
+            <p className="text-center text-xs text-muted-foreground px-2">
+              Complete suas metas diárias (água, treino, sono) para acumular sequências e desbloquear conquistas 🏅
+            </p>
+          )}
         </CardContent>
       </Card>
 

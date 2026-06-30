@@ -126,7 +126,11 @@ Retorne APENAS JSON válido (sem markdown):
   }
 
   const result = await response.json()
-  return JSON.parse(result.choices[0].message.content)
+  try {
+    return JSON.parse(result.choices[0].message.content)
+  } catch {
+    throw new Error('A IA retornou uma resposta inválida ao calcular as metas. Tente novamente.')
+  }
 }
 
 /**
@@ -198,7 +202,11 @@ async function estimateNutritionByName(name: string, brand: string): Promise<{
   }
 
   const data = await response.json()
-  return JSON.parse(data.choices[0].message.content)
+  try {
+    return JSON.parse(data.choices[0].message.content)
+  } catch {
+    throw new Error('Não foi possível interpretar os dados nutricionais retornados pela IA. Tente novamente.')
+  }
 }
 
 /**
@@ -382,7 +390,12 @@ Use valores baseados na tabela TACO/IBGE para alimentos brasileiros.`
   const data = await response.json()
   const text = (data.choices[0].message.content as string).trim()
   const jsonText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
-  const parsed = JSON.parse(jsonText)
+  let parsed: ReturnType<typeof JSON.parse>
+  try {
+    parsed = JSON.parse(jsonText)
+  } catch {
+    throw new Error('Não foi possível identificar os alimentos na foto. Tente uma foto mais clara e bem iluminada.')
+  }
 
   if (!Array.isArray(parsed)) return [parsed]
   return parsed
@@ -1692,7 +1705,46 @@ export async function generateWeeklyMenu(user: UserProfile, options?: {
         ? `\nCULINÁRIA DE ${country}: use ${CULINARY[norm(country)]}. Pratos típicos variados desse país (tabela nutricional local). NÃO adapte pratos brasileiros.`
         : `\nUse alimentos típicos, acessíveis e do dia a dia de ${country}.`)
 
-  const prompt = `Você é um nutricionista com 20 anos de experiência clínica. Gera cardápios semanais de 7 dias com qualidade profissional para o app Bem.AI. Leia e aplique TODOS os campos do perfil e TODAS as preferências abaixo; nenhum campo pode ser ignorado.
+  // Estratégia nutricional clínica por objetivo — usada no prompt e no preenchimento de dias faltantes
+  const goalStrategy = user.goal === 'perder_peso'
+    ? `ESTRATÉGIA CLÍNICA — PERDA DE PESO:
+• Déficit calórico de ~500 kcal/dia (base: TDEE calculado pelo perfil)
+• Proteína ELEVADA (≥1,8g/kg = ≥${Math.round((user.currentWeight || 70) * 1.8)}g/dia): preserva massa muscular durante o déficit, aumenta saciedade e gasto energético via termogênese
+• Carboidratos integrais e de baixo índice glicêmico: arroz integral, batata-doce, aveia, leguminosas. Evitar açúcar refinado, pão branco, sucos
+• Gorduras boas com moderação: azeite, abacate, castanhas (densidade calórica alta, usar com cuidado)
+• Alta densidade de micronutrientes: vegetais folhosos (alface, rúcula, couve, espinafre) e legumes coloridos em ABUNDÂNCIA — volumosos, poucos carboidratos, muito fiber e vitaminas
+• Distribuição calórica recomendada: café da manhã 22% | almoço 38% | jantar 24% | lanches 16%
+• Lanches leves e saciantes: iogurte, frutas com baixo IG, castanhas em quantidade controlada
+• Jantar mais leve que o almoço (menor aporte calórico noturno favorece a perda de gordura)`
+    : user.goal === 'ganhar_massa'
+    ? `ESTRATÉGIA CLÍNICA — GANHO DE MASSA MUSCULAR:
+• Superávit calórico de +300 a +500 kcal/dia (base: TDEE calculado pelo perfil)
+• Proteína MUITO ELEVADA (2,0g/kg = ≥${Math.round((user.currentWeight || 70) * 2.0)}g/dia): distribuída ao longo do dia para maximizar síntese proteica muscular
+• Carboidratos em quantidade suficiente para reposição de glicogênio: arroz, batata-doce, macarrão integral, banana, aveia — maior volume em refeições pré e pós-treino
+• Gorduras saudáveis sem restrição excessiva: azeite, abacate, castanhas, queijo — contribuem para o superávit calórico sem comprometer a composição corporal
+• Refeições mais volumosas e calóricas: porções generosas de proteína + carboidrato em cada refeição principal
+• Distribuição calórica recomendada: café da manhã 25% | almoço 35% | jantar 25% | lanches 15%
+• Lanches calóricos: banana com pasta de amendoim, iogurte com granola, pão integral com ovo/queijo
+• Pré-treino: carboidrato + proteína 60-90 min antes; pós-treino: proteína + carboidrato rápido em 30-45 min`
+    : user.goal === 'saude_geral'
+    ? `ESTRATÉGIA CLÍNICA — SAÚDE GERAL E BEM-ESTAR:
+• Calorias no TDEE (manutenção do peso atual)
+• Proteína adequada (1,5g/kg = ≥${Math.round((user.currentWeight || 70) * 1.5)}g/dia): mantém massa muscular e função imunológica
+• Variedade de alimentos: "arco-íris no prato" — vegetais e frutas de cores diferentes = diferentes antioxidantes e fitoquímicos
+• Carboidratos integrais predominantes: arroz integral, feijão, aveia, batata-doce, mandioca
+• Gorduras boas: priorizar azeite, peixe, abacate, oleaginosas; minimizar gordura saturada
+• Fibras em abundância (≥25g/dia): leguminosas, vegetais, frutas, aveia — saúde intestinal, controle glicêmico e colesterol
+• Hidratação: 35ml/kg/dia como base`
+    : `ESTRATÉGIA CLÍNICA — MANUTENÇÃO DE PESO:
+• Calorias no TDEE (balanço energético neutro)
+• Proteína moderada (1,5g/kg = ≥${Math.round((user.currentWeight || 70) * 1.5)}g/dia): mantém composição corporal
+• Equilíbrio entre os três macronutrientes: proteína ~25-30%, carboidrato ~45-50%, gordura ~25-30%
+• Comida brasileira tradicional como base: arroz + feijão + proteína + salada — modelo nutricional completo
+• Variedade semanal: rodar proteínas (frango, peixe, carne bovina, ovos, leguminosas) e vegetais`
+
+  const prompt = `Você é um nutricionista com 20 anos de experiência clínica em nutrição esportiva, emagrecimento e saúde feminina. Gera cardápios semanais de 7 dias com qualidade de prescrição profissional para o app BEM.ai. Leia e aplique TODOS os campos do perfil, TODAS as preferências e a ESTRATÉGIA CLÍNICA abaixo — nenhum campo pode ser ignorado.
+
+${goalStrategy}
 
 ${dietaryText ? `${dietaryText}\n\n` : ''}${medLimText ? `${medLimText}\n\n` : ''}DADOS DO PERFIL DO USUÁRIO:
 - Nome: ${user.name}
@@ -1938,7 +1990,51 @@ Retorne APENAS JSON: { "days": [ { "day": "Nome-do-dia", "meals": [ ...mesma est
     report(99, 'Quase pronto...')
     return parsed
   } catch (error: unknown) {
-    console.error('Erro ao gerar cardápio:', error)
-    throw new Error('Não foi possível gerar o cardápio. Tente novamente.')
+    console.error('Erro ao gerar cardápio com IA:', error)
+    // Fallback offline: gera cardápio determinístico com diferenciação real por objetivo
+    try {
+      const { generateOfflineDietRecommendation } = await import('./diet-generator')
+      const offline = generateOfflineDietRecommendation({
+        name: user.name,
+        goal: user.goal,
+        currentWeight: user.currentWeight,
+        height: user.height,
+        age: user.age,
+        gender: user.gender,
+        activityLevel: user.activityLevel,
+        medication: user.medication ?? 'nenhum',
+        hadBariatricSurgery: user.hadBariatricSurgery,
+        dietaryPreferences: user.dietaryPreferences ?? [],
+        excludedFoods: options?.excludedFoods,
+        targetCalories: user.targetCalories ?? 1800,
+        targetProtein: user.targetProtein ?? 120,
+        targetCarbs: Math.max(0, user.targetCarbs ?? 200),
+        targetFat: user.targetFat ?? 60,
+        targetFiber: user.targetFiber ?? 25,
+      })
+      // Adapta o formato do fallback para o formato esperado pela UI
+      return {
+        title: offline.title + ' (modo offline)',
+        description: offline.description + '\n\n⚠️ Este cardápio foi gerado offline. Conecte-se para obter um plano personalizado pela IA.',
+        days: offline.weekDays.map(d => ({
+          day: d.day,
+          meals: d.meals.map(m => ({
+            type: m.type,
+            name: m.type,
+            foods: m.foods.map(f => ({ name: f, calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 })),
+            calories: m.calories,
+            protein: m.protein,
+            carbs: m.carbs,
+            fat: m.fat,
+            fiber: m.fiber,
+          })),
+        })),
+        tips: offline.tips,
+        shoppingList: offline.shoppingList,
+        substitutions: [],
+      }
+    } catch {
+      throw new Error('Não foi possível gerar o cardápio. Verifique sua conexão e tente novamente.')
+    }
   }
 }

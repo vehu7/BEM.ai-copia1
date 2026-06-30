@@ -246,7 +246,7 @@ export function Progress() {
         doc.setFontSize(8)
         doc.setFont('helvetica', 'normal')
         doc.setTextColor(200, 235, 200)
-        doc.text('Bem.AI — Analise de Progresso', margin, pageH - 4.5)
+        doc.text('BEM.ai — Analise de Progresso', margin, pageH - 4.5)
         doc.text(`${i} / ${total}`, pageW - margin, pageH - 4.5, { align: 'right' })
       }
     }

@@ -154,7 +154,7 @@ const fr = {
     },
     "lgpd": {
       "title": "Loi Générale sur la Protection des Données (LGPD)",
-      "description": "Le Bem.AI est conforme à la LGPD (Loi n° 13.709/2018).",
+      "description": "Le BEM.ai est conforme à la LGPD (Loi n° 13.709/2018).",
       "rights": "Vos droits :",
       "right1": "Accès à vos données personnelles",
       "right2": "Correction de données incomplètes ou obsolètes",
@@ -187,7 +187,7 @@ const fr = {
       "contact": "Contacter le Support"
     },
     "logout": "Se Déconnecter",
-    "version": "Bem.AI v1.0.0",
+    "version": "BEM.ai v1.0.0",
     "madeWith": "Fait avec ❤️ pour votre santé",
     "deleteConfirm": {
       "title": "Supprimer Toutes les Données",
@@ -635,7 +635,7 @@ const fr = {
     }
   },
   "login": {
-    "appName": "Bem.AI",
+    "appName": "BEM.ai",
     "tagline": "Votre compagnon de santé et de bien-être",
     "title": "Connectez-vous à votre compte",
     "email": "Votre e-mail",
@@ -680,7 +680,7 @@ const fr = {
     "passwordTooShort": "Le mot de passe doit comporter au moins 6 caractères",
     "error": "Erreur lors de la création du compte",
     "success": "Compte créé !",
-    "successDesc": "Bienvenue chez Bem.AI !"
+    "successDesc": "Bienvenue chez BEM.ai !"
   },
   "resetPassword": {
     "title": "Réinitialiser le mot de passe",
@@ -763,7 +763,7 @@ const fr = {
     "greeting": "Comment ça va aujourd'hui ?"
   },
   "pwa": {
-    "title": "Installez Bem.AI !",
+    "title": "Installez BEM.ai !",
     "subtitle": "Accès rapide directement depuis votre écran d'accueil",
     "iosSafari": "Safari sur iPhone / iPad",
     "iosStep1": "Touchez le bouton Partager dans la barre inférieure de Safari",
@@ -790,18 +790,18 @@ const fr = {
       "subtitle": "Nutrition, entraînement, sommeil, hydratation et jeûne — tout intégré dans une seule application qui apprend avec vous et évolue ensemble.",
       "ctaStart": "Commencer Maintenant — C'est Gratuit",
       "ctaHow": "Voir comment ça fonctionne",
-      "socialProof": "+2.400 utilisateurs actifs"
+      "socialProof": "Premiers utilisateurs déjà actifs"
     },
     "stats": {
       "users": {
-        "v": "+2.400",
-        "l": "Utilisateurs actifs",
-        "sub": "personnes prenant soin de leur santé chaque jour"
+        "v": "IA",
+        "l": "Plans repas personnalisés",
+        "sub": "générés par IA pour votre objectif"
       },
       "weight": {
-        "v": "+12kg",
-        "l": "Moyenne de perte de poids",
-        "sub": "au cours des 3 premiers mois d'utilisation"
+        "v": "100%",
+        "l": "Personnalisé",
+        "sub": "plan unique pour chaque profil"
       },
       "modules": {
         "v": "8",
@@ -814,14 +814,14 @@ const fr = {
         "sub": "plan unique pour votre profil"
       },
       "menus": {
-        "v": "+18.000",
-        "l": "Menus générés",
-        "sub": "hebdomadaires et adaptés à chaque utilisateur"
+        "v": "IA",
+        "l": "Génération intelligente",
+        "sub": "menus adaptés à votre contexte"
       },
       "rating": {
-        "v": "4,9★",
-        "l": "Évaluation moyenne",
-        "sub": "basée sur les évaluations d'utilisateurs réels"
+        "v": "PWA",
+        "l": "Fonctionne sur mobile",
+        "sub": "installez comme app sur votre écran d'accueil"
       },
       "privacy": {
         "v": "LGPD",
@@ -1038,7 +1038,7 @@ const fr = {
     }
   },
   "onboarding": {
-    "welcome": "Bienvenue sur Bem.AI",
+    "welcome": "Bienvenue sur BEM.ai",
     "letsStart": "Commençons !"
   },
   "trial": {
@@ -1050,7 +1050,7 @@ const fr = {
     },
     "expired": {
       "title": "Votre période d'essai est terminée",
-      "subtitle": "Pour continuer à utiliser Bem.AI avec toutes les fonctionnalités, choisissez l'un des plans ci-dessous.",
+      "subtitle": "Pour continuer à utiliser BEM.ai avec toutes les fonctionnalités, choisissez l'un des plans ci-dessous.",
       "emailTitle": "Important : utilisez le même e-mail que celui de votre inscription",
       "emailBody1": "Pour continuer avec toutes vos données (pesées, menus, photos de progression), l'achat doit être effectué avec l'e-mail",
       "emailBodyFallback": "utilisé lors de l'inscription",
@@ -1082,7 +1082,7 @@ const fr = {
       "trialEndingToday": "Votre essai gratuit se termine aujourd'hui"
     },
     "hero": {
-      "title": "Débloquez tout Bem.AI",
+      "title": "Débloquez tout BEM.ai",
       "subtitle": "Accès illimité au chat IA, génération d'entraînements personnalisés, menus hebdomadaires et bien plus."
     },
     "trustPills": {
@@ -1135,7 +1135,7 @@ const fr = {
         },
         {
           "question": "Fonctionne-t-il sur Android et iPhone ?",
-          "answer": "Oui. Bem.AI est une PWA : installez-la directement depuis votre navigateur (Chrome sur Android, Safari sur iPhone) et utilisez-la comme n'importe quelle app."
+          "answer": "Oui. BEM.ai est une PWA : installez-la directement depuis votre navigateur (Chrome sur Android, Safari sur iPhone) et utilisez-la comme n'importe quelle app."
         }
       ]
     },
@@ -1149,8 +1149,8 @@ const fr = {
     },
     "confirmEmail": {
       "title": "Confirmez votre e-mail",
-      "description": "Pour lier votre abonnement à votre compte Bem.AI, utilisez exactement cet e-mail au checkout MercadoPago :",
-      "yourEmail": "Votre e-mail Bem.AI",
+      "description": "Pour lier votre abonnement à votre compte BEM.ai, utilisez exactement cet e-mail au checkout MercadoPago :",
+      "yourEmail": "Votre e-mail BEM.ai",
       "warning": "Si vous utilisez un autre e-mail (ex. : compte MercadoPago d'une autre personne), le premium ne sera pas activé automatiquement et vous devrez contacter le support.",
       "checkbox": "Compris, j'utiliserai cet e-mail au paiement",
       "cancel": "Annuler",
@@ -1479,7 +1479,7 @@ const fr = {
       "whatYouGet": "Découvrez tout ce que vous allez recevoir :",
       "features": {
         "app": {
-          "t": "📱 Accès complet à l'app Bem.AI",
+          "t": "📱 Accès complet à l'app BEM.ai",
           "d": "Plan alimentaire, entraînements, hydratation, sommeil et méditation"
         },
         "chat": {

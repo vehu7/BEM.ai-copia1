@@ -92,8 +92,8 @@ export function Onboarding() {
       <div className="w-full max-w-2xl">
         <div className="text-center mb-8">
           <Mascot size="lg" mood="excited" showMessage message="Vamos começar sua jornada de saúde!" />
-          <h1 className="text-4xl font-bold text-foreground mt-4">Bem.AI</h1>
-          <p className="text-muted-foreground mt-2">Seu companheiro de saúde e bem-estar</p>
+          <h1 className="text-4xl font-bold text-foreground mt-4">BEM.ai</h1>
+          <p className="text-muted-foreground mt-2">Sua companheira de saúde e bem-estar</p>
         </div>
 
         <Card className="shadow-xl">

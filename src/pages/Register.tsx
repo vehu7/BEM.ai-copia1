@@ -70,10 +70,10 @@ export function Register() {
     <div className="min-h-screen flex flex-col items-center justify-center px-6 bg-background">
       <img
         src="/mascots/koala-zen.webp"
-        alt="Mascote"
+        alt="a BEM, sua companheira de saúde"
         className="w-24 h-24 object-contain mb-3"
       />
-      <h1 className="font-display text-4xl font-extrabold tracking-tight mb-1 text-primary">Bem.AI</h1>
+      <h1 className="font-display text-4xl font-extrabold tracking-tight mb-1 text-primary">BEM.ai</h1>
       <p className="text-sm mb-8 text-muted-foreground">
         {t.register.subtitle}
       </p>

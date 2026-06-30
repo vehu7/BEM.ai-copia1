@@ -1,11 +1,11 @@
-/* Service Worker — Bem.AI Push Notifications */
+/* Service Worker — BEM.ai Push Notifications */
 
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()))
 
 /* ── Push event — recebe notificacao do servidor ─────────────────────────── */
 self.addEventListener('push', (event) => {
-  let data = { title: 'Bem.AI', body: 'Lembrete do BEM para voce!', icon: '/favicon.ico' }
+  let data = { title: 'BEM.ai', body: 'Lembrete da BEM para você!', icon: '/favicon.ico' }
   try {
     if (event.data) data = { ...data, ...event.data.json() }
   } catch { /* fallback defaults */ }

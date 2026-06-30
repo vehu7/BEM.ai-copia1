@@ -56,7 +56,7 @@ RULES (critical):
 1. Translate ONLY the VALUES (strings). Keep ALL keys EXACTLY as they are.
 2. Preserve the EXACT nested structure. Do not add or remove any keys.
 3. Keep all emojis, arrows (→, ↓, ✓, ⚠️, etc.) and special characters unchanged.
-4. Keep product-specific names untranslated: "Bem AI", "Bem.AI", "BEM", "Ozempic", "Saxenda", "Mounjaro", "Wegovy", "Victoza", "GLP-1", "OMAD", "LGPD" (keep as is — this is a Brazilian data protection law acronym).
+4. Keep product-specific names untranslated: "Bem AI", "BEM.ai", "BEM", "Ozempic", "Saxenda", "Mounjaro", "Wegovy", "Victoza", "GLP-1", "OMAD", "LGPD" (keep as is — this is a Brazilian data protection law acronym).
 5. Use natural, idiomatic ${meta.name}. Marketing tone — warm, motivating, human.
 6. Keep punctuation style consistent with ${meta.name}.
 7. For measurements keep "kg", "cm", "ml", "g", "mg", "kcal" as-is.

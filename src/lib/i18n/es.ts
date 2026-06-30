@@ -154,7 +154,7 @@ const es = {
     },
     "lgpd": {
       "title": "Ley General de Protección de Datos (LGPD)",
-      "description": "El Bem.AI cumple con la LGPD (Ley nº 13.709/2018).",
+      "description": "El BEM.ai cumple con la LGPD (Ley nº 13.709/2018).",
       "rights": "Tus derechos:",
       "right1": "Acceso a tus datos personales",
       "right2": "Corrección de datos incompletos o desactualizados",
@@ -187,7 +187,7 @@ const es = {
       "contact": "Hablar con Soporte"
     },
     "logout": "Cerrar Sesión",
-    "version": "Bem.AI v1.0.0",
+    "version": "BEM.ai v1.0.0",
     "madeWith": "Hecho con ❤️ para tu salud",
     "deleteConfirm": {
       "title": "Eliminar Todos los Datos",
@@ -635,7 +635,7 @@ const es = {
     }
   },
   "login": {
-    "appName": "Bem.AI",
+    "appName": "BEM.ai",
     "tagline": "Tu compañero de salud y bienestar",
     "title": "Iniciar sesión en tu cuenta",
     "email": "Tu correo electrónico",
@@ -680,7 +680,7 @@ const es = {
     "passwordTooShort": "La contraseña debe tener al menos 6 caracteres",
     "error": "Error al crear cuenta",
     "success": "¡Cuenta creada!",
-    "successDesc": "¡Bienvenida a Bem.AI!"
+    "successDesc": "¡Bienvenida a BEM.ai!"
   },
   "resetPassword": {
     "title": "Restablecer contraseña",
@@ -763,7 +763,7 @@ const es = {
     "greeting": "¿Cómo estás hoy?"
   },
   "pwa": {
-    "title": "¡Instala Bem.AI!",
+    "title": "¡Instala BEM.ai!",
     "subtitle": "Acceso rápido directamente desde tu pantalla de inicio",
     "iosSafari": "Safari en iPhone / iPad",
     "iosStep1": "Toca el botón Compartir en la barra inferior de Safari",
@@ -790,18 +790,18 @@ const es = {
       "subtitle": "Nutrición, entrenamiento, sueño, hidratación y ayuno — todo integrado en una sola app que aprende contigo y evoluciona a tu lado.",
       "ctaStart": "Comenzar Ahora — Es Gratis",
       "ctaHow": "Ver cómo funciona",
-      "socialProof": "+2.400 usuarios activos"
+      "socialProof": "Primeros usuarios ya usando"
     },
     "stats": {
       "users": {
-        "v": "+2.400",
-        "l": "Usuarios activos",
-        "sub": "personas cuidando su salud cada día"
+        "v": "IA",
+        "l": "Planes de comida personalizados",
+        "sub": "generados por IA para tu objetivo"
       },
       "weight": {
-        "v": "+12kg",
-        "l": "Promedio de pérdida de peso",
-        "sub": "en los primeros 3 meses de uso"
+        "v": "100%",
+        "l": "Personalizado",
+        "sub": "plan único para cada perfil"
       },
       "modules": {
         "v": "8",
@@ -814,14 +814,14 @@ const es = {
         "sub": "plan único para tu perfil"
       },
       "menus": {
-        "v": "+18.000",
-        "l": "Menús generados",
-        "sub": "semanales y adaptados a cada usuario"
+        "v": "IA",
+        "l": "Generación inteligente",
+        "sub": "menús adaptados a tu contexto"
       },
       "rating": {
-        "v": "4,9★",
-        "l": "Calificación promedio",
-        "sub": "basada en valoraciones de usuarios reales"
+        "v": "PWA",
+        "l": "Funciona en móvil",
+        "sub": "instala como app en tu pantalla de inicio"
       },
       "privacy": {
         "v": "LGPD",
@@ -1038,7 +1038,7 @@ const es = {
     }
   },
   "onboarding": {
-    "welcome": "Bienvenido a Bem.AI",
+    "welcome": "Bienvenido a BEM.ai",
     "letsStart": "¡Vamos a empezar!"
   },
   "trial": {
@@ -1050,7 +1050,7 @@ const es = {
     },
     "expired": {
       "title": "Tu período de prueba ha terminado",
-      "subtitle": "Para seguir utilizando Bem.AI con todas las funcionalidades, elige uno de los planes a continuación.",
+      "subtitle": "Para seguir utilizando BEM.ai con todas las funcionalidades, elige uno de los planes a continuación.",
       "emailTitle": "Importante: usa el mismo correo electrónico de tu registro",
       "emailBody1": "Para continuar con todos tus datos (pesajes, menús, fotos de progreso), la compra debe realizarse con el correo electrónico",
       "emailBodyFallback": "utilizado en el registro",
@@ -1082,7 +1082,7 @@ const es = {
       "trialEndingToday": "Tu prueba gratis termina hoy"
     },
     "hero": {
-      "title": "Desbloquea todo Bem.AI",
+      "title": "Desbloquea todo BEM.ai",
       "subtitle": "Acceso ilimitado al chat con IA, generación de entrenamientos personalizados, menús semanales y mucho más."
     },
     "trustPills": {
@@ -1135,7 +1135,7 @@ const es = {
         },
         {
           "question": "¿Funciona en Android e iPhone?",
-          "answer": "Sí. Bem.AI es una PWA: la instalas directo desde el navegador (Chrome en Android, Safari en iPhone) y la usas como cualquier app."
+          "answer": "Sí. BEM.ai es una PWA: la instalas directo desde el navegador (Chrome en Android, Safari en iPhone) y la usas como cualquier app."
         }
       ]
     },
@@ -1149,8 +1149,8 @@ const es = {
     },
     "confirmEmail": {
       "title": "Confirma tu e-mail",
-      "description": "Para vincular tu suscripción a tu cuenta de Bem.AI, usa exactamente este e-mail en el checkout de MercadoPago:",
-      "yourEmail": "Tu e-mail en Bem.AI",
+      "description": "Para vincular tu suscripción a tu cuenta de BEM.ai, usa exactamente este e-mail en el checkout de MercadoPago:",
+      "yourEmail": "Tu e-mail en BEM.ai",
       "warning": "Si usas otro e-mail (ej.: la cuenta MercadoPago de otra persona), el premium no se activará automáticamente y deberás abrir soporte.",
       "checkbox": "Entendido, usaré este e-mail en el pago",
       "cancel": "Cancelar",
@@ -1479,7 +1479,7 @@ const es = {
       "whatYouGet": "Mira todo lo que recibirás:",
       "features": {
         "app": {
-          "t": "📱 Acceso completo a la app Bem.AI",
+          "t": "📱 Acceso completo a la app BEM.ai",
           "d": "Plan alimentario, entrenamientos, hidratación, sueño y meditación"
         },
         "chat": {

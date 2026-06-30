@@ -45,7 +45,7 @@ export function generatePDFReport(
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(22)
   doc.setFont('helvetica', 'bold')
-  doc.text('Bem.AI', 14, y + 7)
+  doc.text('BEM.ai', 14, y + 7)
 
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
@@ -216,7 +216,7 @@ export function generatePDFReport(
     doc.setPage(i)
     doc.setFontSize(8)
     doc.setTextColor(150)
-    doc.text(`Página ${i} de ${pageCount} — Bem.AI`, pageW / 2, 290, { align: 'center' })
+    doc.text(`Página ${i} de ${pageCount} — BEM.ai`, pageW / 2, 290, { align: 'center' })
   }
 
   doc.save(`relatorio-bemai-${startDate}-${endDate}.pdf`)
@@ -235,7 +235,7 @@ export function generateMenuPDF(menu: SavedWeeklyMenu): void {
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(22)
   doc.setFont('helvetica', 'bold')
-  doc.text('Bem.AI', 14, y + 7)
+  doc.text('BEM.ai', 14, y + 7)
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
   doc.text(menu.title, 14, y + 14)
@@ -343,7 +343,7 @@ export function generateMenuPDF(menu: SavedWeeklyMenu): void {
     doc.setPage(i)
     doc.setFontSize(8)
     doc.setTextColor(150)
-    doc.text(`Página ${i} de ${pageCount} — Bem.AI`, pageW / 2, 290, { align: 'center' })
+    doc.text(`Página ${i} de ${pageCount} — BEM.ai`, pageW / 2, 290, { align: 'center' })
   }
 
   const slug = menu.title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
@@ -440,7 +440,7 @@ export function generateFullDashboardPDF(
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(22)
   doc.setFont('helvetica', 'bold')
-  doc.text('Bem.AI', 14, 22)
+  doc.text('BEM.ai', 14, 22)
   doc.setFontSize(10)
   doc.setFont('helvetica', 'normal')
   doc.text(`Relatório de Saúde — ${user.name}`, 14, 28)
@@ -733,10 +733,10 @@ export function generateFullDashboardPDF(
     doc.setFontSize(7)
     doc.setTextColor(150)
     doc.text(
-      'Este relatório é gerado pelo app Bem.AI e não substitui avaliação médica profissional.',
+      'Este relatório é gerado pelo app BEM.ai e não substitui avaliação médica profissional.',
       pageW / 2, 287, { align: 'center' },
     )
-    doc.text(`Página ${i} de ${pageCount} — Bem.AI`, pageW / 2, 292, { align: 'center' })
+    doc.text(`Página ${i} de ${pageCount} — BEM.ai`, pageW / 2, 292, { align: 'center' })
   }
 
   doc.save(`relatorio-bemai-${user.name.replace(/\s+/g, '-').toLowerCase()}-${startDate}.pdf`)

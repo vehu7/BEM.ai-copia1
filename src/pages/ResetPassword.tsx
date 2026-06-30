@@ -69,9 +69,9 @@ export function ResetPassword() {
         alt="Mascote"
         className="w-24 h-24 object-contain mb-3"
       />
-      <h1 className="text-4xl font-black mb-1 text-primary">Bem.AI</h1>
+      <h1 className="text-4xl font-black mb-1 text-primary">BEM.ai</h1>
       <p className="text-sm mb-8 text-muted-foreground">
-        Seu companheiro de saúde e bem-estar
+        Sua companheira de saúde e bem-estar
       </p>
 
       <div className="w-full max-w-sm bg-card border border-border rounded-2xl p-6 shadow-lg space-y-4">

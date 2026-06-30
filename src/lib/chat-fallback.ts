@@ -34,12 +34,12 @@ export function getFallbackResponse(message: string, user: UserProfile | null): 
     const greetings = [
       `Olá${user ? `, ${user.name}` : ''}! 👋 Como vai você hoje? Estou aqui para ajudar com dicas de nutrição, receitas ou motivação!`,
       `Oi${user ? `, ${user.name}` : ''}! 😊 Que bom te ver por aqui! Como posso te ajudar hoje?`,
-      `Hey${user ? `, ${user.name}` : ''}! 🌟 Pronto para conquistar seus objetivos? Me diga como posso ajudar!`,
+      `Hey${user ? `, ${user.name}` : ''}! 🌟 Pronto(a) para conquistar seus objetivos? Me diga como posso ajudar!`,
       `E aí${user ? `, ${user.name}` : ''}! 💪 Bora conversar sobre saúde? Estou aqui pra te apoiar!`,
-      `Olá! 👋 ${user?.goal === 'perder_peso' ? 'Vamos focar na perda de peso hoje?' : user?.goal === 'ganhar_massa' ? 'Pronto para ganhar massa?' : 'Como posso ajudar?'}`,
+      `Olá! 👋 ${user?.goal === 'perder_peso' ? 'Vamos focar na perda de peso hoje?' : user?.goal === 'ganhar_massa' ? 'Pronto(a) para ganhar massa?' : 'Como posso ajudar?'}`,
       `Oi! 🎯 Que legal te ver! Podemos falar sobre treinos, nutrição ou qualquer dúvida que você tiver!`,
       `Hey! ✨ ${user ? `${user.name}, ` : ''}me conta, o que você precisa hoje? Receitas, motivação, treinos?`,
-      `Olá${user ? `, ${user.name}` : ''}! 🌈 Seu assistente de saúde está aqui! Me pergunte o que quiser!`,
+      `Olá${user ? `, ${user.name}` : ''}! 🌈 Sua assistente de saúde está aqui! Me pergunte o que quiser!`,
       `E aí! 🚀 Bora conversar? Posso te ajudar com alimentação, exercícios ou dicas de bem-estar!`,
       `Oi${user ? `, ${user.name}` : ''}! 💚 Feliz em te ver! Como anda sua jornada de saúde?`
     ]

@@ -1,7 +1,7 @@
 /**
  * Supabase Edge Function: send-notifications
  *
- * Envia push notifications esporadicas para usuarios do Bem.AI.
+ * Envia push notifications esporadicas para usuarios do BEM.ai.
  * Deve ser chamada via cron (ex: a cada 2h) pelo Supabase Dashboard:
  *   Cron: 0 8,10,12,14,16,18,20 * * *  (8h as 20h, a cada 2h)
  *

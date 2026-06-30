@@ -24,6 +24,12 @@ import {
   Scale,
   FileText,
   Moon,
+  Coffee,
+  UtensilsCrossed,
+  Cookie,
+  CheckCircle2,
+  ChevronRight,
+  Lightbulb,
 } from 'lucide-react'
 import { calculateIMC, getIMCColor, formatWeight, getSleepQualityBadge } from '@/lib/health-utils'
 import { DailyCheckin } from '@/components/daily-checkin'
@@ -35,7 +41,7 @@ import type { WorkoutSession, WorkoutType } from '@/types'
 import { toast } from 'sonner'
 
 export function Dashboard() {
-  const { user, todayWater, todayMeals, todayWorkouts, activeFasting, addWorkout, weightHistory, cycleConfig, aiWorkoutPlan, sleepHistory, bodyMeasurements, isProfileComplete } = useApp()
+  const { user, todayWater, todayMeals, todayWorkouts, activeFasting, addWorkout, weightHistory, cycleConfig, aiWorkoutPlan, sleepHistory, bodyMeasurements, isProfileComplete, savedWeeklyMenu, checkInState } = useApp()
   const [dailyMessage] = useState(getTimeAwareMessage)
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -178,11 +184,169 @@ export function Dashboard() {
   const weightDiff = latestWeight - user.targetWeight
   const weightProgress = Math.abs(weightDiff)
 
+  // ── Cardápio de hoje ────────────────────────────────────────────────────────
+  // JS getDay(): 0=Dom, 1=Seg … 6=Sab → menu index: 0=Seg … 6=Dom
+  const todayMenuIndex = (new Date().getDay() + 6) % 7
+  const todayMenuDay = savedWeeklyMenu?.days[todayMenuIndex]
+
+  const MENU_TYPE_TO_MEAL_TYPE: Record<string, string> = {
+    'Café da Manhã': 'cafe',
+    'Lanche da Manhã': 'lanche_manha',
+    'Almoço': 'almoco',
+    'Lanche da Tarde': 'lanche_tarde',
+    'Jantar': 'jantar',
+    'Ceia': 'ceia',
+  }
+  const MEAL_ICON: Record<string, React.ReactNode> = {
+    'Café da Manhã': <Coffee className="w-4 h-4" />,
+    'Lanche da Manhã': <Cookie className="w-4 h-4" />,
+    'Almoço': <UtensilsCrossed className="w-4 h-4" />,
+    'Lanche da Tarde': <Cookie className="w-4 h-4" />,
+    'Jantar': <UtensilsCrossed className="w-4 h-4" />,
+    'Ceia': <Apple className="w-4 h-4" />,
+  }
+
+  // Detecta a próxima refeição do dia com base no horário atual
+  const currentHour = new Date().getHours()
+  const nextMealName = (() => {
+    if (currentHour < 9) return 'Café da Manhã'
+    if (currentHour < 11) return 'Lanche da Manhã'
+    if (currentHour < 13) return 'Almoço'
+    if (currentHour < 16) return 'Lanche da Tarde'
+    if (currentHour < 20) return 'Jantar'
+    return 'Ceia'
+  })()
+
+  // ── Insight personalizado do dia ────────────────────────────────────────────
+  const proteinPct = macros.protein > 0 ? (totalProteinToday / macros.protein) * 100 : 0
+  const calPct = calorieTarget > 0 ? (totalCaloriesToday / calorieTarget) * 100 : 0
+  const waterPct = todayWater.target > 0 ? (todayWater.consumed / todayWater.target) * 100 : 0
+
+  const dailyInsight = (() => {
+    if (calPct >= 100) return { color: 'text-destructive', bg: 'bg-destructive/10 border-destructive/20', icon: '🔴', text: `Você atingiu 100% das calorias diárias. Prefira lanches leves como frutas ou iogurte para o restante do dia.` }
+    if (calPct >= 85 && currentHour < 17) return { color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800', icon: '⚠️', text: `Você já consumiu ${Math.round(calPct)}% das calorias e ainda é cedo. Planeje uma janta mais leve.` }
+    if (proteinPct < 40 && currentHour >= 13) return { color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800', icon: '💪', text: `Sua proteína está em ${Math.round(totalProteinToday)}g de ${macros.protein}g (${Math.round(proteinPct)}%). Priorize proteína nas próximas refeições: frango, ovo ou iogurte grego.` }
+    if (waterPct < 40 && currentHour >= 14) return { color: 'text-cyan-600', bg: 'bg-cyan-50 border-cyan-200 dark:bg-cyan-950/30 dark:border-cyan-800', icon: '💧', text: `Você bebeu apenas ${todayWater.consumed}ml de ${todayWater.target}ml de água. Tente beber um copo agora!` }
+    if (proteinPct >= 90 && calPct < 80) return { color: 'text-green-600', bg: 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800', icon: '✅', text: `Excelente! Você já atingiu ${Math.round(proteinPct)}% da meta de proteína. Continue assim e complete as calorias com boas gorduras.` }
+    if (totalCaloriesToday === 0 && currentHour >= 9) return { color: 'text-primary', bg: 'bg-primary/10 border-primary/20', icon: '🍽️', text: `Você ainda não registrou nenhuma refeição hoje. Comece pelo café da manhã do seu cardápio!` }
+    return null
+  })()
+
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto p-4 pb-28 space-y-6">
-        {/* Saudação */}
-        <MascotGreeting name={user.name} />
+        {/* Saudação contextual com dados reais */}
+        {(() => {
+          const pendingCount = [
+            waterProgress < 100,
+            hasProfileData && (totalCaloriesToday / calorieTarget) * 100 < 80,
+            hasProfileData && proteinPct < 80,
+          ].filter(Boolean).length
+          return (
+            <MascotGreeting
+              name={user.name}
+              streak={checkInState.currentStreak}
+              pendingActions={pendingCount}
+              waterPct={waterProgress}
+              calPct={calPct}
+              proteinPct={proteinPct}
+            />
+          )
+        })()}
+
+        {/* ── Resumo do Dia — visível sem scroll, principal gatilho de ação ── */}
+        {hasProfileData && (
+          <div className="rounded-2xl bg-card border border-border shadow-sm px-4 py-3 space-y-3">
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Meta do Dia</p>
+            <div className="space-y-2">
+              {/* Água */}
+              <div className="flex items-center gap-3">
+                <Droplet className="w-4 h-4 text-chart-1 flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Água</span>
+                    <span className={`font-semibold tabular-nums ${waterProgress >= 100 ? 'text-green-600' : 'text-foreground'}`}>
+                      {todayWater.consumed}ml / {todayWater.target}ml
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-chart-1 transition-all duration-500"
+                      style={{ width: `${Math.min(waterProgress, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                {waterProgress >= 100 && <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />}
+              </div>
+              {/* Proteína */}
+              <div className="flex items-center gap-3">
+                <Dumbbell className="w-4 h-4 text-primary flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Proteína</span>
+                    <span className={`font-semibold tabular-nums ${proteinPct >= 100 ? 'text-green-600' : 'text-foreground'}`}>
+                      {Math.round(totalProteinToday)}g / {macros.protein}g
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-500"
+                      style={{ width: `${Math.min(proteinPct, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                {proteinPct >= 100 && <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />}
+              </div>
+              {/* Calorias */}
+              <div className="flex items-center gap-3">
+                <Flame className="w-4 h-4 text-chart-3 flex-shrink-0" />
+                <div className="flex-1">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-muted-foreground">Calorias</span>
+                    <span className={`font-semibold tabular-nums ${calPct >= 100 ? 'text-destructive' : 'text-foreground'}`}>
+                      {totalCaloriesToday} / {calorieTarget} kcal
+                    </span>
+                  </div>
+                  <div className="h-2 rounded-full bg-muted overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ${calPct >= 100 ? 'bg-destructive' : 'bg-chart-3'}`}
+                      style={{ width: `${Math.min(calPct, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                {calPct >= 100 && <CheckCircle2 className="w-4 h-4 text-destructive flex-shrink-0" />}
+              </div>
+            </div>
+            {/* CTA dinâmica — próxima ação sugerida */}
+            {(() => {
+              if (waterProgress < 30 && currentHour >= 8) return (
+                <button onClick={() => navigate('/water')} className="w-full flex items-center justify-between rounded-xl bg-chart-1/10 border border-chart-1/20 px-3 py-2 text-sm text-chart-1 font-semibold hover:bg-chart-1/20 transition-colors">
+                  <span>💧 Beber água agora</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )
+              if (todayMeals.length === 0 && currentHour >= 7) return (
+                <button onClick={() => navigate('/meals')} className="w-full flex items-center justify-between rounded-xl bg-primary/10 border border-primary/20 px-3 py-2 text-sm text-primary font-semibold hover:bg-primary/20 transition-colors">
+                  <span>🍽️ Registrar primeira refeição</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )
+              if (proteinPct < 50 && currentHour >= 12) return (
+                <button onClick={() => navigate('/meals')} className="w-full flex items-center justify-between rounded-xl bg-primary/10 border border-primary/20 px-3 py-2 text-sm text-primary font-semibold hover:bg-primary/20 transition-colors">
+                  <span>💪 Adicionar proteína na próxima refeição</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              )
+              if (waterProgress >= 100 && proteinPct >= 80 && calPct >= 80) return (
+                <div className="flex items-center gap-2 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 px-3 py-2">
+                  <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
+                  <span className="text-sm text-green-700 dark:text-green-400 font-semibold">Metas do dia quase completas — ótimo trabalho!</span>
+                </div>
+              )
+              return null
+            })()}
+          </div>
+        )}
 
         {/* Banner perfil incompleto */}
         {!isProfileComplete && (
@@ -208,6 +372,90 @@ export function Dashboard() {
           <Sparkles className="w-4 h-4 flex-shrink-0 mt-0.5 text-primary" />
           <p className="text-sm leading-relaxed italic text-foreground">{dailyMessage.message}</p>
         </div>
+
+        {/* Insight personalizado do dia */}
+        {dailyInsight && (
+          <div className={`rounded-2xl px-5 py-4 flex items-start gap-3 border ${dailyInsight.bg}`}>
+            <Lightbulb className={`w-4 h-4 flex-shrink-0 mt-0.5 ${dailyInsight.color}`} />
+            <p className={`text-sm leading-relaxed ${dailyInsight.color}`}>{dailyInsight.text}</p>
+          </div>
+        )}
+
+        {/* Cardápio de hoje */}
+        {todayMenuDay && (
+          <Card>
+            <CardHeader className="pb-3">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <UtensilsCrossed className="w-4 h-4 text-primary" />
+                    Cardápio de Hoje
+                  </CardTitle>
+                  <CardDescription className="text-xs mt-0.5">{todayMenuDay.day}</CardDescription>
+                </div>
+                <button
+                  onClick={() => navigate('/meals')}
+                  className="flex items-center gap-1 text-xs text-primary font-medium"
+                >
+                  Ver completo <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {todayMenuDay.meals.map((meal, i) => {
+                const mealType = MENU_TYPE_TO_MEAL_TYPE[meal.type]
+                const isRegistered = todayMeals.some(m => m.type === mealType)
+                const isNext = meal.type === nextMealName && !isRegistered
+
+                return (
+                  <div
+                    key={i}
+                    className={`flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors ${
+                      isRegistered
+                        ? 'bg-primary/8 opacity-60'
+                        : isNext
+                        ? 'bg-primary/15 border border-primary/30'
+                        : 'bg-muted/60'
+                    }`}
+                  >
+                    {/* Ícone da refeição */}
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isRegistered ? 'bg-primary/20 text-primary' : isNext ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground'}`}>
+                      {isRegistered ? <CheckCircle2 className="w-4 h-4" /> : MEAL_ICON[meal.type] ?? <UtensilsCrossed className="w-4 h-4" />}
+                    </div>
+
+                    {/* Informações */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <p className="text-sm font-semibold text-foreground truncate">{meal.type}</p>
+                        {isNext && <Badge className="text-[10px] h-4 px-1.5 bg-primary text-primary-foreground">Próxima</Badge>}
+                        {isRegistered && <Badge variant="outline" className="text-[10px] h-4 px-1.5 text-primary border-primary/30">Registrada ✓</Badge>}
+                      </div>
+                      <p className="text-xs text-muted-foreground">{meal.calories} kcal · {meal.protein}g prot · {meal.carbs}g carb</p>
+                    </div>
+
+                    {/* Botão registrar */}
+                    {!isRegistered && (
+                      <button
+                        onClick={() => navigate('/meals')}
+                        className="text-xs text-primary font-medium flex-shrink-0 hover:underline"
+                      >
+                        Registrar
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
+
+              {/* Resumo calórico do cardápio */}
+              <div className="flex justify-between items-center pt-1 px-1">
+                <span className="text-xs text-muted-foreground">Total planejado</span>
+                <span className="text-xs font-bold text-primary">
+                  {todayMenuDay.meals.reduce((s, m) => s + m.calories, 0)} kcal
+                </span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Check-in diário */}
         <DailyCheckin />
@@ -387,8 +635,14 @@ export function Dashboard() {
             )}
 
             {todayMeals.length === 0 && (
-              <div className="text-center py-4 text-muted-foreground text-sm">
-                {t.dashboard.noMealsToday}
+              <div className="text-center py-5 space-y-2">
+                <p className="text-sm text-muted-foreground">{t.dashboard.noMealsToday}</p>
+                <button
+                  onClick={() => navigate('/meals')}
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  + Registrar primeira refeição
+                </button>
               </div>
             )}
           </CardContent>
@@ -513,7 +767,27 @@ export function Dashboard() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-3">
+            {/* Sugestão de treino do plano AI para hoje */}
+            {aiWorkoutPlan && todayWorkouts.length === 0 && (() => {
+              const planDay = aiWorkoutPlan.plan.days[todayMenuIndex % aiWorkoutPlan.plan.days.length]
+              return planDay ? (
+                <div className="rounded-xl bg-primary/10 border border-primary/20 px-4 py-3">
+                  <p className="text-xs font-semibold text-primary mb-1">Treino sugerido para hoje</p>
+                  <p className="text-sm font-bold text-foreground">{planDay.name} — {planDay.focus}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {planDay.exercises.length} exercícios · {aiWorkoutPlan.plan.sessionDuration} min estimados
+                  </p>
+                  <button
+                    onClick={() => { setWorkoutMode('plan'); setSelectedPlanDayIndex(todayMenuIndex % aiWorkoutPlan.plan.days.length); setIsWorkoutDialogOpen(true) }}
+                    className="mt-2 text-xs text-primary font-semibold hover:underline flex items-center gap-1"
+                  >
+                    Registrar este treino <ChevronRight className="w-3 h-3" />
+                  </button>
+                </div>
+              ) : null
+            })()}
+
             {todayWorkouts.length > 0 ? (
               <div className="space-y-2">
                 {todayWorkouts.map((workout) => (
@@ -527,8 +801,14 @@ export function Dashboard() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-4 text-muted-foreground text-sm">
-                {t.dashboard.noWorkoutsToday}
+              <div className="text-center py-5 space-y-2">
+                <p className="text-sm text-muted-foreground">{t.dashboard.noWorkoutsToday}</p>
+                <button
+                  onClick={() => setIsWorkoutDialogOpen(true)}
+                  className="text-xs font-semibold text-primary hover:underline"
+                >
+                  + Registrar treino de hoje
+                </button>
               </div>
             )}
           </CardContent>

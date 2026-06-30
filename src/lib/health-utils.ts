@@ -128,7 +128,7 @@ export function calculateMacros(
   const fat = (calories * fatPercentage) / 9
   const fatCalories = fat * 9
 
-  const carbCalories = calories - proteinCalories - fatCalories
+  const carbCalories = Math.max(0, calories - proteinCalories - fatCalories)
   const carbs = carbCalories / 4
 
   const fiber = Math.round(calories / 1000 * 14) // 14g por 1000 calorias

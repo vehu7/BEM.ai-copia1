@@ -42,7 +42,7 @@ export async function registerBiometric(
     const credential = await navigator.credentials.create({
       publicKey: {
         challenge,
-        rp: { name: 'Bem.AI', id: window.location.hostname },
+        rp: { name: 'BEM.ai', id: window.location.hostname },
         user: {
           id: new TextEncoder().encode(userId),
           name: email,

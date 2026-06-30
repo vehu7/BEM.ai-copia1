@@ -119,10 +119,10 @@ function mapGuruStatus(status: string): string {
 }
 
 // Mapeia o Offer ID do Guru para o plano interno do app.
-// Esses IDs vêm do painel Digital Manager Guru (aba Ofertas do produto Bem.AI Premium).
+// Esses IDs vêm do painel Digital Manager Guru (aba Ofertas do produto BEM.ai Premium).
 const OFFER_ID_TO_PLAN: Record<string, 'premium' | 'premium_anual'> = {
-  'a1a58ba9-4276-44c1-aa3a-2c797dd03399': 'premium',        // Bem.AI Premium Mensal — R$29,90/mês
-  'a1a58c01-d60b-41c8-950c-b833fe9b2873': 'premium_anual',  // Bem.AI Premium Anual — R$199,90/ano
+  'a1a58ba9-4276-44c1-aa3a-2c797dd03399': 'premium',        // BEM.ai Premium Mensal — R$29,90/mês
+  'a1a58c01-d60b-41c8-950c-b833fe9b2873': 'premium_anual',  // BEM.ai Premium Anual — R$199,90/ano
 }
 
 function mapOfferIdToPlan(offerId: string): 'free' | 'premium' | 'premium_anual' {

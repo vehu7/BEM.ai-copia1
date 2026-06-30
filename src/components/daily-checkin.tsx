@@ -92,35 +92,49 @@ export function DailyCheckin() {
         </CardHeader>
         <CardContent className="space-y-3">
           {/* Streak info */}
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-2xl font-black text-foreground">
-                {checkInState.currentStreak}
-                <span className="text-sm font-normal text-muted-foreground ml-1">dia(s)</span>
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Recorde: {checkInState.longestStreak} dia(s)
-              </p>
+          {alreadyCheckedIn ? (
+            <div className="flex items-center gap-3 rounded-xl bg-primary/10 border border-primary/20 px-4 py-3">
+              <div className="flex flex-col items-center flex-shrink-0">
+                <span className="text-3xl font-black text-primary leading-none">{checkInState.currentStreak}</span>
+                <span className="text-[10px] text-primary/80 font-semibold uppercase tracking-wide">dias</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold text-foreground leading-tight">
+                  {checkInState.currentStreak >= 30
+                    ? 'Você é uma força da natureza! 🏆'
+                    : checkInState.currentStreak >= 14
+                    ? 'Duas semanas seguidas — incrível! 🌟'
+                    : checkInState.currentStreak >= 7
+                    ? 'Uma semana completa — você manda! 🔥'
+                    : checkInState.currentStreak >= 3
+                    ? 'Sequência forte — não pare agora! 💪'
+                    : 'Check-in de hoje feito! Amanhã de novo 🎯'}
+                </p>
+                <p className="text-xs text-muted-foreground">Recorde pessoal: {checkInState.longestStreak} dia(s)</p>
+              </div>
+              <CheckCircle className="w-6 h-6 text-primary flex-shrink-0" />
             </div>
-            <Button
-              size="sm"
-              onClick={handleCheckIn}
-              disabled={alreadyCheckedIn}
-              className="gap-2"
-            >
-              {alreadyCheckedIn ? (
-                <>
-                  <CheckCircle className="w-4 h-4" />
-                  Feito!
-                </>
-              ) : (
-                <>
-                  <Flame className="w-4 h-4" />
-                  Fazer Check-in
-                </>
-              )}
-            </Button>
-          </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-2xl font-black text-foreground">
+                  {checkInState.currentStreak}
+                  <span className="text-sm font-normal text-muted-foreground ml-1">dia(s)</span>
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Recorde: {checkInState.longestStreak} dia(s)
+                </p>
+              </div>
+              <Button
+                size="sm"
+                onClick={handleCheckIn}
+                className="gap-2"
+              >
+                <Flame className="w-4 h-4" />
+                Fazer Check-in
+              </Button>
+            </div>
+          )}
 
           {/* Progress to next badge */}
           {nextBadge && (

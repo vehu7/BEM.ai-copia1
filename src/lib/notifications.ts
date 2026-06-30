@@ -1,5 +1,5 @@
 /**
- * Sistema de notificacoes do Bem.AI.
+ * Sistema de notificacoes do BEM.ai.
  * - Registra Service Worker
  * - Pede permissao de notificacao
  * - Envia lembretes esporadicos enquanto o app esta aberto

@@ -70,12 +70,12 @@ export function PwaInstallPrompt() {
         <div className="flex items-center gap-3 mb-4">
           <img
             src="/mascots/koala-zen.webp"
-            alt="Bem.AI"
+            alt="BEM.ai"
             className="w-12 h-12 object-contain"
           />
           <div>
             <h2 className="text-base font-black text-primary">
-              Instale o Bem.AI!
+              Instale o BEM.ai!
             </h2>
             <p className="text-xs text-muted-foreground">
               Acesso rápido direto da sua tela inicial

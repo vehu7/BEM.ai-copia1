@@ -194,7 +194,11 @@ function Testimonials3D() {
         })}
       </div>
 
-      <div className="flex justify-center items-center gap-1.5 mt-6 px-5">
+      <p className="text-center text-[10px] mt-4 px-6" style={{ color: '#4a8c4e99' }}>
+        {t.landingPage.testimonials.disclaimer}
+      </p>
+
+      <div className="flex justify-center items-center gap-1.5 mt-4 px-5">
         {TESTIMONIAL_KEYS.map((_, i) => (
           <button key={i} onClick={() => setActive(i)} className="rounded-full transition-all duration-300"
             style={{ width: active === i ? '20px' : '6px', height: '6px', backgroundColor: active === i ? '#285B2C' : '#9BC89B' }} />
@@ -233,8 +237,8 @@ export function LandingPage() {
       >
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/alimentacao.png" alt="Bem AI" className="w-8 h-8 object-contain" />
-            <span className="font-bold text-lg" style={{ color: '#285B2C' }}>Bem AI</span>
+            <img src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/alimentacao.png" alt="BEM.ai" className="w-8 h-8 object-contain" />
+            <span className="font-bold text-lg" style={{ color: '#285B2C' }}>BEM.ai</span>
           </div>
 
           <nav className="hidden md:flex items-center gap-6">
@@ -341,7 +345,7 @@ export function LandingPage() {
           <div className="absolute inset-0 rounded-3xl" style={{ backgroundColor: '#9BC89B30', filter: 'blur(20px)', transform: 'scale(0.9) translateY(10%)' }} />
           <img
             src="/zen.png"
-            alt="Bem AI mascote"
+            alt="BEM.ai mascote"
             className="relative w-48 h-48 sm:w-56 sm:h-56 object-contain mx-auto drop-shadow-xl"
           />
         </div>
@@ -589,11 +593,11 @@ export function LandingPage() {
       <footer className="py-10 px-5" style={{ backgroundColor: '#0f1a0f', borderTop: '1px solid #1e2e1e' }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/alimentacao.png" alt="Bem AI" className="w-7 h-7 object-contain" />
-            <span className="font-bold text-sm text-white">Bem AI</span>
+            <img src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/alimentacao.png" alt="BEM.ai" className="w-7 h-7 object-contain" />
+            <span className="font-bold text-sm text-white">BEM.ai</span>
           </div>
           <p className="text-xs text-center" style={{ color: 'rgba(255,255,255,0.4)' }}>
-            © {new Date().getFullYear()} Bem AI. {t.landingPage.footer.rights}
+            © {new Date().getFullYear()} BEM.ai. {t.landingPage.footer.rights}
           </p>
           <div className="flex gap-4">
             <button onClick={() => navigate('/login')} className="text-xs transition-colors hover:text-white" style={{ color: 'rgba(255,255,255,0.4)' }}>{t.landingPage.footer.login}</button>

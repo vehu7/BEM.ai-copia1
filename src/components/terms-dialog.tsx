@@ -12,7 +12,7 @@ export function TermsDialog({ open, onOpenChange }: TermsDialogProps) {
       <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="text-2xl">Termos de Uso e Condições Gerais</DialogTitle>
-          <DialogDescription>Aplicativo Bem.AI</DialogDescription>
+          <DialogDescription>Aplicativo BEM.ai</DialogDescription>
         </DialogHeader>
         <ScrollArea className="h-[70vh] pr-4">
           <div className="space-y-6 text-sm">
@@ -23,7 +23,7 @@ export function TermsDialog({ open, onOpenChange }: TermsDialogProps) {
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">1.1. Objeto</h4>
                 <p className="text-muted-foreground leading-relaxed">
-                  Os presentes Termos de Uso e Condições Gerais ("Termos") regulam a utilização do aplicativo móvel Bem.AI ("Aplicativo"), desenvolvido e operado pela AAES SOLUÇÕES DIGITAIS LTDA, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº 48.569.146/0001-89 ("Empresa" ou "Bem.AI").
+                  Os presentes Termos de Uso e Condições Gerais ("Termos") regulam a utilização do aplicativo móvel BEM.ai ("Aplicativo"), desenvolvido e operado pela AAES SOLUÇÕES DIGITAIS LTDA, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº 48.569.146/0001-89 ("Empresa" ou "BEM.ai").
                 </p>
               </div>
 
@@ -59,7 +59,7 @@ export function TermsDialog({ open, onOpenChange }: TermsDialogProps) {
 
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">2.1. Funcionalidades</h4>
-                <p className="text-muted-foreground mb-2">O Bem.AI oferece as seguintes funcionalidades:</p>
+                <p className="text-muted-foreground mb-2">O BEM.ai oferece as seguintes funcionalidades:</p>
                 <ul className="list-disc pl-6 text-muted-foreground space-y-1">
                   <li>Rastreamento nutricional por meio de fotografias;</li>
                   <li>Cálculo e monitoramento do Índice de Massa Corporal (IMC);</li>

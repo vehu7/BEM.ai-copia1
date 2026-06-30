@@ -106,7 +106,16 @@ function getIsDark() {
   return hour >= 18 || hour < 6
 }
 
-export function MascotGreeting({ name }: { name: string }) {
+interface MascotGreetingProps {
+  name: string
+  streak?: number
+  pendingActions?: number
+  waterPct?: number
+  calPct?: number
+  proteinPct?: number
+}
+
+export function MascotGreeting({ name, streak = 0, pendingActions = 0, waterPct = 0, calPct = 0, proteinPct = 0 }: MascotGreetingProps) {
   const hour = new Date().getHours()
   const [isDark, setIsDark] = useState(getIsDark)
 
@@ -126,14 +135,24 @@ export function MascotGreeting({ name }: { name: string }) {
   }
 
   const isNight = hour >= 18 || hour < 6
-
   const mascot = isDark ? <DarkMascot /> : isNight ? <SleepMascot /> : <ZenMascot />
+
+  // Subtítulo contextual baseado em dados reais
+  const subtitle = (() => {
+    if (streak >= 7) return `🔥 ${streak} dias seguidos — você está imparável!`
+    if (streak >= 3) return `🔥 ${streak} dias de sequência — continue assim!`
+    if (streak === 1) return `✨ Primeiro dia da sequência — ótimo começo!`
+    if (waterPct >= 100 && proteinPct >= 80) return `✅ Água e proteína em dia — parabéns!`
+    if (calPct >= 100) return `Meta calórica atingida hoje 🎯`
+    if (pendingActions > 0) return `Você tem ${pendingActions} meta${pendingActions > 1 ? 's' : ''} para completar hoje`
+    return `Como você está hoje?`
+  })()
 
   return (
     <div className="flex items-center justify-between gap-3 px-1 pt-2">
       <div className="min-w-0 flex-1">
         <h2 className="font-display text-3xl font-extrabold tracking-tight text-primary truncate">{greeting}, {name}!</h2>
-        <p className="text-sm text-muted-foreground mt-0.5 truncate">Como você está hoje?</p>
+        <p className="text-sm text-muted-foreground mt-0.5 leading-snug">{subtitle}</p>
       </div>
       <div className="flex-shrink-0">{mascot}</div>
     </div>

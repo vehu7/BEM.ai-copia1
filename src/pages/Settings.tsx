@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
-import { User, Shield, Trash2, Download, Edit, Ruler, Plus, AlertTriangle, Globe, Mail, MessageCircle, Star, ChevronRight, LogOut, ScanFace, Bell, Languages } from 'lucide-react'
+import { User, Shield, Trash2, Download, Edit, Ruler, Plus, AlertTriangle, Globe, Mail, MessageCircle, Star, ChevronRight, LogOut, ScanFace, Bell, Languages, Flame, Beef, Wheat, Droplets, Activity } from 'lucide-react'
 import { calculateIMC, formatWeight, formatHeight, getMedicationInfo } from '@/lib/health-utils'
 import { toast } from 'sonner'
 import { ThemeToggle } from '@/components/theme-toggle'
@@ -182,7 +182,7 @@ export function Settings() {
       <div className="max-w-2xl mx-auto p-4 pb-24 space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
-          <img src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/construtor.png" alt="Mascote" className="w-24 h-24 mx-auto object-contain drop-shadow-md" />
+          <img src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/construtor.png" alt="a BEM — suas configurações" className="w-24 h-24 mx-auto object-contain drop-shadow-md" />
           <h1 className="text-3xl font-bold">{t.settings.title}</h1>
           <p className="text-muted-foreground">{t.settings.subtitle}</p>
         </div>
@@ -311,6 +311,99 @@ export function Settings() {
           </CardContent>
         </Card>
 
+        {/* Metas Nutricionais Calculadas */}
+        {user.targetCalories && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Flame className="w-5 h-5 text-primary" />
+                Metas Nutricionais Diárias
+              </CardTitle>
+              <CardDescription>
+                Calculadas automaticamente com base no seu perfil, objetivo e nível de atividade (fórmula Mifflin-St Jeor).
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-3">
+                {/* Calorias */}
+                <div className="col-span-2 flex items-center justify-between rounded-xl bg-primary/10 px-4 py-3">
+                  <div className="flex items-center gap-2">
+                    <Flame className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-semibold text-primary">Calorias-alvo</span>
+                  </div>
+                  <span className="text-lg font-bold text-primary">{user.targetCalories} kcal</span>
+                </div>
+
+                {/* Proteína */}
+                <div className="flex items-center justify-between rounded-xl border px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <Beef className="w-4 h-4 text-orange-500" />
+                    <span className="text-xs font-medium">Proteína</span>
+                  </div>
+                  <span className="text-sm font-bold">{user.targetProtein}g</span>
+                </div>
+
+                {/* Carboidratos */}
+                <div className="flex items-center justify-between rounded-xl border px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <Wheat className="w-4 h-4 text-yellow-500" />
+                    <span className="text-xs font-medium">Carboidratos</span>
+                  </div>
+                  <span className="text-sm font-bold">{user.targetCarbs}g</span>
+                </div>
+
+                {/* Gorduras */}
+                <div className="flex items-center justify-between rounded-xl border px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <Activity className="w-4 h-4 text-red-400" />
+                    <span className="text-xs font-medium">Gorduras</span>
+                  </div>
+                  <span className="text-sm font-bold">{user.targetFat}g</span>
+                </div>
+
+                {/* Fibras */}
+                <div className="flex items-center justify-between rounded-xl border px-3 py-2.5">
+                  <div className="flex items-center gap-2">
+                    <Wheat className="w-4 h-4 text-green-500" />
+                    <span className="text-xs font-medium">Fibras</span>
+                  </div>
+                  <span className="text-sm font-bold">{user.targetFiber}g</span>
+                </div>
+
+                {/* Água */}
+                {user.targetWater && (
+                  <div className="col-span-2 flex items-center justify-between rounded-xl border px-3 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <Droplets className="w-4 h-4 text-blue-500" />
+                      <span className="text-xs font-medium">Meta de Água</span>
+                    </div>
+                    <span className="text-sm font-bold">{(user.targetWater / 1000).toFixed(1)} L/dia</span>
+                  </div>
+                )}
+              </div>
+
+              {/* TMB / TDEE */}
+              {user.bmr && user.tdee && (
+                <div className="mt-3 rounded-xl bg-muted/60 px-4 py-3 space-y-1.5">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Metabolismo</p>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Taxa Metabólica Basal (TMB)</span>
+                    <span className="font-semibold">{user.bmr} kcal</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Gasto Total (TDEE)</span>
+                    <span className="font-semibold">{user.tdee} kcal</span>
+                  </div>
+                </div>
+              )}
+
+              <p className="mt-3 text-[11px] text-muted-foreground text-center">
+                As metas são recalculadas automaticamente ao salvar alterações no perfil.
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Medidas Corporais */}
         <Card>
           <CardHeader>
@@ -401,7 +494,7 @@ export function Settings() {
               Instalar o app
             </CardTitle>
             <CardDescription>
-              Adicione o Bem.AI à tela inicial do seu celular para acesso rápido, como um aplicativo (Android e iPhone).
+              Adicione o BEM.ai à tela inicial do seu celular para acesso rápido, como um aplicativo (Android e iPhone).
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -415,7 +508,7 @@ export function Settings() {
         <Dialog open={showInstallGuide} onOpenChange={setShowInstallGuide}>
           <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Como instalar o Bem.AI</DialogTitle>
+              <DialogTitle>Como instalar o BEM.ai</DialogTitle>
               <DialogDescription>
                 Tenha acesso rápido direto da tela inicial, igual a um app.
               </DialogDescription>
@@ -645,13 +738,13 @@ export function Settings() {
           <CardContent className="space-y-3">
             <button
               className="w-full flex items-center justify-between px-4 py-3 rounded-xl border hover:bg-muted/50 transition-colors text-left"
-              onClick={() => window.open('mailto:contato@vivabemapp.com?subject=Suporte - Bem.AI', '_blank')}
+              onClick={() => window.open('mailto:contato@bemai.app?subject=Suporte - BEM.ai', '_blank')}
             >
               <div className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-muted-foreground" />
                 <div>
                   <p className="text-sm font-medium">{t.settings.support.contact}</p>
-                  <p className="text-xs text-muted-foreground">contato@vivabemapp.com</p>
+                  <p className="text-xs text-muted-foreground">contato@bemai.app</p>
                 </div>
               </div>
               <ChevronRight className="w-4 h-4 text-muted-foreground" />

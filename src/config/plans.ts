@@ -1,5 +1,5 @@
 // ============================================================
-// Bem.AI - Configuracao de Planos (Digital Manager Guru)
+// BEM.ai - Configuracao de Planos (Digital Manager Guru)
 // ============================================================
 
 export const GURU_PRODUCT_ID = '1777323339'

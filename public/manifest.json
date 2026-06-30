@@ -1,12 +1,16 @@
 {
-  "name": "Bem.AI",
-  "short_name": "Bem.AI",
+  "id": "/",
+  "name": "BEM.ai",
+  "short_name": "BEM.ai",
   "description": "Seu companheiro de saude e bem-estar",
+  "lang": "pt-BR",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3F8848",
   "orientation": "portrait",
+  "categories": ["health", "fitness"],
   "icons": [
     {
       "src": "/mascots/icon-192.png",

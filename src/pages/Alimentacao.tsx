@@ -57,7 +57,7 @@ const calcMultiplier = (food: { portion: string }, unit: FoodUnit, value: number
 
 function dietMealToFoodItems(
   foods: MenuFood[],
-  mealTotals: { calories: number; protein: number; carbs: number; fat: number }
+  mealTotals: { calories: number; protein: number; carbs: number; fat: number; fiber?: number }
 ): FoodItem[] {
   const n = foods.length || 1
   return foods.map((food, i) => {
@@ -73,7 +73,7 @@ function dietMealToFoodItems(
         protein: food.protein,
         carbs: food.carbs,
         fat: food.fat,
-        fiber: 0,
+        fiber: food.fiber ?? 0,
         isBrazilian: false,
         isHealthy: true,
       }
@@ -95,7 +95,7 @@ function dietMealToFoodItems(
       protein: Math.round((mealTotals.protein / n) * 10) / 10,
       carbs: Math.round((mealTotals.carbs / n) * 10) / 10,
       fat: Math.round((mealTotals.fat / n) * 10) / 10,
-      fiber: 0,
+      fiber: Math.round(((mealTotals.fiber ?? 0) / n) * 10) / 10,
       isBrazilian: false,
       isHealthy: true,
     }
@@ -253,6 +253,14 @@ export function Alimentacao() {
   const saveMeal = async () => {
     if (selectedFoods.length === 0) return
 
+    const alreadyLogged = todayMeals.some(m => m.type === selectedMealType)
+    if (alreadyLogged) {
+      toast.warning('Refeição já registrada', {
+        description: `Você já registrou uma refeição neste horário hoje. Verifique se não é um registro duplicado.`,
+        duration: 6000,
+      })
+    }
+
     // Calcular totais considerando a quantidade customizada de cada alimento
     const totalCalories = selectedFoods.reduce((sum, food) => {
       const quantity = food.customQuantity || 1
@@ -284,7 +292,7 @@ export function Alimentacao() {
 
     addMeal(meal)
 
-    // Gerar feedback do BEM com IA
+    // Gerar feedback da BEM com IA
     await generateAIFeedback(meal)
 
     setSelectedFoods([])
@@ -314,6 +322,14 @@ export function Alimentacao() {
   }
 
   const saveDietMeal = async (foodItems: FoodItem[], enabledMap: Record<number, boolean>, valuesMap: Record<number, number>, unitsMap: Record<number, FoodUnit>) => {
+    const alreadyLogged = todayMeals.some(m => m.type === dietMealType)
+    if (alreadyLogged) {
+      toast.warning('Refeição já registrada', {
+        description: `Você já registrou uma refeição neste horário hoje. Verifique se não é um registro duplicado.`,
+        duration: 6000,
+      })
+    }
+
     const enabledFoods = foodItems
       .map((food, i) => ({ food, enabled: enabledMap[i] !== false, value: valuesMap[i] || 1, unit: unitsMap[i] || 'unidade' as FoodUnit }))
       .filter(x => x.enabled)
@@ -730,7 +746,7 @@ export function Alimentacao() {
             <h1 className="text-3xl font-bold">{ta.title}</h1>
             <p className="text-sm text-muted-foreground">{ta.subtitle}</p>
           </div>
-          <img src="/mascots/koala-nutricao.webp" alt="Mascote" className="w-20 h-20 object-contain drop-shadow-md" />
+          <img src="/mascots/koala-nutricao.webp" alt="a BEM — sua assistente de nutrição" className="w-20 h-20 object-contain drop-shadow-md" />
         </div>
 
         {/* Resumo calórico */}
@@ -990,7 +1006,7 @@ export function Alimentacao() {
                                       onClick={() => addFoodToSelection(food, multiplier)}
                                     >
                                       <Plus className="w-3 h-3 mr-1" />
-                                      Add
+                                      Adicionar
                                     </Button>
                                   </div>
                                 </div>
@@ -1139,9 +1155,9 @@ export function Alimentacao() {
                       <div className="space-y-2 pr-4">
                         {BRAZILIAN_FOODS.filter(f => favoriteFoods.includes(f.id)).length === 0 ? (
                           <div className="text-center py-8 text-muted-foreground">
-                            <Star className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                            <p className="text-sm">Nenhum favorito ainda</p>
-                            <p className="text-xs">Adicione alimentos aos favoritos para acesso rápido</p>
+                            <Star className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                            <p className="text-sm font-semibold text-foreground">Seus favoritos aparecem aqui</p>
+                            <p className="text-xs mt-1 leading-relaxed">Toque na estrela ao lado de qualquer alimento na busca para salvar e acessar rapidamente.</p>
                           </div>
                         ) : (
                           BRAZILIAN_FOODS.filter(f => favoriteFoods.includes(f.id)).map((food) => {
@@ -1193,7 +1209,7 @@ export function Alimentacao() {
                                         onClick={() => addFoodToSelection(food, multiplier)}
                                       >
                                         <Plus className="w-3 h-3 mr-1" />
-                                        Add
+                                        Adicionar
                                       </Button>
                                     </div>
                                   </div>
@@ -1213,8 +1229,9 @@ export function Alimentacao() {
                       <div className="space-y-2 pr-4">
                         {recentFoods.length === 0 ? (
                           <div className="text-center py-8 text-muted-foreground">
-                            <Clock className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                            <p className="text-sm">Nenhum alimento recente</p>
+                            <Clock className="w-12 h-12 mx-auto mb-3 opacity-40" />
+                            <p className="text-sm font-semibold text-foreground">Histórico vazio por enquanto</p>
+                            <p className="text-xs mt-1 leading-relaxed">Os alimentos que você adicionar aparecem aqui para agilizar o próximo registro.</p>
                           </div>
                         ) : (
                           recentFoods.map((food) => {
@@ -1266,7 +1283,7 @@ export function Alimentacao() {
                                         onClick={() => addFoodToSelection(food, multiplier)}
                                       >
                                         <Plus className="w-3 h-3 mr-1" />
-                                        Add
+                                        Adicionar
                                       </Button>
                                     </div>
                                   </div>
@@ -1621,9 +1638,9 @@ export function Alimentacao() {
           <h2 className="text-xl font-bold">Refeições de Hoje</h2>
           {todayMeals.length === 0 ? (
             <div className="bg-card rounded-2xl p-8 text-center shadow-sm">
-              <img src="/mascots/koala-cansado.png" alt="Mascote" className="w-24 h-24 mx-auto object-contain mb-3" />
-              <p className="text-sm text-muted-foreground">{ta.noMealsToday}</p>
-              <p className="text-xs text-muted-foreground mt-1">Busque alimentos ou tire uma foto!</p>
+              <img src="/mascots/koala-cansado.png" alt="a BEM aguardando seu primeiro registro do dia" className="w-24 h-24 mx-auto object-contain mb-3" />
+              <p className="text-sm font-semibold text-foreground">Nenhuma refeição registrada ainda hoje</p>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Comece pelo café da manhã — busque um alimento, tire uma foto ou use seu cardápio!</p>
             </div>
           ) : (
             todayMeals.map((meal) => {
@@ -1933,7 +1950,7 @@ export function Alimentacao() {
         const currentDay = days[dietSelectedDay]
         const currentMeal = dietSelectedMealIdx !== null ? currentDay?.meals[dietSelectedMealIdx] : null
         const foodItems = currentMeal
-          ? dietMealToFoodItems(currentMeal.foods, { calories: currentMeal.calories, protein: currentMeal.protein, carbs: currentMeal.carbs, fat: currentMeal.fat })
+          ? dietMealToFoodItems(currentMeal.foods, { calories: currentMeal.calories, protein: currentMeal.protein, carbs: currentMeal.carbs, fat: currentMeal.fat, fiber: currentMeal.fiber })
           : []
 
         const enabledCount = foodItems.filter((_, i) => dietFoodEnabled[i] !== false).length
@@ -2180,7 +2197,7 @@ export function Alimentacao() {
                       }}
                     >
                       <Plus className="w-3.5 h-3.5 mr-1" />
-                      Add
+                      Adicionar
                     </Button>
                   </div>
                 ))}

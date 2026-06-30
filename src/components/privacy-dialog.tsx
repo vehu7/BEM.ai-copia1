@@ -12,7 +12,7 @@ export function PrivacyDialog({ open, onOpenChange }: PrivacyDialogProps) {
       <DialogContent className="max-w-4xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="text-2xl">Política de Privacidade</DialogTitle>
-          <DialogDescription>Aplicativo Bem.AI</DialogDescription>
+          <DialogDescription>Aplicativo BEM.ai</DialogDescription>
         </DialogHeader>
         <ScrollArea className="h-[70vh] pr-4">
           <div className="space-y-6 text-sm">
@@ -23,7 +23,7 @@ export function PrivacyDialog({ open, onOpenChange }: PrivacyDialogProps) {
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">1.1. Identificação do Controlador</h4>
                 <p className="text-muted-foreground leading-relaxed">
-                  Esta Política de Privacidade ("Política") é aplicável ao aplicativo móvel Bem.AI ("Aplicativo"), desenvolvido e operado pela AAES SOLUÇÕES DIGITAIS LTDA, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº 48.569.146/0001-89 ("Empresa", "Controlador" ou "Bem.AI").
+                  Esta Política de Privacidade ("Política") é aplicável ao aplicativo móvel BEM.ai ("Aplicativo"), desenvolvido e operado pela AAES SOLUÇÕES DIGITAIS LTDA, pessoa jurídica de direito privado, inscrita no CNPJ sob o nº 48.569.146/0001-89 ("Empresa", "Controlador" ou "BEM.ai").
                 </p>
               </div>
 
@@ -37,7 +37,7 @@ export function PrivacyDialog({ open, onOpenChange }: PrivacyDialogProps) {
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">1.3. Aplicabilidade</h4>
                 <p className="text-muted-foreground leading-relaxed">
-                  Esta Política aplica-se a todos os usuários do Aplicativo Bem.AI e descreve como coletamos, utilizamos, armazenamos, compartilhamos e protegemos os dados pessoais.
+                  Esta Política aplica-se a todos os usuários do Aplicativo BEM.ai e descreve como coletamos, utilizamos, armazenamos, compartilhamos e protegemos os dados pessoais.
                 </p>
               </div>
 
@@ -59,7 +59,7 @@ export function PrivacyDialog({ open, onOpenChange }: PrivacyDialogProps) {
 
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">2.1. Categorias de Dados</h4>
-                <p className="text-muted-foreground mb-2">O Bem.AI coleta as seguintes categorias de dados pessoais:</p>
+                <p className="text-muted-foreground mb-2">O BEM.ai coleta as seguintes categorias de dados pessoais:</p>
 
                 <div className="space-y-3 mt-3">
                   <div>
@@ -119,7 +119,7 @@ export function PrivacyDialog({ open, onOpenChange }: PrivacyDialogProps) {
 
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">2.2. Dados Não Coletados</h4>
-                <p className="text-muted-foreground mb-2">O Bem.AI NÃO coleta:</p>
+                <p className="text-muted-foreground mb-2">O BEM.ai NÃO coleta:</p>
                 <ul className="list-disc pl-6 text-muted-foreground space-y-1">
                   <li>Dados de localização em tempo real;</li>
                   <li>Contatos do dispositivo;</li>
@@ -199,7 +199,7 @@ export function PrivacyDialog({ open, onOpenChange }: PrivacyDialogProps) {
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">4.1. Princípio da Não Compartilhamento</h4>
                 <p className="text-muted-foreground leading-relaxed">
-                  Como regra geral, o Bem.AI NÃO compartilha dados pessoais com terceiros, mantendo-os sob rigoroso controle e proteção.
+                  Como regra geral, o BEM.ai NÃO compartilha dados pessoais com terceiros, mantendo-os sob rigoroso controle e proteção.
                 </p>
               </div>
 
@@ -252,7 +252,7 @@ export function PrivacyDialog({ open, onOpenChange }: PrivacyDialogProps) {
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">4.4. Transferência Internacional</h4>
                 <p className="text-muted-foreground leading-relaxed">
-                  Atualmente, o Bem.AI não realiza transferência internacional de dados. Caso venha a ocorrer, será implementada em conformidade com a LGPD e com notificação prévia aos usuários.
+                  Atualmente, o BEM.ai não realiza transferência internacional de dados. Caso venha a ocorrer, será implementada em conformidade com a LGPD e com notificação prévia aos usuários.
                 </p>
               </div>
             </section>
@@ -401,7 +401,7 @@ export function PrivacyDialog({ open, onOpenChange }: PrivacyDialogProps) {
 
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">7.1. Uso de Cookies</h4>
-                <p className="text-muted-foreground mb-2">O Bem.AI utiliza cookies e tecnologias similares para:</p>
+                <p className="text-muted-foreground mb-2">O BEM.ai utiliza cookies e tecnologias similares para:</p>
                 <ul className="list-disc pl-6 text-muted-foreground space-y-1">
                   <li>Manter sessões de usuário ativas;</li>
                   <li>Lembrar preferências de configuração;</li>
@@ -461,7 +461,7 @@ export function PrivacyDialog({ open, onOpenChange }: PrivacyDialogProps) {
               <div className="mb-4">
                 <h4 className="font-semibold mb-2">8.1. Restrição de Idade</h4>
                 <p className="text-muted-foreground leading-relaxed">
-                  O Bem.AI é destinado exclusivamente a usuários maiores de 18 anos. Não coletamos intencionalmente dados de menores de idade.
+                  O BEM.ai é destinado exclusivamente a usuários maiores de 18 anos. Não coletamos intencionalmente dados de menores de idade.
                 </p>
               </div>
 

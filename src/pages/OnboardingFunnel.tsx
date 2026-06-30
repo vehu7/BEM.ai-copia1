@@ -5,7 +5,12 @@ import { useTranslation } from '@/contexts/LanguageContext'
 
 /* ── assets ─────────────────────────────────────────────────────────────────── */
 const mascot = '/mascots/koala-zen.webp'
+const mascotNutricao = '/mascots/koala-nutricao.webp'
 const mascotTreino = '/mascots/koala-treino.png'
+const mascotConquista = '/mascots/koala-conquista.webp'
+const mascotFeliz = '/mascots/bem-feliz.png'
+const mascotHero = '/mascots/koala-hero.webp'
+const mascotCelebracao = '/mascots/koala-celebracao.webp'
 
 /* ── quiz images (generated with Nano Banana) ───────────────────────────────── */
 const IMG = {
@@ -25,8 +30,12 @@ const IMG = {
 
 function ProgressBar({ pct }: { pct: number }) {
   return (
-    <div className="px-6 pt-5 pb-1">
-      <div className="w-full h-1.5 rounded-full overflow-hidden bg-background/40">
+    <div className="px-6 pt-4 pb-1">
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-primary/40">Seu plano</span>
+        <span className="text-[11px] font-black text-primary">{Math.round(pct)}%</span>
+      </div>
+      <div className="w-full h-2.5 rounded-full overflow-hidden bg-background/40">
         <div className="h-full rounded-full transition-all duration-500 bg-primary" style={{ width: `${pct}%` }} />
       </div>
     </div>
@@ -225,6 +234,20 @@ function CTA({ label, onClick, icon }: { label: string; onClick: () => void; ico
   )
 }
 
+/* ── BEM Speech Bubble ───────────────────────────────────────────────────────── */
+function BemBubble({ msg, img }: { msg: string; img?: string }) {
+  return (
+    <div className="flex items-start gap-3 rounded-2xl p-4 mt-4 border border-primary/20 bg-primary/10"
+      style={{ animation: 'bubbleIn 0.4s cubic-bezier(0.34,1.56,0.64,1)' }}>
+      <img src={img || mascot} alt="" className="w-12 h-12 object-contain flex-shrink-0" />
+      <div>
+        <p className="text-xs font-black text-primary/60 mb-0.5 uppercase tracking-wider">a BEM diz:</p>
+        <p className="text-sm font-semibold text-primary leading-relaxed">{msg}</p>
+      </div>
+    </div>
+  )
+}
+
 /* ── helper ──────────────────────────────────────────────────────────────────── */
 function toggle(arr: string[], v: string) {
   return arr.includes(v) ? arr.filter(x => x !== v) : [...arr, v]
@@ -295,6 +318,16 @@ export function OnboardingFunnel() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
+      <style>{`
+        @keyframes bubbleIn {
+          from { opacity: 0; transform: translateY(12px) scale(0.95); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes pulseGlow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(74,140,78,0.4); }
+          50% { box-shadow: 0 0 0 8px rgba(74,140,78,0); }
+        }
+      `}</style>
 
       {showProgress && <ProgressBar pct={pctMap[step] || 0} />}
 
@@ -313,8 +346,18 @@ export function OnboardingFunnel() {
               </p>
             </div>
 
-            <div className="w-[75%] rounded-2xl overflow-hidden mb-5 shadow-lg mx-auto">
+            <div className="w-[75%] rounded-2xl overflow-hidden shadow-lg mx-auto relative">
               <img src={IMG.hero} alt="" className="w-full object-contain" />
+              <img src={mascotHero} alt="" className="absolute -bottom-4 -right-4 w-20 h-20 object-contain drop-shadow-lg" />
+            </div>
+
+            <div className="flex items-center justify-center gap-2 my-3 mt-7">
+              <div className="flex -space-x-2">
+                {['#e8a87c', '#b5d5a8', '#a8c4e8'].map((color, i) => (
+                  <div key={i} className="w-7 h-7 rounded-full border-2 border-background" style={{ backgroundColor: color }} />
+                ))}
+              </div>
+              <p className="text-xs font-bold text-primary/70">+10.000 pessoas já transformaram sua saúde</p>
             </div>
 
             <h2 className="text-xl font-black mb-1 text-primary">
@@ -352,9 +395,15 @@ export function OnboardingFunnel() {
               { l: tf.step2.options.normal, v: 'normal', img: IMG.bodyAvg },
               { l: tf.step2.options.emForma, v: 'em_forma', img: IMG.bodyFit },
             ].map(o => (
-              <Opt key={o.v} label={o.l} image={o.img} selected={body === o.v} onSelect={() => auto(setBody, o.v)} />
+              <Opt key={o.v} label={o.l} image={o.img} selected={body === o.v} onSelect={() => {
+                setBody(o.v)
+                setTimeout(() => setStep(s => s + 1), 900)
+              }} />
             ))}
           </div>
+          {body && tf.step2.bemMessages[body as keyof typeof tf.step2.bemMessages] && (
+            <BemBubble msg={tf.step2.bemMessages[body as keyof typeof tf.step2.bemMessages]} />
+          )}
         </div>)}
 
         {/* STEP 3 — METABOLISMO */}
@@ -363,6 +412,7 @@ export function OnboardingFunnel() {
           <div className="space-y-2.5">
             <Opt label={tf.step3.slow} emoji="🐢" selected={metabolism === 'lento'} onSelect={() => auto(setMetabolism, 'lento')} />
             <Opt label={tf.step3.fast} emoji="🔥" selected={metabolism === 'acelerado'} onSelect={() => auto(setMetabolism, 'acelerado')} />
+            <Opt label={tf.step3.unknown} emoji="🤔" selected={metabolism === 'nao_sei'} onSelect={() => auto(setMetabolism, 'nao_sei')} />
           </div>
         </div>)}
 
@@ -374,15 +424,25 @@ export function OnboardingFunnel() {
               tf.step4.options.a, tf.step4.options.b, tf.step4.options.c,
               tf.step4.options.d, tf.step4.options.e, tf.step4.options.f, tf.step4.options.g,
             ].map(v => (
-              <Opt key={v} label={v} selected={weightGoal === v} onSelect={() => auto(setWeightGoal, v)} />
+              <Opt key={v} label={v} selected={weightGoal === v} onSelect={() => {
+                setWeightGoal(v)
+                setTimeout(() => setStep(s => s + 1), 900)
+              }} />
             ))}
           </div>
+          {weightGoal && <BemBubble msg={
+            weightGoal === tf.step4.options.a ? tf.step4.bemMessages.a
+            : weightGoal === tf.step4.options.b ? tf.step4.bemMessages.b
+            : weightGoal === tf.step4.options.f ? tf.step4.bemMessages.f
+            : weightGoal === tf.step4.options.g ? tf.step4.bemMessages.g
+            : tf.step4.bemMessages.above10
+          } />}
         </div>)}
 
         {/* STEP 5 — LOADING 1 */}
         {step === 5 && (
           <Loading title={tf.step5.title} sub={tf.step5.subtitle} duration={3000} onDone={next}
-            msgs={[tf.step5.msg1, tf.step5.msg2, tf.step5.msg3]} />
+            img={mascotNutricao} msgs={[tf.step5.msg1, tf.step5.msg2, tf.step5.msg3]} />
         )}
 
         {/* STEP 6 — PROVA SOCIAL */}
@@ -474,13 +534,15 @@ export function OnboardingFunnel() {
             <p className="text-sm font-black text-center text-primary">{tf.step12.statsTitle}</p>
 
             <div className="rounded-2xl p-4 space-y-4 bg-card">
-              <MetricBar label={tf.step12.burn} value={metabolism === 'lento' ? 27 : 58} max={100} color="bg-destructive" tag={tf.step12.youAreHere} />
+              <MetricBar label={tf.step12.burn} value={metabolism === 'acelerado' ? 58 : 27} max={100} color="bg-destructive" tag={tf.step12.youAreHere} />
               <MetricBar label={tf.step12.potentialWithPlan} value={89} max={100} color="bg-primary" tag={tf.step12.goal} />
             </div>
 
             <div className="rounded-2xl p-4 bg-primary/15 border border-primary/25">
               <p className="text-base text-primary">{tf.step12.solution}</p>
             </div>
+
+            <BemBubble msg={tf.step12.bemMessage} />
 
             <p className="text-center text-sm font-black uppercase text-primary">
               {tf.step12.next}
@@ -524,7 +586,11 @@ export function OnboardingFunnel() {
         {/* STEP 16 — SOLUÇÃO */}
         {step === 16 && (
           <div className="pt-2 space-y-4">
-            <div className="rounded-2xl p-4 text-center bg-primary/15 border-2 border-primary">
+            <div className="flex justify-center">
+              <img src={mascotCelebracao} alt="" className="w-24 h-24 object-contain" />
+            </div>
+            <div className="rounded-2xl p-4 text-center bg-primary/15 border-2 border-primary"
+              style={{ animation: 'pulseGlow 2s ease-in-out infinite' }}>
               <p className="text-sm font-black uppercase text-primary">
                 {tf.step16.badge}
               </p>
@@ -578,7 +644,7 @@ export function OnboardingFunnel() {
         {step === 18 && (
           <div className="flex flex-col flex-1">
             <Loading title={tf.step18.title} sub={tf.step18.subtitle} duration={5000} onDone={next}
-              msgs={[tf.step18.msg1, tf.step18.msg2, tf.step18.msg3, tf.step18.msg4]} />
+              img={mascotConquista} msgs={[tf.step18.msg1, tf.step18.msg2, tf.step18.msg3, tf.step18.msg4]} />
             <div className="space-y-3 mt-4">
               {TESTIMONIAL_KEYS.slice(2).map((k) => {
                 const data = tf.testimonials[k]
@@ -592,13 +658,18 @@ export function OnboardingFunnel() {
         {step === 19 && (
           <div className="pt-2 space-y-5">
             <div className="text-center">
-              <img src={mascot} alt="" className="w-28 h-28 object-contain mx-auto mb-3" />
+              <img src={mascotFeliz} alt="" className="w-28 h-28 object-contain mx-auto mb-3" />
               <h2 className="text-2xl font-black leading-tight text-primary">
                 {tf.step19.title}
               </h2>
               <p className="text-base mt-2 text-primary/70">
                 {tf.step19.subtitle}
               </p>
+            </div>
+
+            <div className="rounded-xl px-4 py-2.5 flex items-center gap-2 text-sm font-bold bg-destructive/15 border border-destructive/30 text-destructive">
+              <span>⏰</span>
+              <span>Oferta de 7 dias grátis disponível agora</span>
             </div>
 
             <CTA label={tf.step19.ctaMain} onClick={goRegister} icon={<Sparkles className="w-5 h-5" />} />
@@ -638,7 +709,7 @@ export function OnboardingFunnel() {
 
             <div className="grid grid-cols-3 gap-3 text-center">
               {[
-                { v: '2k+', l: tf.step19.social.users },
+                { v: '10k+', l: tf.step19.social.users },
                 { v: '4.9', l: tf.step19.social.rating },
                 { v: '92%', l: tf.step19.social.satisfaction },
               ].map((s, i) => (

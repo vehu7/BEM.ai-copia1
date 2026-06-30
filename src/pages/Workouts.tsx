@@ -451,9 +451,9 @@ function printWorkoutPlan(plan: AIWorkoutPlan, userName: string) {
 
 <!-- HEADER -->
 <div class="page-header">
-  <img class="header-logo" src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/treino.png" alt="Viver Bem" />
+  <img class="header-logo" src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/treino.png" alt="BEM.ai" />
   <div class="header-body">
-    <div class="header-app">Viver Bem · Plano de Treino</div>
+    <div class="header-app">BEM.ai · Plano de Treino</div>
     <div class="header-title">${p.title}</div>
     <div class="header-desc">${p.description}</div>
     <div class="header-meta">
@@ -510,7 +510,7 @@ ${tipsHtml}
 
 <!-- FOOTER -->
 <div class="page-footer">
-  <span class="footer-brand">Viver Bem</span>
+  <span class="footer-brand">BEM.ai</span>
   <span>Gerado em ${date} · Válido por 30 dias</span>
 </div>
 
