@@ -69,13 +69,6 @@ const STEP_NUMS: Record<(typeof STEP_KEYS)[number], string> = {
 }
 
 const TESTIMONIAL_KEYS = ['ana', 'bruno', 'carla', 'daniel', 'eduarda'] as const
-const TESTIMONIAL_IMGS: Record<(typeof TESTIMONIAL_KEYS)[number], string> = {
-  ana: 'https://randomuser.me/api/portraits/women/44.jpg',
-  bruno: 'https://randomuser.me/api/portraits/men/32.jpg',
-  carla: 'https://randomuser.me/api/portraits/women/68.jpg',
-  daniel: 'https://randomuser.me/api/portraits/men/75.jpg',
-  eduarda: 'https://randomuser.me/api/portraits/women/12.jpg',
-}
 
 const FAQ_KEYS = ['free', 'noExpert', 'glp1', 'bariatric', 'privacy', 'mobile', 'fasting', 'personalized'] as const
 
@@ -91,6 +84,24 @@ const STAT_KEYS = ['users', 'weight', 'modules', 'personalized', 'menus', 'ratin
 
 // ── Component ─────────────────────────────────────────────────────────────
 
+function TestimonialAvatar({ name }: { name: string }) {
+  const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
+  const colors = [
+    'from-emerald-400 to-teal-500',
+    'from-violet-400 to-purple-500',
+    'from-rose-400 to-pink-500',
+    'from-amber-400 to-orange-500',
+    'from-blue-400 to-indigo-500',
+  ]
+  const colorIndex = name.charCodeAt(0) % colors.length
+  return (
+    <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${colors[colorIndex]} flex items-center justify-center text-white font-bold text-sm flex-shrink-0`}
+      style={{ border: '2px solid #9BC89B' }}>
+      {initials}
+    </div>
+  )
+}
+
 function StatsCarousel() {
   const { t } = useTranslation()
   const stats = STAT_KEYS.map(k => t.landingPage.stats[k])
@@ -104,7 +115,7 @@ function StatsCarousel() {
           <div key={i} className="text-center px-6 flex-shrink-0" style={{ width: '25vw' }}>
             <p className="text-2xl font-black text-white">{s.v}</p>
             <p className="text-xs font-semibold mt-0.5" style={{ color: 'rgba(255,255,255,0.9)' }}>{s.l}</p>
-            <p className="text-[10px] mt-0.5 leading-tight" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.sub}</p>
+            <p className="text-xs mt-0.5 leading-tight" style={{ color: 'rgba(255,255,255,0.5)' }}>{s.sub}</p>
           </div>
         ))}
       </div>
@@ -182,10 +193,10 @@ function Testimonials3D() {
                 </div>
                 <p className="text-sm leading-relaxed" style={{ color: '#090C09cc' }}>"{data.text}"</p>
                 <div className="flex items-center gap-3 pt-2" style={{ borderTop: '1px solid #e8f4e8' }}>
-                  <img src={TESTIMONIAL_IMGS[key]} alt={data.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" style={{ border: '2px solid #9BC89B' }} />
+                  <TestimonialAvatar name={data.name} />
                   <div>
                     <p className="font-semibold text-sm" style={{ color: '#0f2410' }}>{data.name}</p>
-                    <p className="text-[11px]" style={{ color: '#4a8c4e' }}>{data.role}</p>
+                    <p className="text-xs" style={{ color: '#4a8c4e' }}>{data.role}</p>
                   </div>
                 </div>
               </div>
@@ -194,7 +205,7 @@ function Testimonials3D() {
         })}
       </div>
 
-      <p className="text-center text-[10px] mt-4 px-6" style={{ color: '#4a8c4e99' }}>
+      <p className="text-center text-xs mt-4 px-6" style={{ color: '#4a8c4e99' }}>
         {t.landingPage.testimonials.disclaimer}
       </p>
 

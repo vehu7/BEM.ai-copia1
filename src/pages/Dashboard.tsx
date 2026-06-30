@@ -254,8 +254,49 @@ export function Dashboard() {
           )
         })()}
 
+        {/* Banner perfil incompleto — primeiro elemento após saudação */}
+        {!isProfileComplete && (
+          <>
+            <button
+              onClick={() => setShowProfileModal(true)}
+              className="w-full rounded-2xl px-5 py-4 flex items-center gap-3 text-left bg-primary text-primary-foreground shadow-[0_4px_14px_-4px_oklch(0.52_0.16_145/0.4)] transition-all hover:-translate-y-px active:scale-[0.99]"
+            >
+              <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center flex-shrink-0">
+                <Sparkles className="w-5 h-5" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold">{t.dashboard.completeProfile}</p>
+                <p className="text-xs opacity-80">{t.dashboard.completeProfileDesc}</p>
+              </div>
+              <div className="opacity-70 text-lg">→</div>
+            </button>
+            <div className="rounded-2xl bg-muted/60 border border-border px-5 py-6 text-center space-y-2">
+              <p className="text-sm text-muted-foreground">Complete seu perfil para ver suas metas personalizadas de calorias, proteína e água.</p>
+            </div>
+          </>
+        )}
+
+        {/* Quick Nav — chips de navegação rápida por seção */}
+        <div className="flex gap-2 px-0 py-1 overflow-x-auto scrollbar-hide">
+          {[
+            { icon: '🍽️', label: 'Nutrição', anchor: 'nutricao' },
+            { icon: '💧', label: 'Água', anchor: 'agua' },
+            { icon: '💪', label: 'Treino', anchor: 'treino' },
+            { icon: '😴', label: 'Sono', anchor: 'sono' },
+          ].map(item => (
+            <button
+              key={item.anchor}
+              onClick={() => document.getElementById(item.anchor)?.scrollIntoView({ behavior: 'smooth' })}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold whitespace-nowrap border border-primary/20 active:bg-primary/20 transition-colors"
+            >
+              <span>{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
+
         {/* ── Resumo do Dia — visível sem scroll, principal gatilho de ação ── */}
-        {hasProfileData && (
+        {isProfileComplete && hasProfileData && (
           <div className="rounded-2xl bg-card border border-border shadow-sm px-4 py-3 space-y-3">
             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Meta do Dia</p>
             <div className="space-y-2">
@@ -348,23 +389,6 @@ export function Dashboard() {
           </div>
         )}
 
-        {/* Banner perfil incompleto */}
-        {!isProfileComplete && (
-          <button
-            onClick={() => setShowProfileModal(true)}
-            className="w-full rounded-2xl px-5 py-4 flex items-center gap-3 text-left bg-primary text-primary-foreground shadow-[0_4px_14px_-4px_oklch(0.52_0.16_145/0.4)] transition-all hover:-translate-y-px active:scale-[0.99]"
-          >
-            <div className="w-10 h-10 rounded-full bg-primary-foreground/20 flex items-center justify-center flex-shrink-0">
-              <Sparkles className="w-5 h-5" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold">{t.dashboard.completeProfile}</p>
-              <p className="text-xs opacity-80">{t.dashboard.completeProfileDesc}</p>
-            </div>
-            <div className="opacity-70 text-lg">→</div>
-          </button>
-        )}
-
         <ProfileSetupModal open={showProfileModal} onComplete={onProfileComplete} />
 
         {/* Mensagem motivacional do dia */}
@@ -383,7 +407,7 @@ export function Dashboard() {
 
         {/* Cardápio de hoje */}
         {todayMenuDay && (
-          <Card>
+          <Card id="nutricao">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
@@ -427,8 +451,8 @@ export function Dashboard() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <p className="text-sm font-semibold text-foreground truncate">{meal.type}</p>
-                        {isNext && <Badge className="text-[10px] h-4 px-1.5 bg-primary text-primary-foreground">Próxima</Badge>}
-                        {isRegistered && <Badge variant="outline" className="text-[10px] h-4 px-1.5 text-primary border-primary/30">Registrada ✓</Badge>}
+                        {isNext && <Badge className="text-xs h-4 px-1.5 bg-primary text-primary-foreground">Próxima</Badge>}
+                        {isRegistered && <Badge variant="outline" className="text-xs h-4 px-1.5 text-primary border-primary/30">Registrada ✓</Badge>}
                       </div>
                       <p className="text-xs text-muted-foreground">{meal.calories} kcal · {meal.protein}g prot · {meal.carbs}g carb</p>
                     </div>
@@ -525,7 +549,7 @@ export function Dashboard() {
         </div>}
 
         {/* Água */}
-        <Card>
+        <Card id="agua">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -604,29 +628,29 @@ export function Dashboard() {
 
             {hasMicroData && (
               <div>
-                <p className="text-[10px] text-muted-foreground font-medium mb-1.5">{t.dashboard.micronutrients}</p>
+                <p className="text-xs text-muted-foreground font-medium mb-1.5">{t.dashboard.micronutrients}</p>
                 <div className="flex flex-wrap gap-x-4 gap-y-1.5">
                   <div className="flex items-baseline gap-1">
-                    <span className="text-[10px] text-muted-foreground">{t.dashboard.sodium}</span>
+                    <span className="text-xs text-muted-foreground">{t.dashboard.sodium}</span>
                     <span className="text-xs font-bold text-red-500">{Math.round(totalSodiumToday)}mg</span>
                   </div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-[10px] text-muted-foreground">{t.dashboard.sugar}</span>
+                    <span className="text-xs text-muted-foreground">{t.dashboard.sugar}</span>
                     <span className="text-xs font-bold text-pink-500">{Math.round(totalSugarToday * 10) / 10}g</span>
                   </div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-[10px] text-muted-foreground">{t.dashboard.saturatedFat}</span>
+                    <span className="text-xs text-muted-foreground">{t.dashboard.saturatedFat}</span>
                     <span className="text-xs font-bold text-amber-600">{Math.round(totalSatFatToday * 10) / 10}g</span>
                   </div>
                   {totalOmega3Today > 0 && (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-[10px] text-muted-foreground">{t.dashboard.omega3}</span>
+                      <span className="text-xs text-muted-foreground">{t.dashboard.omega3}</span>
                       <span className="text-xs font-bold text-cyan-600">{Math.round(totalOmega3Today * 100) / 100}g</span>
                     </div>
                   )}
                   {totalCholesterolToday > 0 && (
                     <div className="flex items-baseline gap-1">
-                      <span className="text-[10px] text-muted-foreground">{t.dashboard.cholesterol}</span>
+                      <span className="text-xs text-muted-foreground">{t.dashboard.cholesterol}</span>
                       <span className="text-xs font-bold text-purple-500">{Math.round(totalCholesterolToday)}mg</span>
                     </div>
                   )}
@@ -654,7 +678,7 @@ export function Dashboard() {
           const qualityLabel: Record<string, string> = { excelente: 'Excelente', bom: 'Bom', regular: 'Regular', ruim: 'Ruim' }
           const formatH = (h: number) => { const hh = Math.floor(h); const mm = Math.round((h - hh) * 60); return mm > 0 ? `${hh}h ${mm}min` : `${hh}h` }
           return (
-            <Card>
+            <Card id="sono">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -749,7 +773,7 @@ export function Dashboard() {
         )}
 
         {/* Treinos */}
-        <Card>
+        <Card id="treino">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>

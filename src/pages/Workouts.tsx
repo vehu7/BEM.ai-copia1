@@ -592,7 +592,7 @@ function WorkoutDayCard({ day, index }: { day: AIWorkoutDay; index: number }) {
             )}
           </div>
           <div className="flex items-center gap-2 shrink-0 ml-2">
-            <Badge variant={allDone ? 'default' : 'secondary'} className="text-[10px]">
+            <Badge variant={allDone ? 'default' : 'secondary'} className="text-xs">
               {doneCount}/{day.exercises.length}
             </Badge>
             {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
@@ -1302,7 +1302,7 @@ export function Workouts() {
             {aiWorkoutPlan.muscleGroups?.length > 0 && (
               <div className="flex flex-wrap gap-1 mt-1.5">
                 {aiWorkoutPlan.muscleGroups.map(m => (
-                  <Badge key={m} variant="outline" className="text-[10px] py-0">{m}</Badge>
+                  <Badge key={m} variant="outline" className="text-xs py-0">{m}</Badge>
                 ))}
               </div>
             )}

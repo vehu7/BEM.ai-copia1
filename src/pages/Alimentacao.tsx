@@ -772,22 +772,22 @@ export function Alimentacao() {
           <div className="grid grid-cols-4 gap-2">
             <div className="text-center bg-chart-5/10 rounded-xl py-2.5">
               <div className="text-lg font-bold text-chart-5">{Math.round(totalProteinToday)}g</div>
-              <div className="text-[10px] text-chart-5 mt-0.5">{ta.protein}</div>
+              <div className="text-xs text-chart-5 mt-0.5">{ta.protein}</div>
               <div className="text-[9px] text-muted-foreground">/{targetProtein}g</div>
             </div>
             <div className="text-center bg-chart-3/10 rounded-xl py-2.5">
               <div className="text-lg font-bold text-chart-3">{Math.round(totalCarbsToday)}g</div>
-              <div className="text-[10px] text-chart-3 mt-0.5">{ta.carbs}</div>
+              <div className="text-xs text-chart-3 mt-0.5">{ta.carbs}</div>
               <div className="text-[9px] text-muted-foreground">/{targetCarbs}g</div>
             </div>
             <div className="text-center bg-warning/10 rounded-xl py-2.5">
               <div className="text-lg font-bold text-warning">{Math.round(totalFatToday)}g</div>
-              <div className="text-[10px] text-warning mt-0.5">{ta.fat}</div>
+              <div className="text-xs text-warning mt-0.5">{ta.fat}</div>
               <div className="text-[9px] text-muted-foreground">/{targetFat}g</div>
             </div>
             <div className="text-center bg-success/10 rounded-xl py-2.5">
               <div className="text-lg font-bold text-success">{Math.round(totalFiberToday)}g</div>
-              <div className="text-[10px] text-success mt-0.5">{ta.fiber}</div>
+              <div className="text-xs text-success mt-0.5">{ta.fiber}</div>
               <div className="text-[9px] text-muted-foreground">/{targetFiber}g</div>
             </div>
           </div>
@@ -807,35 +807,35 @@ export function Alimentacao() {
                   {totalSodiumToday > 0 && (
                     <div className="text-center bg-destructive/10 rounded-xl py-2.5 px-1">
                       <div className="text-sm font-bold text-destructive">{Math.round(totalSodiumToday)}mg</div>
-                      <div className="text-[10px] text-destructive mt-0.5">Sódio</div>
+                      <div className="text-xs text-destructive mt-0.5">Sódio</div>
                       <div className="text-[9px] text-muted-foreground">máx 2300mg</div>
                     </div>
                   )}
                   {totalSugarToday > 0 && (
                     <div className="text-center bg-chart-4/10 rounded-xl py-2.5 px-1">
                       <div className="text-sm font-bold text-chart-4">{Math.round(totalSugarToday * 10) / 10}g</div>
-                      <div className="text-[10px] text-chart-4 mt-0.5">Açúcar</div>
+                      <div className="text-xs text-chart-4 mt-0.5">Açúcar</div>
                       <div className="text-[9px] text-muted-foreground">máx 25g</div>
                     </div>
                   )}
                   {totalSatFatToday > 0 && (
                     <div className="text-center bg-warning/10 rounded-xl py-2.5 px-1">
                       <div className="text-sm font-bold text-warning">{Math.round(totalSatFatToday * 10) / 10}g</div>
-                      <div className="text-[10px] text-warning mt-0.5">Gord. Sat.</div>
+                      <div className="text-xs text-warning mt-0.5">Gord. Sat.</div>
                       <div className="text-[9px] text-muted-foreground">máx 20g</div>
                     </div>
                   )}
                   {totalOmega3Today > 0 && (
                     <div className="text-center bg-info/10 rounded-xl py-2.5 px-1">
                       <div className="text-sm font-bold text-info">{Math.round(totalOmega3Today * 100) / 100}g</div>
-                      <div className="text-[10px] text-info mt-0.5">Ômega-3</div>
+                      <div className="text-xs text-info mt-0.5">Ômega-3</div>
                       <div className="text-[9px] text-muted-foreground">mín 1.1g</div>
                     </div>
                   )}
                   {totalCholesterolToday > 0 && (
                     <div className="text-center bg-accent rounded-xl py-2.5 px-1">
                       <div className="text-sm font-bold text-secondary">{Math.round(totalCholesterolToday)}mg</div>
-                      <div className="text-[10px] text-secondary mt-0.5">Colesterol</div>
+                      <div className="text-xs text-secondary mt-0.5">Colesterol</div>
                       <div className="text-[9px] text-muted-foreground">máx 300mg</div>
                     </div>
                   )}
@@ -860,7 +860,7 @@ export function Alimentacao() {
 
         {/* Destaque: Cardápio com IA — sempre no topo */}
         <div className="rounded-2xl p-4 pt-5 border-2 border-primary/30 bg-gradient-to-br from-primary/10 via-primary/5 to-secondary/10 shadow-md">
-          <div className="inline-flex items-center gap-1 px-2.5 py-1 mb-3 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-wide shadow-sm">
+          <div className="inline-flex items-center gap-1 px-2.5 py-1 mb-3 rounded-full bg-primary text-primary-foreground text-xs font-bold uppercase tracking-wide shadow-sm">
             <Sparkles className="w-3 h-3" />
             Cardápio com IA
           </div>
@@ -883,7 +883,7 @@ export function Alimentacao() {
         {/* Registro de Refeições */}
         <div className="flex items-center gap-2 pt-1">
           <div className="flex-1 h-px bg-border" />
-          <span className="text-[11px] font-semibold tracking-widest text-muted-foreground uppercase px-2">Registro de Refeições</span>
+          <span className="text-xs font-semibold tracking-widest text-muted-foreground uppercase px-2">Registro de Refeições</span>
           <div className="flex-1 h-px bg-border" />
         </div>
 
@@ -961,7 +961,7 @@ export function Alimentacao() {
                                     <div className="flex items-center gap-2">
                                       <div className="text-right">
                                         <div className="font-bold text-primary text-sm">{previewCals} kcal</div>
-                                        <div className="text-[10px] text-muted-foreground">
+                                        <div className="text-xs text-muted-foreground">
                                           P:{Math.round(food.protein*multiplier)}g C:{Math.round(food.carbs*multiplier)}g G:{Math.round(food.fat*multiplier)}g
                                         </div>
                                       </div>
@@ -1122,7 +1122,7 @@ export function Alimentacao() {
                               ))}
                             </div>
                             {(calculatedCustomFood.fiber ?? 0) > 0 && (
-                              <p className="text-[10px] text-muted-foreground">Fibras: {calculatedCustomFood.fiber}g</p>
+                              <p className="text-xs text-muted-foreground">Fibras: {calculatedCustomFood.fiber}g</p>
                             )}
                           </div>
                           <div className="flex gap-2">
@@ -1175,7 +1175,7 @@ export function Alimentacao() {
                                       </div>
                                       <div className="text-right">
                                         <div className="font-bold text-primary text-sm">{Math.round(food.calories*multiplier)} kcal</div>
-                                        <div className="text-[10px] text-muted-foreground">
+                                        <div className="text-xs text-muted-foreground">
                                           P:{Math.round(food.protein*multiplier)}g C:{Math.round(food.carbs*multiplier)}g
                                         </div>
                                       </div>
@@ -1249,7 +1249,7 @@ export function Alimentacao() {
                                       </div>
                                       <div className="text-right">
                                         <div className="font-bold text-primary text-sm">{Math.round(food.calories*multiplier)} kcal</div>
-                                        <div className="text-[10px] text-muted-foreground">
+                                        <div className="text-xs text-muted-foreground">
                                           P:{Math.round(food.protein*multiplier)}g C:{Math.round(food.carbs*multiplier)}g
                                         </div>
                                       </div>
@@ -1510,7 +1510,7 @@ export function Alimentacao() {
 
                       {/* Totais calculados */}
                       <div>
-                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
                           Total consumido
                         </p>
                         <div className="grid grid-cols-4 gap-1.5 text-center">
@@ -1553,7 +1553,7 @@ export function Alimentacao() {
                         </button>
                         {barcodeEditMode && (
                           <div className="px-3 py-3 space-y-2.5">
-                            <p className="text-[10px] text-muted-foreground">Valores referentes a 1 porção ({scannedProduct.portion})</p>
+                            <p className="text-xs text-muted-foreground">Valores referentes a 1 porção ({scannedProduct.portion})</p>
                             {editField('calories',     'Calorias',        'kcal', 0)}
                             {editField('protein',      'Proteínas',       'g')}
                             {editField('carbs',        'Carboidratos',    'g')}
@@ -1565,7 +1565,7 @@ export function Alimentacao() {
                             {Object.keys(barcodeEdited).length > 0 && (
                               <button
                                 onClick={() => setBarcodeEdited({})}
-                                className="text-[10px] text-muted-foreground underline"
+                                className="text-xs text-muted-foreground underline"
                               >
                                 Restaurar valores originais
                               </button>
@@ -1654,7 +1654,7 @@ export function Alimentacao() {
                       </div>
                       <div>
                         <p className="font-semibold text-sm">{getMealLabel(meal.type)}</p>
-                        <p className="text-[10px] text-muted-foreground">
+                        <p className="text-xs text-muted-foreground">
                           {new Date(meal.date).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
@@ -1688,9 +1688,9 @@ export function Alimentacao() {
                       )
                     })}
                     <div className="flex gap-1.5 pt-2 flex-wrap">
-                      <span className="text-[10px] px-2 py-0.5 bg-chart-5/10 text-chart-5 rounded-full font-medium">P: {Math.round(meal.totalProtein)}g</span>
-                      <span className="text-[10px] px-2 py-0.5 bg-chart-3/10 text-chart-3 rounded-full font-medium">C: {Math.round(meal.totalCarbs)}g</span>
-                      <span className="text-[10px] px-2 py-0.5 bg-warning/10 text-warning rounded-full font-medium">G: {Math.round(meal.totalFat)}g</span>
+                      <span className="text-xs px-2 py-0.5 bg-chart-5/10 text-chart-5 rounded-full font-medium">P: {Math.round(meal.totalProtein)}g</span>
+                      <span className="text-xs px-2 py-0.5 bg-chart-3/10 text-chart-3 rounded-full font-medium">C: {Math.round(meal.totalCarbs)}g</span>
+                      <span className="text-xs px-2 py-0.5 bg-warning/10 text-warning rounded-full font-medium">G: {Math.round(meal.totalFat)}g</span>
                     </div>
                   </div>
                 </div>
@@ -1759,44 +1759,44 @@ export function Alimentacao() {
                       <div className="flex gap-2 flex-wrap">
                         <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-chart-5/10">
                           <span className="text-[9px] text-chart-5 font-medium leading-tight">Proteína</span>
-                          <span className="text-[11px] text-chart-5 font-bold">{Math.round(food.protein * mult)}g</span>
+                          <span className="text-xs text-chart-5 font-bold">{Math.round(food.protein * mult)}g</span>
                         </div>
                         <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-chart-3/10">
                           <span className="text-[9px] text-chart-3 font-medium leading-tight">Carboidrato</span>
-                          <span className="text-[11px] text-chart-3 font-bold">{Math.round(food.carbs * mult)}g</span>
+                          <span className="text-xs text-chart-3 font-bold">{Math.round(food.carbs * mult)}g</span>
                         </div>
                         <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-warning/10">
                           <span className="text-[9px] text-warning font-medium leading-tight">Gordura</span>
-                          <span className="text-[11px] text-warning font-bold">{Math.round(food.fat * mult)}g</span>
+                          <span className="text-xs text-warning font-bold">{Math.round(food.fat * mult)}g</span>
                         </div>
                         {(food.sodium ?? 0) > 0 && (
                           <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-destructive/10">
                             <span className="text-[9px] text-destructive font-medium leading-tight">Sódio</span>
-                            <span className="text-[11px] text-destructive font-bold">{Math.round((food.sodium ?? 0) * mult)}mg</span>
+                            <span className="text-xs text-destructive font-bold">{Math.round((food.sodium ?? 0) * mult)}mg</span>
                           </div>
                         )}
                         {(food.sugar ?? 0) > 0 && (
                           <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-chart-4/10">
                             <span className="text-[9px] text-chart-4 font-medium leading-tight">Açúcar</span>
-                            <span className="text-[11px] text-chart-4 font-bold">{Math.round((food.sugar ?? 0) * mult * 10) / 10}g</span>
+                            <span className="text-xs text-chart-4 font-bold">{Math.round((food.sugar ?? 0) * mult * 10) / 10}g</span>
                           </div>
                         )}
                         {(food.saturatedFat ?? 0) > 0 && (
                           <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-warning/10">
                             <span className="text-[9px] text-warning font-medium leading-tight text-center">Gord. Sat.</span>
-                            <span className="text-[11px] text-warning font-bold">{Math.round((food.saturatedFat ?? 0) * mult * 10) / 10}g</span>
+                            <span className="text-xs text-warning font-bold">{Math.round((food.saturatedFat ?? 0) * mult * 10) / 10}g</span>
                           </div>
                         )}
                         {(food.omega3 ?? 0) > 0 && (
                           <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-info/10">
                             <span className="text-[9px] text-info font-medium leading-tight">Ômega-3</span>
-                            <span className="text-[11px] text-info font-bold">{Math.round((food.omega3 ?? 0) * mult * 100) / 100}g</span>
+                            <span className="text-xs text-info font-bold">{Math.round((food.omega3 ?? 0) * mult * 100) / 100}g</span>
                           </div>
                         )}
                         {(food.cholesterol ?? 0) > 0 && (
                           <div className="flex flex-col items-center justify-center w-14 h-14 rounded-full bg-accent">
                             <span className="text-[9px] text-secondary font-medium leading-tight">Colesterol</span>
-                            <span className="text-[11px] text-secondary font-bold">{Math.round((food.cholesterol ?? 0) * mult)}mg</span>
+                            <span className="text-xs text-secondary font-bold">{Math.round((food.cholesterol ?? 0) * mult)}mg</span>
                           </div>
                         )}
                       </div>
@@ -1836,7 +1836,7 @@ export function Alimentacao() {
               {/* Total estimado (quando múltiplos alimentos) */}
               {photoScannedFoods.length > 1 && (
                 <div className="rounded-xl border p-3 bg-muted/40">
-                  <p className="text-[11px] font-medium text-muted-foreground mb-1.5">Total estimado da refeição</p>
+                  <p className="text-xs font-medium text-muted-foreground mb-1.5">Total estimado da refeição</p>
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-bold text-primary text-sm">
                       {Math.round(photoScannedFoods.reduce((s, f) => s + f.calories * calcMultiplier(f, photoFoodUnits[f.id] || 'unidade', photoFoodQuantities[f.id] || 1), 0))} kcal
@@ -2039,11 +2039,11 @@ export function Alimentacao() {
                               {meal.name && meal.name !== meal.type && (
                                 <p className="text-xs text-muted-foreground">{meal.name}</p>
                               )}
-                              <p className="text-[10px] text-muted-foreground mt-0.5">{meal.foods.length} item{meal.foods.length !== 1 ? 's' : ''}</p>
+                              <p className="text-xs text-muted-foreground mt-0.5">{meal.foods.length} item{meal.foods.length !== 1 ? 's' : ''}</p>
                             </div>
                             <div className="text-right">
                               <p className="text-sm font-bold text-secondary">{meal.calories} kcal</p>
-                              <p className="text-[10px] text-muted-foreground">P:{meal.protein}g C:{meal.carbs}g G:{meal.fat}g{meal.fiber != null ? ` Fib:${meal.fiber}g` : ''}</p>
+                              <p className="text-xs text-muted-foreground">P:{meal.protein}g C:{meal.carbs}g G:{meal.fat}g{meal.fiber != null ? ` Fib:${meal.fiber}g` : ''}</p>
                             </div>
                           </div>
                         </button>
@@ -2079,11 +2079,11 @@ export function Alimentacao() {
                                   isEnabled ? 'bg-secondary border-secondary' : 'border-border bg-background'
                                 }`}
                               >
-                                {isEnabled && <span className="text-secondary-foreground text-[10px] font-bold leading-none">✓</span>}
+                                {isEnabled && <span className="text-secondary-foreground text-xs font-bold leading-none">✓</span>}
                               </button>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium leading-snug">{food.name}</p>
-                                <p className="text-[10px] text-muted-foreground">{food.portion} · {Math.round(food.calories * mult)} kcal</p>
+                                <p className="text-xs text-muted-foreground">{food.portion} · {Math.round(food.calories * mult)} kcal</p>
                               </div>
                               <button
                                 onClick={() => setDietFoodEnabled(prev => ({ ...prev, [i]: false }))}
@@ -2261,7 +2261,7 @@ export function Alimentacao() {
 
                 {/* Totais ao vivo */}
                 <div className="rounded-xl p-3 bg-muted/40 space-y-1.5">
-                  <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wide">Total recalculado</p>
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Total recalculado</p>
                   <div className="flex items-center gap-3 flex-wrap">
                     <span className="font-bold text-primary">{Math.round(liveTotal.cal)} kcal</span>
                     <span className="text-xs text-chart-5">P:{Math.round(liveTotal.prot)}g</span>
@@ -2297,7 +2297,7 @@ export function Alimentacao() {
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium leading-snug">{food.name}</p>
-                            <p className="text-[10px] text-muted-foreground">{food.portion}</p>
+                            <p className="text-xs text-muted-foreground">{food.portion}</p>
                           </div>
                           <div className="flex items-center gap-1 flex-shrink-0">
                             <span className="text-sm font-bold text-primary">{cals} kcal</span>
@@ -2324,7 +2324,7 @@ export function Alimentacao() {
                         </div>
 
                         {/* Macros calculados */}
-                        <div className="flex gap-2 flex-wrap text-[10px]">
+                        <div className="flex gap-2 flex-wrap text-xs">
                           <span className="text-chart-5">P:{prot}g</span>
                           <span className="text-chart-3">C:{carb}g</span>
                           <span className="text-warning">G:{fat}g</span>
@@ -2406,7 +2406,7 @@ export function Alimentacao() {
                             >
                               <div>
                                 <p className="text-xs font-medium">{food.name}</p>
-                                <p className="text-[10px] text-muted-foreground">{food.portion}</p>
+                                <p className="text-xs text-muted-foreground">{food.portion}</p>
                               </div>
                               <span className="text-xs font-bold text-primary ml-2 flex-shrink-0">{food.calories} kcal</span>
                             </button>

@@ -25,6 +25,7 @@ import type {
 } from '@/types'
 import { BADGES } from '@/data/badges'
 import { ACHIEVEMENTS } from '@/data/achievements'
+import { XP_ACTIONS, type XPAction } from '@/lib/gamification'
 import { calculateBMR, calculateTDEE, calculateCalorieTarget, calculateMacros, calculateWaterTarget, applyClinicalFloors } from '@/lib/health-utils'
 import { supabase } from '@/lib/supabase'
 import {
@@ -148,6 +149,9 @@ interface AppContextType {
   dismissAchievements: () => void
   pendingRecord: { kind: ActivityKind; streak: number } | null // novo recorde aguardando celebração
   dismissRecord: () => void
+
+  // XP System
+  awardXP: (action: import('@/lib/gamification').XPAction) => void
 
   // Profile completeness
   isProfileComplete: boolean
@@ -1452,6 +1456,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const dismissAchievements = () => setPendingAchievements([])
   const dismissRecord = () => setPendingRecord(null)
 
+  // ── XP SYSTEM ──
+  const awardXP = (action: XPAction) => {
+    if (!user) return
+    const gained = XP_ACTIONS[action] ?? 0
+    if (gained === 0) return
+    const newTotal = (user.totalXP ?? 0) + gained
+    setUser({ ...user, totalXP: newTotal, updatedAt: new Date() })
+  }
+
   // ── BIOMETRIA ──
 
   const enableBiometric = async (): Promise<{ error: string | null }> => {
@@ -1541,6 +1554,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         enableBiometric, disableBiometric, loginWithBiometric,
         checkInState, performCheckIn,
         gamification, registerActivity, pendingAchievements, dismissAchievements, pendingRecord, dismissRecord,
+        awardXP,
         isProfileComplete,
         updateSubscription,
       }}

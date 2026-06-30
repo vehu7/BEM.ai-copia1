@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -99,6 +99,33 @@ export function OnboardingNew() {
   const [showTermsDialog, setShowTermsDialog] = useState(false)
   const [showPrivacyDialog, setShowPrivacyDialog] = useState(false)
   const [formData, setFormData] = useState(getInitialForm())
+  const [birthDateError, setBirthDateError] = useState('')
+
+  // Pré-preencher campos com dados do funnel (sessionStorage)
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem('funnel_data')
+      if (!raw) return
+      const data = JSON.parse(raw) as {
+        name?: string
+        current_weight?: string
+        target_weight?: string
+        height?: string
+        goal?: string
+        age_range?: string
+      }
+      sessionStorage.removeItem('funnel_data')
+      setFormData(prev => ({
+        ...prev,
+        ...(data.name ? { name: data.name } : {}),
+        ...(data.current_weight ? { currentWeight: String(data.current_weight) } : {}),
+        ...(data.target_weight ? { targetWeight: String(data.target_weight) } : {}),
+        ...(data.height ? { height: String(data.height) } : {}),
+      }))
+    } catch {
+      // sessionStorage indisponível ou JSON inválido — ignorar silenciosamente
+    }
+  }, [])
 
   const totalSteps = 10
 
@@ -107,15 +134,36 @@ export function OnboardingNew() {
     else handleComplete()
   }
 
+  const validateBirthDate = (): { valid: boolean; age: number } => {
+    const [dd, mm, yyyy] = formData.birthDate.split('/')
+    const parsed = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd))
+    if (
+      isNaN(parsed.getTime()) ||
+      parsed.getFullYear() !== parseInt(yyyy) ||
+      parsed.getMonth() !== parseInt(mm) - 1 ||
+      parsed.getDate() !== parseInt(dd)
+    ) {
+      setBirthDateError('Data de nascimento inválida. Use o formato DD/MM/AAAA.')
+      return { valid: false, age: 0 }
+    }
+    const today = new Date()
+    const age = today.getFullYear() - parsed.getFullYear() -
+      (today.getMonth() < parsed.getMonth() ||
+        (today.getMonth() === parsed.getMonth() && today.getDate() < parsed.getDate()) ? 1 : 0)
+    if (age < 10 || age > 100) {
+      setBirthDateError('A idade deve ser entre 10 e 100 anos.')
+      return { valid: false, age: 0 }
+    }
+    setBirthDateError('')
+    return { valid: true, age }
+  }
+
   const handleComplete = async () => {
+    const { valid, age } = validateBirthDate()
+    if (!valid) return
+
     setIsCalculating(true)
 
-    const [dd, mm, yyyy] = formData.birthDate.split('/')
-    const birthDate = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd))
-    const today = new Date()
-    const age = today.getFullYear() - birthDate.getFullYear() -
-      (today.getMonth() < birthDate.getMonth() ||
-        (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate()) ? 1 : 0)
     const height = formData.heightUnit === 'ft'
       ? Math.round(parseFloat(formData.height) * 30.48)
       : parseInt(formData.height)
@@ -219,13 +267,23 @@ export function OnboardingNew() {
 
     savePendingProfile(user)
     setIsCalculating(false)
-    navigate('/registrar')
+    navigate('/')
   }
 
   const canProceed = () => {
     switch (step) {
       case 1: return formData.name.length > 0
-      case 2: return !!(formData.birthDate.length === 10 && formData.gender)
+      case 2: {
+        if (!(formData.birthDate.length === 10 && formData.gender)) return false
+        const [dd, mm, yyyy] = formData.birthDate.split('/')
+        const parsed = new Date(parseInt(yyyy), parseInt(mm) - 1, parseInt(dd))
+        if (isNaN(parsed.getTime())) return false
+        const today = new Date()
+        const age = today.getFullYear() - parsed.getFullYear() -
+          (today.getMonth() < parsed.getMonth() ||
+            (today.getMonth() === parsed.getMonth() && today.getDate() < parsed.getDate()) ? 1 : 0)
+        return age >= 10 && age <= 100
+      }
       case 3: return !!(formData.height && formData.currentWeight && formData.targetWeight)
       case 4: return !!(formData.goal && formData.activityLevel)
       case 5: return true
@@ -409,10 +467,14 @@ export function OnboardingNew() {
                     let masked = digits
                     if (digits.length > 4) masked = digits.slice(0, 2) + '/' + digits.slice(2, 4) + '/' + digits.slice(4)
                     else if (digits.length > 2) masked = digits.slice(0, 2) + '/' + digits.slice(2)
+                    setBirthDateError('')
                     setFormData({ ...formData, birthDate: masked })
                   }}
                   className={pill}
                 />
+                {birthDateError && (
+                  <p className="text-xs font-semibold text-destructive mt-1 px-1">{birthDateError}</p>
+                )}
               </div>
               <div>
                 <p className="text-sm font-bold text-foreground mb-1">Sexo biológico</p>

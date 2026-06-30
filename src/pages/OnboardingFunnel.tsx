@@ -32,8 +32,8 @@ function ProgressBar({ pct }: { pct: number }) {
   return (
     <div className="px-6 pt-4 pb-1">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-primary/40">Seu plano</span>
-        <span className="text-[11px] font-black text-primary">{Math.round(pct)}%</span>
+        <span className="text-xs font-bold uppercase tracking-widest text-primary/40">Seu plano</span>
+        <span className="text-xs font-black text-primary">{Math.round(pct)}%</span>
       </div>
       <div className="w-full h-2.5 rounded-full overflow-hidden bg-background/40">
         <div className="h-full rounded-full transition-all duration-500 bg-primary" style={{ width: `${pct}%` }} />
@@ -159,7 +159,7 @@ function MetricBar({ label, value, max, color, tag }: {
       <div className="w-full h-4 rounded-full overflow-hidden relative bg-card/50">
         <div className={`h-full rounded-full ${color}`} style={{ width: `${w}%`, transition: 'width 1100ms ease-out' }} />
         <div className="absolute top-0 h-full flex items-center ease-out" style={{ left: `${w}%`, transform: 'translateX(-50%)', transition: 'left 1100ms ease-out' }}>
-          <div className="text-[10px] font-black px-1.5 py-0.5 rounded-full text-primary-foreground bg-primary">{shown}%</div>
+          <div className="text-xs font-black px-1.5 py-0.5 rounded-full text-primary-foreground bg-primary">{shown}%</div>
         </div>
       </div>
     </div>
@@ -294,7 +294,17 @@ export function OnboardingFunnel() {
   const auto = (fn: (v: string) => void, v: string) => { fn(v); setTimeout(() => setStep(s => s + 1), 350) }
   const next = () => setStep(s => s + 1)
   const goLogin = () => navigate('/login')
-  const goRegister = () => navigate('/registrar')
+  const goRegister = () => {
+    try {
+      sessionStorage.setItem('funnel_data', JSON.stringify({
+        age_range: age,      // '18-25', '26-35', etc.
+        goal: weightGoal,    // valor selecionado na step 4
+      }))
+    } catch {
+      // sessionStorage indisponível — continuar sem salvar
+    }
+    navigate('/registrar')
+  }
 
   const pctMap: Record<number, number> = {
     1:5, 2:10, 3:16, 4:21, 5:26, 6:32, 7:37, 8:42, 9:47, 10:53,
@@ -341,7 +351,7 @@ export function OnboardingFunnel() {
               <span className="underline decoration-2 underline-offset-4 decoration-card">{tf.step1.titleHighlight}</span>
             </h1>
             <div className="rounded-full px-4 py-1.5 mb-4 bg-primary">
-              <p className="text-[11px] font-black text-primary-foreground uppercase tracking-wider">
+              <p className="text-xs font-black text-primary-foreground uppercase tracking-wider">
                 {tf.step1.badge}
               </p>
             </div>
@@ -381,7 +391,7 @@ export function OnboardingFunnel() {
             <div className="mt-5 rounded-2xl p-3 w-full bg-primary/15 border border-primary/20">
               <p className="text-sm text-primary">{tf.step1.info}</p>
             </div>
-            <p className="text-[10px] mt-3 font-medium text-primary/40">{tf.step1.estimatedTime}</p>
+            <p className="text-xs mt-3 font-medium text-primary/40">{tf.step1.estimatedTime}</p>
           </div>
         )}
 
@@ -715,7 +725,7 @@ export function OnboardingFunnel() {
               ].map((s, i) => (
                 <div key={i} className="rounded-xl py-3 bg-card">
                   <p className="text-xl font-black text-primary">{s.v}</p>
-                  <p className="text-[10px] font-bold text-primary/50">{s.l}</p>
+                  <p className="text-xs font-bold text-primary/50">{s.l}</p>
                 </div>
               ))}
             </div>

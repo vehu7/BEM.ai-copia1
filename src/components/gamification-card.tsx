@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useApp } from '@/contexts/AppContext'
 import { ACHIEVEMENTS, ACTIVITY_LABELS } from '@/data/achievements'
 import { TIER_COLORS, TIER_BG } from '@/data/badges'
+import { XP_ACHIEVEMENTS, getLevelForXP, getProgressToNextLevel } from '@/lib/gamification'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import {
@@ -48,11 +49,18 @@ function AchievementItem({ achievement, unlocked }: { achievement: AchievementDe
 }
 
 export function GamificationCard() {
-  const { gamification } = useApp()
+  const { gamification, user } = useApp()
   const [showGallery, setShowGallery] = useState(false)
 
   const unlockedCount = gamification.unlockedAchievements.length
   const total = ACHIEVEMENTS.length
+
+  // XP System
+  const totalXP = user?.totalXP ?? 0
+  const currentLevel = getLevelForXP(totalXP)
+  const xpProgress = getProgressToNextLevel(totalXP)
+  const earnedXPAchievements = (user?.xpAchievements ?? [])
+  const recentXPAchievements = XP_ACHIEVEMENTS.filter(a => earnedXPAchievements.includes(a.id)).slice(-3)
 
   return (
     <>
@@ -73,6 +81,53 @@ export function GamificationCard() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          {/* ── Barra de XP e Nível ── */}
+          <div className="rounded-xl bg-muted/60 p-3 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5">
+                <span className="text-base leading-none" aria-hidden>{currentLevel.emoji}</span>
+                <span className="text-sm font-bold text-foreground">{currentLevel.name}</span>
+                <span className="text-xs text-muted-foreground font-medium">Nv. {currentLevel.level}</span>
+              </div>
+              <span className="text-xs font-semibold text-primary tabular-nums">{totalXP} XP</span>
+            </div>
+            {/* Barra de progresso */}
+            <div className="space-y-1">
+              <div className="h-2 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-700"
+                  style={{ width: `${xpProgress.percentage}%` }}
+                />
+              </div>
+              {!xpProgress.isMaxLevel && (
+                <p className="text-[10px] text-muted-foreground text-right">
+                  {xpProgress.current}/{xpProgress.required} XP para o próximo nível
+                </p>
+              )}
+              {xpProgress.isMaxLevel && (
+                <p className="text-[10px] text-primary font-semibold text-right">Nível máximo atingido! 💎</p>
+              )}
+            </div>
+          </div>
+
+          {/* ── Últimas conquistas XP ── */}
+          {recentXPAchievements.length > 0 && (
+            <div className="space-y-1.5">
+              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">Últimas conquistas</p>
+              <div className="flex gap-2 flex-wrap">
+                {recentXPAchievements.map(a => (
+                  <div
+                    key={a.id}
+                    className="flex items-center gap-1.5 rounded-lg px-2 py-1.5 bg-accent"
+                    title={a.description}
+                  >
+                    <span className="text-sm leading-none" aria-hidden>{a.emoji}</span>
+                    <span className="text-xs font-semibold text-accent-foreground">{a.name}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <div className="grid grid-cols-3 gap-2">
             {ACTIVITY_ORDER.map(activity => {
               const Icon = ACTIVITY_ICON[activity]
@@ -91,7 +146,7 @@ export function GamificationCard() {
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center ${hasStreak ? 'bg-primary/20' : 'bg-muted'}`}>
                     <Icon className={`w-4 h-4 ${hasStreak ? 'text-primary' : 'text-muted-foreground'}`} />
                   </div>
-                  <span className="text-[11px] text-muted-foreground font-medium">{ACTIVITY_LABELS[activity]}</span>
+                  <span className="text-xs text-muted-foreground font-medium">{ACTIVITY_LABELS[activity]}</span>
                   <span className={`flex items-center gap-0.5 text-base font-black leading-none ${hasStreak ? 'text-primary' : 'text-muted-foreground'}`}>
                     {hasStreak && <Flame className="w-3.5 h-3.5 text-secondary" />}
                     {streak.currentStreak}

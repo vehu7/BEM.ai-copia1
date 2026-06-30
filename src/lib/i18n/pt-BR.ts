@@ -214,7 +214,7 @@ const ptBR = {
       saude_geral: 'Saúde geral',
     },
     activityLevels: {
-      sedentario: 'Sedentário',
+      sedentario: 'Sedentário(a)',
       leve: 'Leve (1-3 dias/semana)',
       moderado: 'Moderado (3-5 dias/semana)',
       intenso: 'Intenso (6-7 dias/semana)',

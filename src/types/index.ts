@@ -92,6 +92,10 @@ export interface UserProfile {
   trialStartedAt?: Date
   subscriptionEmail?: string
 
+  // Gamificação XP
+  totalXP?: number              // Total de pontos de experiência acumulados
+  xpAchievements?: string[]     // IDs de XPAchievement desbloqueados (sistema novo)
+
   createdAt: Date
   updatedAt: Date
 }

@@ -17,36 +17,41 @@ export interface Plan {
   highlighted?: boolean
 }
 
-export const plans: Plan[] = [
+export interface FreePlan extends Plan {
+  trialDays: number
+}
+
+export const plans: (Plan | FreePlan)[] = [
   {
     id: 'free',
     name: 'Gratuito',
     price: 0,
-    billingCycle: 'gratis para sempre',
+    billingCycle: '7 dias gratis, depois basico',
+    trialDays: 7,
     features: [
-      'Acesso a meditacoes basicas',
-      'Diario de bem-estar (3 registros/dia)',
-      'Dicas diarias de saude',
-      'Rastreamento basico de humor',
-      'Conteudos introdutorios de mindfulness',
+      'Cardapio semanal gerado por IA (1x por semana)',
+      'Registro de refeicoes e rastreamento de macros',
+      'Rastreamento de agua, sono e peso',
+      'Acompanhamento de ciclo menstrual',
+      'Dicas diarias personalizadas',
+      'Acesso a dashboard de saude',
     ],
     guruCheckoutUrl: '',
     guruOfferId: '',
-  },
+  } as FreePlan,
   {
     id: 'premium',
     name: 'Premium',
     price: 29.9,
     billingCycle: 'por mes',
     features: [
-      'Todas as funcionalidades do plano Gratuito',
-      'Meditacoes guiadas ilimitadas',
-      'Diario de bem-estar ilimitado',
-      'Planos personalizados de saude',
-      'Rastreamento avancado de humor e habitos',
-      'Receitas saudaveis exclusivas',
-      'Chat com inteligencia artificial',
-      'Relatorios semanais de progresso',
+      'Tudo do plano gratuito',
+      'Cardapio personalizado ilimitado (gerado por IA)',
+      'Chat ilimitado com a BEM (IA nutricionista)',
+      'Plano de treinos personalizado por IA',
+      'Relatorio PDF para compartilhar com medico/nutricionista',
+      'Receitas exclusivas e calculadora de substituicoes',
+      'Modo GLP-1/Pos-bariatrica especializado',
       'Suporte prioritario',
     ],
     guruCheckoutUrl: 'https://clkdmg.site/subscribe/bemai-premium-mensal',
@@ -59,11 +64,10 @@ export const plans: Plan[] = [
     price: 199.9,
     billingCycle: 'por ano',
     features: [
-      'Todas as funcionalidades do plano Premium',
-      'Economia de mais de 44% em relacao ao mensal',
-      'Acesso antecipado a novos recursos',
-      'Consultorias mensais de bem-estar',
-      'Conteudos exclusivos para assinantes anuais',
+      'Tudo do Premium mensal',
+      'Economia de 44% vs mensal',
+      'Acesso antecipado a novas funcionalidades',
+      'Badge exclusiva "BEM Elite Anual"',
     ],
     guruCheckoutUrl: 'https://clkdmg.site/subscribe/bemai-premium-anual',
     guruOfferId: 'a1a58c01-d60b-41c8-950c-b833fe9b2873',
