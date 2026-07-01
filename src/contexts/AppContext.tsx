@@ -404,15 +404,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (stored) {
       try {
         const parsedUser = JSON.parse(stored)
-        if (!parsedUser.dietaryPreferences || !parsedUser.mealRoutine || !parsedUser.consentTerms) {
-          console.log('Perfil antigo detectado, resetando...')
-          localStorage.clear()
+        // Detecta perfil estruturalmente inválido (campos obrigatórios ausentes = undefined).
+        // ATENÇÃO: usa === undefined, NÃO !campo, para não confundir consentTerms=false
+        // (usuário que ainda não aceitou) com campo ausente (perfil muito antigo).
+        // localStorage.clear() substituído por remoção seletiva — não apaga dados do usuário
+        // (refeições, água, treinos, peso) por causa de um perfil corrompido.
+        if (parsedUser.dietaryPreferences === undefined || parsedUser.mealRoutine === undefined || parsedUser.consentTerms === undefined) {
+          console.log('Perfil antigo detectado, removendo apenas o perfil...')
+          localStorage.removeItem(STORAGE_KEYS.USER)
           return null
         }
         return parsedUser
       } catch (e) {
         console.error('Erro ao carregar perfil:', e)
-        localStorage.clear()
+        localStorage.removeItem(STORAGE_KEYS.USER)
         return null
       }
     }
