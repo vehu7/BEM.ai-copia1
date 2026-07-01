@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { Plus, RotateCcw } from 'lucide-react'
 import { ActivityStreak } from '@/components/activity-streak'
+import { toast } from 'sonner'
 
 const GLASS_SIZES = [
   { label: '50ml', value: 50 },
@@ -14,8 +15,12 @@ const GLASS_SIZES = [
   { label: '1L', value: 1000 }
 ]
 
+function getTodayWaterGoalKey(): string {
+  return 'bem_water_goal_' + new Date().toISOString().slice(0, 10)
+}
+
 export function WaterTracker() {
-  const { user, todayWater, addWater, resetWater } = useApp()
+  const { user, todayWater, addWater, resetWater, awardXP } = useApp()
   const { t } = useTranslation()
 
   if (!user) return null
@@ -23,6 +28,22 @@ export function WaterTracker() {
   const progress = Math.min((todayWater.consumed / todayWater.target) * 100, 100)
   const remainingWater = Math.max(0, todayWater.target - todayWater.consumed)
   const isComplete = progress >= 100
+
+  const handleAddWater = (amount: number) => {
+    addWater(amount)
+    // XP por registrar água
+    awardXP('REGISTER_WATER')
+    setTimeout(() => { toast.success('+5 XP ganhos!', { icon: '⚡' }) }, 800)
+
+    // XP por atingir meta hídrica (só uma vez por dia)
+    const newConsumed = todayWater.consumed + amount
+    const key = getTodayWaterGoalKey()
+    if (todayWater.target > 0 && newConsumed >= todayWater.target && !localStorage.getItem(key)) {
+      localStorage.setItem(key, '1')
+      awardXP('HIT_WATER_GOAL')
+      setTimeout(() => { toast.success('+20 XP — Meta hídrica atingida!', { icon: '💧' }) }, 1600)
+    }
+  }
 
   return (
     <div className="min-h-screen">
@@ -77,7 +98,7 @@ export function WaterTracker() {
                     key={size.value}
                     variant="outline"
                     size="lg"
-                    onClick={() => addWater(size.value)}
+                    onClick={() => handleAddWater(size.value)}
                     className="h-auto py-4 flex flex-col gap-1"
                   >
                     <Plus className="w-5 h-5 text-primary" />

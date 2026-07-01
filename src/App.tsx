@@ -22,6 +22,7 @@ import { Settings } from '@/pages/Settings'
 import { CicloMenstrual } from '@/pages/CicloMenstrual'
 import { Workouts } from '@/pages/Workouts'
 import { Sleep } from '@/pages/Sleep'
+import { Achievements } from '@/pages/Achievements'
 import { Toaster } from '@/components/ui/sonner'
 import { Spinner } from '@/components/ui/spinner'
 import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
@@ -146,6 +147,7 @@ export function App() {
           <Route path="/ciclo" element={user?.gender === 'feminino' ? <CicloMenstrual /> : <Navigate to="/" replace />} />
           <Route path="/workouts" element={<RequireProfile><Workouts /></RequireProfile>} />
           <Route path="/sleep" element={<Sleep />} />
+          <Route path="/achievements" element={<Achievements />} />
           <Route path="/onboarding" element={<Navigate to="/" replace />} />
           <Route path="/login" element={<Navigate to="/" replace />} />
           <Route path="/registrar" element={<Navigate to="/" replace />} />

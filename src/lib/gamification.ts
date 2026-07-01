@@ -509,3 +509,99 @@ export const CATEGORY_LABELS: Record<AchievementCategory, string> = {
   sono:             'Sono',
   progresso:        'Progresso',
 }
+
+// ── Desafios Semanais ─────────────────────────────────────────────────────────
+
+export interface WeeklyChallenge {
+  id: string
+  title: string
+  description: string
+  emoji: string
+  category: AchievementCategory
+  goal: number
+  unit: string
+  xpReward: number
+  badgeId?: string
+}
+
+export const WEEKLY_CHALLENGES: WeeklyChallenge[] = [
+  {
+    id: 'water_5days',
+    title: 'Semana Aquática',
+    description: 'Beba 2L de água por 5 dos próximos 7 dias',
+    emoji: '💧',
+    category: 'hidratacao',
+    goal: 5,
+    unit: 'dias',
+    xpReward: 150,
+  },
+  {
+    id: 'workout_3week',
+    title: 'Semana Ativa',
+    description: 'Registre 3 treinos esta semana, incluindo 1 de força',
+    emoji: '💪',
+    category: 'treino',
+    goal: 3,
+    unit: 'treinos',
+    xpReward: 150,
+  },
+  {
+    id: 'protein_4days',
+    title: 'Semana Proteica',
+    description: 'Atinja 80% da meta de proteína por 4 dias',
+    emoji: '🥩',
+    category: 'nutricao',
+    goal: 4,
+    unit: 'dias',
+    xpReward: 150,
+  },
+  {
+    id: 'sleep_5nights',
+    title: 'Semana Restauradora',
+    description: 'Durma pelo menos 7h por 5 noites',
+    emoji: '😴',
+    category: 'sono',
+    goal: 5,
+    unit: 'noites',
+    xpReward: 150,
+  },
+  {
+    id: 'checkin_7days',
+    title: 'Presença Total',
+    description: 'Faça check-in todos os dias esta semana',
+    emoji: '✅',
+    category: 'progresso',
+    goal: 7,
+    unit: 'dias',
+    xpReward: 100,
+  },
+]
+
+/** Retorna os desafios disponíveis nesta semana (rotaciona por semana do ano) */
+export function getWeeklyChallenges(): WeeklyChallenge[] {
+  const weekNumber = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000))
+  const start = weekNumber % WEEKLY_CHALLENGES.length
+  return [
+    WEEKLY_CHALLENGES[start % WEEKLY_CHALLENGES.length],
+    WEEKLY_CHALLENGES[(start + 1) % WEEKLY_CHALLENGES.length],
+    WEEKLY_CHALLENGES[(start + 2) % WEEKLY_CHALLENGES.length],
+  ]
+}
+
+/** Retorna quantos dias faltam para a semana atual terminar (segunda a domingo) */
+export function daysUntilWeekEnd(): number {
+  const now = new Date()
+  const dayOfWeek = now.getDay()
+  const daysUntilSunday = dayOfWeek === 0 ? 0 : 7 - dayOfWeek
+  return daysUntilSunday
+}
+
+// ── Escudo de Streak ──────────────────────────────────────────────────────────
+
+/** Verifica se o usuário pode usar o escudo de streak este mês */
+export function canUseStreakShield(lastUsed?: string | null): boolean {
+  if (!lastUsed) return true
+  const lastDate = new Date(lastUsed)
+  const now = new Date()
+  return lastDate.getMonth() !== now.getMonth() || lastDate.getFullYear() !== now.getFullYear()
+}

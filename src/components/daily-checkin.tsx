@@ -41,7 +41,7 @@ function BadgeCard({ badge, unlocked }: { badge: BadgeDefinition; unlocked: bool
 }
 
 export function DailyCheckin() {
-  const { checkInState, performCheckIn } = useApp()
+  const { checkInState, performCheckIn, awardXP } = useApp()
   const [showBadges, setShowBadges] = useState(false)
 
   const localToday = (() => {
@@ -58,6 +58,7 @@ export function DailyCheckin() {
   const handleCheckIn = () => {
     if (alreadyCheckedIn) return
     const newBadges = performCheckIn()
+    awardXP('DAILY_CHECKIN')
     if (newBadges.length > 0) {
       const badge = BADGES.find(b => b.id === newBadges[newBadges.length - 1])
       if (badge) {
@@ -70,6 +71,7 @@ export function DailyCheckin() {
         description: `Sequência: ${checkInState.currentStreak + 1} dia(s)`,
       })
     }
+    setTimeout(() => { toast.success('+5 XP ganhos!', { icon: '⚡' }) }, 800)
   }
 
   return (

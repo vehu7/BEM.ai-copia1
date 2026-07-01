@@ -40,7 +40,7 @@ const inputClass =
   'w-full h-11 rounded-lg px-4 text-sm bg-input border border-border text-foreground outline-none focus:ring-2 focus:ring-ring/40 transition-shadow'
 
 export function Sleep() {
-  const { sleepHistory, addSleepEntry, deleteSleepEntry } = useApp()
+  const { sleepHistory, addSleepEntry, deleteSleepEntry, awardXP } = useApp()
   const { t } = useTranslation()
 
   const qualityLabels: Record<SleepQuality, string> = {
@@ -72,6 +72,10 @@ export function Sleep() {
     addSleepEntry(entry)
     setShowForm(false)
     setNotes('')
+    awardXP('REGISTER_SLEEP')
+    if (duration >= 7) {
+      setTimeout(() => awardXP('GOOD_SLEEP'), 100)
+    }
     toast.success(t.sleep.registered, { description: `${formatDuration(duration)} — ${qualityLabels[quality]}` })
   }
 

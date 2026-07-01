@@ -102,8 +102,13 @@ function dietMealToFoodItems(
   })
 }
 
+// Helper: chave diaria para metas ja premiadas
+function getTodayKey(suffix: string): string {
+  return 'bem_' + suffix + '_' + new Date().toISOString().slice(0, 10)
+}
+
 export function Alimentacao() {
-  const { user, todayMeals, addMeal, removeMeal, savedWeeklyMenu } = useApp()
+  const { user, todayMeals, addMeal, removeMeal, savedWeeklyMenu, awardXP } = useApp()
   const { t } = useTranslation()
   const ta = t.alimentacao
 
@@ -295,6 +300,25 @@ export function Alimentacao() {
     // Gerar feedback da BEM com IA
     await generateAIFeedback(meal)
 
+    // XP por registrar refeição
+    awardXP('REGISTER_MEAL')
+    setTimeout(() => { toast.success('+10 XP ganhos!', { icon: '⚡' }) }, 800)
+
+    // XP por meta calórica do dia (só uma vez por dia)
+    const newCalories = todayMeals.reduce((s, m) => s + m.totalCalories, 0) + meal.totalCalories
+    if (user?.targetCalories && newCalories >= user.targetCalories && !localStorage.getItem(getTodayKey('calorie_goal'))) {
+      localStorage.setItem(getTodayKey('calorie_goal'), '1')
+      awardXP('HIT_CALORIE_GOAL')
+      setTimeout(() => { toast.success('+25 XP — Meta calórica atingida!', { icon: '🎯' }) }, 1600)
+    }
+    // XP por meta de proteína (>=90%) só uma vez por dia
+    const newProtein = todayMeals.reduce((s, m) => s + m.totalProtein, 0) + meal.totalProtein
+    if (user?.targetProtein && newProtein >= user.targetProtein * 0.9 && !localStorage.getItem(getTodayKey('protein_goal'))) {
+      localStorage.setItem(getTodayKey('protein_goal'), '1')
+      awardXP('HIT_PROTEIN_GOAL')
+      setTimeout(() => { toast.success('+20 XP — Meta de proteína atingida!', { icon: '💪' }) }, 2400)
+    }
+
     setSelectedFoods([])
     setFoodQuantities({})
     setIsDialogOpen(false)
@@ -361,6 +385,8 @@ export function Alimentacao() {
     setDietFoodUnits({})
     addMeal(meal)
     await generateAIFeedback(meal)
+    awardXP('REGISTER_MEAL')
+    setTimeout(() => { toast.success('+10 XP ganhos!', { icon: '⚡' }) }, 800)
   }
 
   const openEditMeal = (meal: Meal) => {
@@ -481,6 +507,8 @@ export function Alimentacao() {
     setPhotoFoodQuantities({})
     addMeal(meal)
     await generateAIFeedback(meal)
+    awardXP('REGISTER_MEAL')
+    setTimeout(() => { toast.success('+10 XP ganhos!', { icon: '⚡' }) }, 800)
   }
 
   const addScannedProductToMeal = async () => {
@@ -517,6 +545,8 @@ export function Alimentacao() {
     setBarcodeEdited({})
     addMeal(meal)
     await generateAIFeedback(meal)
+    awardXP('REGISTER_MEAL')
+    setTimeout(() => { toast.success('+10 XP ganhos!', { icon: '⚡' }) }, 800)
   }
 
   const analyzePhoto = async (file: File) => {

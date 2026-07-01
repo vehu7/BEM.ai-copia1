@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+﻿import { useState, useCallback } from 'react'
 import { useApp, getTimeAwareMessage } from '@/contexts/AppContext'
 import { ProfileSetupModal } from '@/components/profile-setup-modal'
 import { MascotGreeting } from '@/components/mascot'
@@ -34,6 +34,7 @@ import {
 import { calculateIMC, getIMCColor, formatWeight, getSleepQualityBadge } from '@/lib/health-utils'
 import { DailyCheckin } from '@/components/daily-checkin'
 import { GamificationCard } from '@/components/gamification-card'
+import { WeeklyChallengeCard } from '@/components/weekly-challenge-card'
 import { generateFullDashboardPDF } from '@/lib/report-generator'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from '@/contexts/LanguageContext'
@@ -41,7 +42,7 @@ import type { WorkoutSession, WorkoutType } from '@/types'
 import { toast } from 'sonner'
 
 export function Dashboard() {
-  const { user, todayWater, todayMeals, todayWorkouts, activeFasting, addWorkout, weightHistory, cycleConfig, aiWorkoutPlan, sleepHistory, bodyMeasurements, isProfileComplete, savedWeeklyMenu, checkInState } = useApp()
+  const { user, todayWater, todayMeals, todayWorkouts, activeFasting, addWorkout, weightHistory, cycleConfig, aiWorkoutPlan, sleepHistory, bodyMeasurements, isProfileComplete, savedWeeklyMenu, checkInState, awardXP } = useApp()
   const [dailyMessage] = useState(getTimeAwareMessage)
   const navigate = useNavigate()
   const { t } = useTranslation()
@@ -89,8 +90,8 @@ export function Dashboard() {
     if (f.includes('caminhada')) return 'caminhada'
     if (f.includes('yoga')) return 'yoga'
     if (f.includes('pilates')) return 'pilates'
-    if (f.includes('natação') || f.includes('natacao')) return 'natacao'
-    if (f.includes('dança') || f.includes('danca')) return 'danca'
+    if (f.includes('nataÃ§Ã£o') || f.includes('natacao')) return 'natacao'
+    if (f.includes('danÃ§a') || f.includes('danca')) return 'danca'
     return 'musculacao'
   }
 
@@ -105,7 +106,7 @@ export function Dashboard() {
       const day = aiWorkoutPlan.plan.days[selectedPlanDayIndex]
       type = inferWorkoutType(day.focus)
       duration = duration || aiWorkoutPlan.plan.sessionDuration
-      planDayName = `${day.name} — ${day.focus}`
+      planDayName = `${day.name} â€” ${day.focus}`
     }
 
     if (!duration) return
@@ -125,8 +126,11 @@ export function Dashboard() {
     setIsWorkoutDialogOpen(false)
     setCustomDuration('')
     setWorkoutMode('manual')
+    // XP por registrar treino
+    awardXP('REGISTER_WORKOUT')
+    setTimeout(() => { toast.success('+15 XP ganhos!', { icon: '⚡' }) }, 800)
     toast.success(t.dashboard.workoutRegistered, {
-      description: `${planDayName ?? type} — ${workout.caloriesBurned} ${t.dashboard.kcalBurned}`,
+      description: `${planDayName ?? type} â€” ${workout.caloriesBurned} ${t.dashboard.kcalBurned}`,
     })
   }
 
@@ -157,9 +161,9 @@ export function Dashboard() {
   const latestWeight = latestWeightFromHistory ?? user.currentWeight
   const imc = hasProfileData ? calculateIMC(latestWeight, user.height) : null
 
-  // Metas vêm do perfil PERSISTIDO (mantido correto por applyClinicalFloors em todo recálculo de
-  // peso), para não oscilar entre telas (antes o Dashboard recalculava ao vivo e divergia da
-  // tela de Alimentação). O IMC segue calculado do peso mais recente (informativo).
+  // Metas vÃªm do perfil PERSISTIDO (mantido correto por applyClinicalFloors em todo recÃ¡lculo de
+  // peso), para nÃ£o oscilar entre telas (antes o Dashboard recalculava ao vivo e divergia da
+  // tela de AlimentaÃ§Ã£o). O IMC segue calculado do peso mais recente (informativo).
   const calorieTarget = hasProfileData ? (user.targetCalories ?? 2000) : 2000
   const macros = hasProfileData
     ? { calories: user.targetCalories ?? 0, protein: user.targetProtein ?? 0, carbs: user.targetCarbs ?? 0, fat: user.targetFat ?? 0, fiber: user.targetFiber ?? 0 }
@@ -184,58 +188,58 @@ export function Dashboard() {
   const weightDiff = latestWeight - user.targetWeight
   const weightProgress = Math.abs(weightDiff)
 
-  // ── Cardápio de hoje ────────────────────────────────────────────────────────
-  // JS getDay(): 0=Dom, 1=Seg … 6=Sab → menu index: 0=Seg … 6=Dom
+  // â”€â”€ CardÃ¡pio de hoje â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  // JS getDay(): 0=Dom, 1=Seg â€¦ 6=Sab â†’ menu index: 0=Seg â€¦ 6=Dom
   const todayMenuIndex = (new Date().getDay() + 6) % 7
   const todayMenuDay = savedWeeklyMenu?.days[todayMenuIndex]
 
   const MENU_TYPE_TO_MEAL_TYPE: Record<string, string> = {
-    'Café da Manhã': 'cafe',
-    'Lanche da Manhã': 'lanche_manha',
-    'Almoço': 'almoco',
+    'CafÃ© da ManhÃ£': 'cafe',
+    'Lanche da ManhÃ£': 'lanche_manha',
+    'AlmoÃ§o': 'almoco',
     'Lanche da Tarde': 'lanche_tarde',
     'Jantar': 'jantar',
     'Ceia': 'ceia',
   }
   const MEAL_ICON: Record<string, React.ReactNode> = {
-    'Café da Manhã': <Coffee className="w-4 h-4" />,
-    'Lanche da Manhã': <Cookie className="w-4 h-4" />,
-    'Almoço': <UtensilsCrossed className="w-4 h-4" />,
+    'CafÃ© da ManhÃ£': <Coffee className="w-4 h-4" />,
+    'Lanche da ManhÃ£': <Cookie className="w-4 h-4" />,
+    'AlmoÃ§o': <UtensilsCrossed className="w-4 h-4" />,
     'Lanche da Tarde': <Cookie className="w-4 h-4" />,
     'Jantar': <UtensilsCrossed className="w-4 h-4" />,
     'Ceia': <Apple className="w-4 h-4" />,
   }
 
-  // Detecta a próxima refeição do dia com base no horário atual
+  // Detecta a prÃ³xima refeiÃ§Ã£o do dia com base no horÃ¡rio atual
   const currentHour = new Date().getHours()
   const nextMealName = (() => {
-    if (currentHour < 9) return 'Café da Manhã'
-    if (currentHour < 11) return 'Lanche da Manhã'
-    if (currentHour < 13) return 'Almoço'
+    if (currentHour < 9) return 'CafÃ© da ManhÃ£'
+    if (currentHour < 11) return 'Lanche da ManhÃ£'
+    if (currentHour < 13) return 'AlmoÃ§o'
     if (currentHour < 16) return 'Lanche da Tarde'
     if (currentHour < 20) return 'Jantar'
     return 'Ceia'
   })()
 
-  // ── Insight personalizado do dia ────────────────────────────────────────────
+  // â”€â”€ Insight personalizado do dia â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const proteinPct = macros.protein > 0 ? (totalProteinToday / macros.protein) * 100 : 0
   const calPct = calorieTarget > 0 ? (totalCaloriesToday / calorieTarget) * 100 : 0
   const waterPct = todayWater.target > 0 ? (todayWater.consumed / todayWater.target) * 100 : 0
 
   const dailyInsight = (() => {
-    if (calPct >= 100) return { color: 'text-destructive', bg: 'bg-destructive/10 border-destructive/20', icon: '🔴', text: `Você atingiu 100% das calorias diárias. Prefira lanches leves como frutas ou iogurte para o restante do dia.` }
-    if (calPct >= 85 && currentHour < 17) return { color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800', icon: '⚠️', text: `Você já consumiu ${Math.round(calPct)}% das calorias e ainda é cedo. Planeje uma janta mais leve.` }
-    if (proteinPct < 40 && currentHour >= 13) return { color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800', icon: '💪', text: `Sua proteína está em ${Math.round(totalProteinToday)}g de ${macros.protein}g (${Math.round(proteinPct)}%). Priorize proteína nas próximas refeições: frango, ovo ou iogurte grego.` }
-    if (waterPct < 40 && currentHour >= 14) return { color: 'text-cyan-600', bg: 'bg-cyan-50 border-cyan-200 dark:bg-cyan-950/30 dark:border-cyan-800', icon: '💧', text: `Você bebeu apenas ${todayWater.consumed}ml de ${todayWater.target}ml de água. Tente beber um copo agora!` }
-    if (proteinPct >= 90 && calPct < 80) return { color: 'text-green-600', bg: 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800', icon: '✅', text: `Excelente! Você já atingiu ${Math.round(proteinPct)}% da meta de proteína. Continue assim e complete as calorias com boas gorduras.` }
-    if (totalCaloriesToday === 0 && currentHour >= 9) return { color: 'text-primary', bg: 'bg-primary/10 border-primary/20', icon: '🍽️', text: `Você ainda não registrou nenhuma refeição hoje. Comece pelo café da manhã do seu cardápio!` }
+    if (calPct >= 100) return { color: 'text-destructive', bg: 'bg-destructive/10 border-destructive/20', icon: 'ðŸ”´', text: `VocÃª atingiu 100% das calorias diÃ¡rias. Prefira lanches leves como frutas ou iogurte para o restante do dia.` }
+    if (calPct >= 85 && currentHour < 17) return { color: 'text-amber-600', bg: 'bg-amber-50 border-amber-200 dark:bg-amber-950/30 dark:border-amber-800', icon: 'âš ï¸', text: `VocÃª jÃ¡ consumiu ${Math.round(calPct)}% das calorias e ainda Ã© cedo. Planeje uma janta mais leve.` }
+    if (proteinPct < 40 && currentHour >= 13) return { color: 'text-blue-600', bg: 'bg-blue-50 border-blue-200 dark:bg-blue-950/30 dark:border-blue-800', icon: 'ðŸ’ª', text: `Sua proteÃ­na estÃ¡ em ${Math.round(totalProteinToday)}g de ${macros.protein}g (${Math.round(proteinPct)}%). Priorize proteÃ­na nas prÃ³ximas refeiÃ§Ãµes: frango, ovo ou iogurte grego.` }
+    if (waterPct < 40 && currentHour >= 14) return { color: 'text-cyan-600', bg: 'bg-cyan-50 border-cyan-200 dark:bg-cyan-950/30 dark:border-cyan-800', icon: 'ðŸ’§', text: `VocÃª bebeu apenas ${todayWater.consumed}ml de ${todayWater.target}ml de Ã¡gua. Tente beber um copo agora!` }
+    if (proteinPct >= 90 && calPct < 80) return { color: 'text-green-600', bg: 'bg-green-50 border-green-200 dark:bg-green-950/30 dark:border-green-800', icon: 'âœ…', text: `Excelente! VocÃª jÃ¡ atingiu ${Math.round(proteinPct)}% da meta de proteÃ­na. Continue assim e complete as calorias com boas gorduras.` }
+    if (totalCaloriesToday === 0 && currentHour >= 9) return { color: 'text-primary', bg: 'bg-primary/10 border-primary/20', icon: 'ðŸ½ï¸', text: `VocÃª ainda nÃ£o registrou nenhuma refeiÃ§Ã£o hoje. Comece pelo cafÃ© da manhÃ£ do seu cardÃ¡pio!` }
     return null
   })()
 
   return (
     <div className="min-h-screen">
       <div className="max-w-7xl mx-auto p-4 pb-28 space-y-6">
-        {/* Saudação contextual com dados reais */}
+        {/* SaudaÃ§Ã£o contextual com dados reais */}
         {(() => {
           const pendingCount = [
             waterProgress < 100,
@@ -254,7 +258,25 @@ export function Dashboard() {
           )
         })()}
 
-        {/* Banner perfil incompleto — primeiro elemento após saudação */}
+        {/* Quick Nav â€” chips de navegaÃ§Ã£o rÃ¡pida por seÃ§Ã£o */}
+        <div className="flex gap-2 px-0 py-1 overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+          {[
+            { icon: 'ðŸ½ï¸', label: 'NutriÃ§Ã£o', anchor: 'sec-nutricao' },
+            { icon: 'ðŸ’§', label: 'Ãgua',     anchor: 'sec-agua' },
+            { icon: 'ðŸ’ª', label: 'Treino',   anchor: 'sec-treino' },
+            { icon: 'ðŸ˜´', label: 'Sono',     anchor: 'sec-sono' },
+          ].map(({ icon, label, anchor }) => (
+            <button
+              key={anchor}
+              onClick={() => document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold whitespace-nowrap border border-primary/20 flex-shrink-0 active:scale-95 transition-transform"
+            >
+              <span>{icon}</span><span>{label}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* Banner perfil incompleto â€” imediatamente apÃ³s Quick Nav */}
         {!isProfileComplete && (
           <>
             <button
@@ -268,44 +290,25 @@ export function Dashboard() {
                 <p className="text-sm font-bold">{t.dashboard.completeProfile}</p>
                 <p className="text-xs opacity-80">{t.dashboard.completeProfileDesc}</p>
               </div>
-              <div className="opacity-70 text-lg">→</div>
+              <div className="opacity-70 text-lg">â†’</div>
             </button>
-            <div className="rounded-2xl bg-muted/60 border border-border px-5 py-6 text-center space-y-2">
-              <p className="text-sm text-muted-foreground">Complete seu perfil para ver suas metas personalizadas de calorias, proteína e água.</p>
-            </div>
+            <p className="text-muted-foreground text-sm text-center py-4">
+              Complete seu perfil para ver suas metas personalizadas de nutriÃ§Ã£o, Ã¡gua e treino.
+            </p>
           </>
         )}
 
-        {/* Quick Nav — chips de navegação rápida por seção */}
-        <div className="flex gap-2 px-0 py-1 overflow-x-auto scrollbar-hide">
-          {[
-            { icon: '🍽️', label: 'Nutrição', anchor: 'nutricao' },
-            { icon: '💧', label: 'Água', anchor: 'agua' },
-            { icon: '💪', label: 'Treino', anchor: 'treino' },
-            { icon: '😴', label: 'Sono', anchor: 'sono' },
-          ].map(item => (
-            <button
-              key={item.anchor}
-              onClick={() => document.getElementById(item.anchor)?.scrollIntoView({ behavior: 'smooth' })}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold whitespace-nowrap border border-primary/20 active:bg-primary/20 transition-colors"
-            >
-              <span>{item.icon}</span>
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </div>
-
-        {/* ── Resumo do Dia — visível sem scroll, principal gatilho de ação ── */}
+        {/* â”€â”€ Resumo do Dia â€” visÃ­vel sem scroll, principal gatilho de aÃ§Ã£o â”€â”€ */}
         {isProfileComplete && hasProfileData && (
           <div className="rounded-2xl bg-card border border-border shadow-sm px-4 py-3 space-y-3">
             <p className="text-xs font-bold text-muted-foreground uppercase tracking-wide">Meta do Dia</p>
             <div className="space-y-2">
-              {/* Água */}
+              {/* Ãgua */}
               <div className="flex items-center gap-3">
                 <Droplet className="w-4 h-4 text-chart-1 flex-shrink-0" />
                 <div className="flex-1">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">Água</span>
+                    <span className="text-muted-foreground">Ãgua</span>
                     <span className={`font-semibold tabular-nums ${waterProgress >= 100 ? 'text-green-600' : 'text-foreground'}`}>
                       {todayWater.consumed}ml / {todayWater.target}ml
                     </span>
@@ -319,12 +322,12 @@ export function Dashboard() {
                 </div>
                 {waterProgress >= 100 && <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />}
               </div>
-              {/* Proteína */}
+              {/* ProteÃ­na */}
               <div className="flex items-center gap-3">
                 <Dumbbell className="w-4 h-4 text-primary flex-shrink-0" />
                 <div className="flex-1">
                   <div className="flex justify-between text-xs mb-1">
-                    <span className="text-muted-foreground">Proteína</span>
+                    <span className="text-muted-foreground">ProteÃ­na</span>
                     <span className={`font-semibold tabular-nums ${proteinPct >= 100 ? 'text-green-600' : 'text-foreground'}`}>
                       {Math.round(totalProteinToday)}g / {macros.protein}g
                     </span>
@@ -358,30 +361,30 @@ export function Dashboard() {
                 {calPct >= 100 && <CheckCircle2 className="w-4 h-4 text-destructive flex-shrink-0" />}
               </div>
             </div>
-            {/* CTA dinâmica — próxima ação sugerida */}
+            {/* CTA dinÃ¢mica â€” prÃ³xima aÃ§Ã£o sugerida */}
             {(() => {
               if (waterProgress < 30 && currentHour >= 8) return (
                 <button onClick={() => navigate('/water')} className="w-full flex items-center justify-between rounded-xl bg-chart-1/10 border border-chart-1/20 px-3 py-2 text-sm text-chart-1 font-semibold hover:bg-chart-1/20 transition-colors">
-                  <span>💧 Beber água agora</span>
+                  <span>ðŸ’§ Beber Ã¡gua agora</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               )
               if (todayMeals.length === 0 && currentHour >= 7) return (
                 <button onClick={() => navigate('/meals')} className="w-full flex items-center justify-between rounded-xl bg-primary/10 border border-primary/20 px-3 py-2 text-sm text-primary font-semibold hover:bg-primary/20 transition-colors">
-                  <span>🍽️ Registrar primeira refeição</span>
+                  <span>ðŸ½ï¸ Registrar primeira refeiÃ§Ã£o</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               )
               if (proteinPct < 50 && currentHour >= 12) return (
                 <button onClick={() => navigate('/meals')} className="w-full flex items-center justify-between rounded-xl bg-primary/10 border border-primary/20 px-3 py-2 text-sm text-primary font-semibold hover:bg-primary/20 transition-colors">
-                  <span>💪 Adicionar proteína na próxima refeição</span>
+                  <span>ðŸ’ª Adicionar proteÃ­na na prÃ³xima refeiÃ§Ã£o</span>
                   <ChevronRight className="w-4 h-4" />
                 </button>
               )
               if (waterProgress >= 100 && proteinPct >= 80 && calPct >= 80) return (
                 <div className="flex items-center gap-2 rounded-xl bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 px-3 py-2">
                   <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
-                  <span className="text-sm text-green-700 dark:text-green-400 font-semibold">Metas do dia quase completas — ótimo trabalho!</span>
+                  <span className="text-sm text-green-700 dark:text-green-400 font-semibold">Metas do dia quase completas â€” Ã³timo trabalho!</span>
                 </div>
               )
               return null
@@ -405,15 +408,15 @@ export function Dashboard() {
           </div>
         )}
 
-        {/* Cardápio de hoje */}
+        {/* CardÃ¡pio de hoje */}
         {todayMenuDay && (
-          <Card id="nutricao">
+          <Card id="sec-nutricao">
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2 text-base">
                     <UtensilsCrossed className="w-4 h-4 text-primary" />
-                    Cardápio de Hoje
+                    CardÃ¡pio de Hoje
                   </CardTitle>
                   <CardDescription className="text-xs mt-0.5">{todayMenuDay.day}</CardDescription>
                 </div>
@@ -442,22 +445,22 @@ export function Dashboard() {
                         : 'bg-muted/60'
                     }`}
                   >
-                    {/* Ícone da refeição */}
+                    {/* Ãcone da refeiÃ§Ã£o */}
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${isRegistered ? 'bg-primary/20 text-primary' : isNext ? 'bg-primary text-primary-foreground' : 'bg-background text-muted-foreground'}`}>
                       {isRegistered ? <CheckCircle2 className="w-4 h-4" /> : MEAL_ICON[meal.type] ?? <UtensilsCrossed className="w-4 h-4" />}
                     </div>
 
-                    {/* Informações */}
+                    {/* InformaÃ§Ãµes */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5">
                         <p className="text-sm font-semibold text-foreground truncate">{meal.type}</p>
-                        {isNext && <Badge className="text-xs h-4 px-1.5 bg-primary text-primary-foreground">Próxima</Badge>}
-                        {isRegistered && <Badge variant="outline" className="text-xs h-4 px-1.5 text-primary border-primary/30">Registrada ✓</Badge>}
+                        {isNext && <Badge className="text-xs h-4 px-1.5 bg-primary text-primary-foreground">PrÃ³xima</Badge>}
+                        {isRegistered && <Badge variant="outline" className="text-xs h-4 px-1.5 text-primary border-primary/30">Registrada âœ“</Badge>}
                       </div>
-                      <p className="text-xs text-muted-foreground">{meal.calories} kcal · {meal.protein}g prot · {meal.carbs}g carb</p>
+                      <p className="text-xs text-muted-foreground">{meal.calories} kcal Â· {meal.protein}g prot Â· {meal.carbs}g carb</p>
                     </div>
 
-                    {/* Botão registrar */}
+                    {/* BotÃ£o registrar */}
                     {!isRegistered && (
                       <button
                         onClick={() => navigate('/meals')}
@@ -470,7 +473,7 @@ export function Dashboard() {
                 )
               })}
 
-              {/* Resumo calórico do cardápio */}
+              {/* Resumo calÃ³rico do cardÃ¡pio */}
               <div className="flex justify-between items-center pt-1 px-1">
                 <span className="text-xs text-muted-foreground">Total planejado</span>
                 <span className="text-xs font-bold text-primary">
@@ -481,14 +484,17 @@ export function Dashboard() {
           </Card>
         )}
 
-        {/* Check-in diário */}
+        {/* Check-in diÃ¡rio */}
         <DailyCheckin />
 
-        {/* Conquistas (gamificação por atividade) */}
+        {/* Conquistas (gamificaÃ§Ã£o por atividade) */}
         <GamificationCard />
 
-        {/* Status rápido */}
-        {hasProfileData && <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Desafios Semanais */}
+        <WeeklyChallengeCard />
+
+        {/* Status rÃ¡pido */}
+        {hasProfileData && <div className={`grid grid-cols-2 lg:grid-cols-4 gap-4 transition-opacity${!isProfileComplete ? ' opacity-30 pointer-events-none' : ''}`}>
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
@@ -548,8 +554,8 @@ export function Dashboard() {
           </Card>
         </div>}
 
-        {/* Água */}
-        <Card id="agua">
+        {/* Ãgua */}
+        <Card id="sec-agua" className={!isProfileComplete ? 'opacity-30 pointer-events-none' : ''}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -570,13 +576,13 @@ export function Dashboard() {
           <CardContent>
             <Progress value={waterProgress} className="h-3" />
             <p className="text-xs text-muted-foreground mt-2">
-              {waterProgress >= 100 ? `✅ ${t.dashboard.goalReached}` : `${t.dashboard.remaining} ${todayWater.target - todayWater.consumed}ml`}
+              {waterProgress >= 100 ? `âœ… ${t.dashboard.goalReached}` : `${t.dashboard.remaining} ${todayWater.target - todayWater.consumed}ml`}
             </p>
           </CardContent>
         </Card>
 
         {/* Nutrição */}
-        <Card>
+        <Card className={!isProfileComplete ? 'opacity-30 pointer-events-none' : ''}>
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -665,7 +671,7 @@ export function Dashboard() {
                   onClick={() => navigate('/meals')}
                   className="text-xs font-semibold text-primary hover:underline"
                 >
-                  + Registrar primeira refeição
+                  + Registrar primeira refeiÃ§Ã£o
                 </button>
               </div>
             )}
@@ -678,7 +684,7 @@ export function Dashboard() {
           const qualityLabel: Record<string, string> = { excelente: 'Excelente', bom: 'Bom', regular: 'Regular', ruim: 'Ruim' }
           const formatH = (h: number) => { const hh = Math.floor(h); const mm = Math.round((h - hh) * 60); return mm > 0 ? `${hh}h ${mm}min` : `${hh}h` }
           return (
-            <Card id="sono">
+            <Card id="sec-sono">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div>
@@ -705,7 +711,7 @@ export function Dashboard() {
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${getSleepQualityBadge(last.quality)}`}>
                           {qualityLabel[last.quality]}
                         </span>
-                        <p className="text-xs text-muted-foreground mt-1">{last.bedtime} → {last.wakeTime}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{last.bedtime} â†’ {last.wakeTime}</p>
                       </div>
                     </div>
                     {sleepHistory.length > 1 && (
@@ -721,7 +727,7 @@ export function Dashboard() {
           )
         })()}
 
-        {/* Atalhos rápidos */}
+        {/* Atalhos rÃ¡pidos */}
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={() => navigate('/fasting')}
@@ -773,7 +779,7 @@ export function Dashboard() {
         )}
 
         {/* Treinos */}
-        <Card id="treino">
+        <Card id="sec-treino">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -792,15 +798,15 @@ export function Dashboard() {
             </div>
           </CardHeader>
           <CardContent className="space-y-3">
-            {/* Sugestão de treino do plano AI para hoje */}
+            {/* SugestÃ£o de treino do plano AI para hoje */}
             {aiWorkoutPlan && todayWorkouts.length === 0 && (() => {
               const planDay = aiWorkoutPlan.plan.days[todayMenuIndex % aiWorkoutPlan.plan.days.length]
               return planDay ? (
                 <div className="rounded-xl bg-primary/10 border border-primary/20 px-4 py-3">
                   <p className="text-xs font-semibold text-primary mb-1">Treino sugerido para hoje</p>
-                  <p className="text-sm font-bold text-foreground">{planDay.name} — {planDay.focus}</p>
+                  <p className="text-sm font-bold text-foreground">{planDay.name} â€” {planDay.focus}</p>
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {planDay.exercises.length} exercícios · {aiWorkoutPlan.plan.sessionDuration} min estimados
+                    {planDay.exercises.length} exercÃ­cios Â· {aiWorkoutPlan.plan.sessionDuration} min estimados
                   </p>
                   <button
                     onClick={() => { setWorkoutMode('plan'); setSelectedPlanDayIndex(todayMenuIndex % aiWorkoutPlan.plan.days.length); setIsWorkoutDialogOpen(true) }}
@@ -818,7 +824,7 @@ export function Dashboard() {
                   <div key={workout.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                     <div>
                       <div className="font-medium capitalize">{workout.notes ?? workout.type}</div>
-                      <div className="text-sm text-muted-foreground">{workout.duration} min · {workout.intensity}</div>
+                      <div className="text-sm text-muted-foreground">{workout.duration} min Â· {workout.intensity}</div>
                     </div>
                     <Badge variant="secondary">{workout.caloriesBurned} kcal</Badge>
                   </div>
@@ -876,16 +882,16 @@ export function Dashboard() {
                     <SelectContent>
                       {aiWorkoutPlan.plan.days.map((day, i) => (
                         <SelectItem key={i} value={String(i)}>
-                          {day.name} — {day.focus}
+                          {day.name} â€” {day.focus}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-                  {/* Preview de exercícios do dia */}
+                  {/* Preview de exercÃ­cios do dia */}
                   <div className="rounded-lg bg-muted p-3 space-y-1 max-h-32 overflow-y-auto">
                     {aiWorkoutPlan.plan.days[selectedPlanDayIndex].exercises.map((ex, i) => (
                       <p key={i} className="text-xs text-muted-foreground">
-                        • {ex.name}{ex.sets ? ` — ${ex.sets}x${ex.reps}` : ex.duration ? ` — ${ex.duration}` : ''}
+                        â€¢ {ex.name}{ex.sets ? ` â€” ${ex.sets}x${ex.reps}` : ex.duration ? ` â€” ${ex.duration}` : ''}
                       </p>
                     ))}
                   </div>
@@ -914,7 +920,7 @@ export function Dashboard() {
                 </div>
               )}
 
-              {/* Duração */}
+              {/* DuraÃ§Ã£o */}
               <div className="space-y-2">
                 <Label htmlFor="workout-duration">{t.dashboard.durationMin}</Label>
                 <Input
@@ -994,7 +1000,7 @@ export function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Exportar para médico */}
+        {/* Exportar para mÃ©dico */}
         <button
           onClick={() => setIsExportOpen(true)}
           className="group w-full flex items-center gap-4 p-4 rounded-2xl bg-card border border-border shadow-sm text-left transition-all hover:-translate-y-px hover:border-primary/60 hover:shadow-[0_6px_20px_-8px_oklch(0.52_0.16_145/0.3)] active:scale-[0.98]"
@@ -1008,7 +1014,7 @@ export function Dashboard() {
           </div>
         </button>
 
-        {/* Dialog de exportação */}
+        {/* Dialog de exportaÃ§Ã£o */}
         <Dialog open={isExportOpen} onOpenChange={setIsExportOpen}>
           <DialogContent>
             <DialogHeader>

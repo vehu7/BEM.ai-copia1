@@ -25,7 +25,7 @@ import type {
 } from '@/types'
 import { BADGES } from '@/data/badges'
 import { ACHIEVEMENTS } from '@/data/achievements'
-import { XP_ACTIONS, type XPAction } from '@/lib/gamification'
+import { XP_ACTIONS, type XPAction, canUseStreakShield } from '@/lib/gamification'
 import { calculateBMR, calculateTDEE, calculateCalorieTarget, calculateMacros, calculateWaterTarget, applyClinicalFloors } from '@/lib/health-utils'
 import { supabase } from '@/lib/supabase'
 import {
@@ -152,6 +152,10 @@ interface AppContextType {
 
   // XP System
   awardXP: (action: import('@/lib/gamification').XPAction) => void
+
+  // Streak Shield
+  streakShieldUsedAt: string | null
+  useStreakShield: () => boolean
 
   // Profile completeness
   isProfileComplete: boolean
@@ -1456,6 +1460,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const dismissAchievements = () => setPendingAchievements([])
   const dismissRecord = () => setPendingRecord(null)
 
+  // ── STREAK SHIELD ──
+  const STREAK_SHIELD_KEY = 'bem_streak_shield_used_at'
+  const [streakShieldUsedAt, setStreakShieldUsedAt] = useState<string | null>(() =>
+    localStorage.getItem(STREAK_SHIELD_KEY)
+  )
+
+  const useStreakShield = (): boolean => {
+    if (!canUseStreakShield(streakShieldUsedAt)) return false
+    const now = new Date().toISOString()
+    localStorage.setItem(STREAK_SHIELD_KEY, now)
+    setStreakShieldUsedAt(now)
+    return true
+  }
+
   // ── XP SYSTEM ──
   const awardXP = (action: XPAction) => {
     if (!user) return
@@ -1555,6 +1573,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         checkInState, performCheckIn,
         gamification, registerActivity, pendingAchievements, dismissAchievements, pendingRecord, dismissRecord,
         awardXP,
+        streakShieldUsedAt, useStreakShield,
         isProfileComplete,
         updateSubscription,
       }}

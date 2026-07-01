@@ -334,13 +334,15 @@ export function LandingPage() {
           <div className="flex items-center justify-center gap-6 flex-wrap">
             <div className="flex -space-x-2">
               {[
-                'https://randomuser.me/api/portraits/women/44.jpg',
-                'https://randomuser.me/api/portraits/men/32.jpg',
-                'https://randomuser.me/api/portraits/women/68.jpg',
-                'https://randomuser.me/api/portraits/men/75.jpg',
-                'https://randomuser.me/api/portraits/women/12.jpg',
-              ].map((src, i) => (
-                <img key={i} src={src} alt="" className="w-8 h-8 rounded-full object-cover border-2 border-white" />
+                { initials: 'AM', palette: 'from-emerald-500 to-teal-600' },
+                { initials: 'BL', palette: 'from-violet-500 to-purple-600' },
+                { initials: 'CR', palette: 'from-rose-500 to-pink-600' },
+                { initials: 'DS', palette: 'from-amber-500 to-orange-600' },
+                { initials: 'EF', palette: 'from-blue-500 to-indigo-600' },
+              ].map(({ initials, palette }, i) => (
+                <div key={i} className={`w-8 h-8 rounded-full bg-gradient-to-br ${palette} flex items-center justify-center text-white font-bold text-xs border-2 border-white flex-shrink-0`}>
+                  {initials}
+                </div>
               ))}
             </div>
             <div className="flex flex-col items-start">

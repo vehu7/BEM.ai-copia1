@@ -100,12 +100,12 @@ export function GamificationCard() {
                 />
               </div>
               {!xpProgress.isMaxLevel && (
-                <p className="text-[10px] text-muted-foreground text-right">
+                <p className="text-xs text-muted-foreground text-right">
                   {xpProgress.current}/{xpProgress.required} XP para o próximo nível
                 </p>
               )}
               {xpProgress.isMaxLevel && (
-                <p className="text-[10px] text-primary font-semibold text-right">Nível máximo atingido! 💎</p>
+                <p className="text-xs text-primary font-semibold text-right">Nível máximo atingido! 💎</p>
               )}
             </div>
           </div>
@@ -113,7 +113,7 @@ export function GamificationCard() {
           {/* ── Últimas conquistas XP ── */}
           {recentXPAchievements.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">Últimas conquistas</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Últimas conquistas</p>
               <div className="flex gap-2 flex-wrap">
                 {recentXPAchievements.map(a => (
                   <div

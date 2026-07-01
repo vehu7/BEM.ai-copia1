@@ -215,10 +215,10 @@ const ptBR = {
     },
     activityLevels: {
       sedentario: 'Sedentário(a)',
-      leve: 'Leve (1-3 dias/semana)',
-      moderado: 'Moderado (3-5 dias/semana)',
-      intenso: 'Intenso (6-7 dias/semana)',
-      muito_intenso: 'Muito intenso (atleta)',
+      leve: 'Levemente ativo(a) (1-3 dias/semana)',
+      moderado: 'Moderadamente ativo(a) (3-5 dias/semana)',
+      intenso: 'Muito ativo(a) (6-7 dias/semana)',
+      muito_intenso: 'Extremamente ativo(a) (atleta)',
     },
     medications: {
       nenhum: 'Nenhum',
