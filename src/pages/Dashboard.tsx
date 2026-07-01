@@ -1,4 +1,4 @@
-﻿import { useState, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 import { useApp, getTimeAwareMessage } from '@/contexts/AppContext'
 import { ProfileSetupModal } from '@/components/profile-setup-modal'
 import { MascotGreeting } from '@/components/mascot'
