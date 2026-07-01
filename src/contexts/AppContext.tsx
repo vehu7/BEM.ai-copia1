@@ -25,7 +25,7 @@ import type {
 } from '@/types'
 import { BADGES } from '@/data/badges'
 import { ACHIEVEMENTS } from '@/data/achievements'
-import { XP_ACTIONS, type XPAction, canUseStreakShield, getLevelForXP, getLevelName } from '@/lib/gamification'
+import { XP_ACTIONS, type XPAction, canUseStreakShield, getLevelForXP, getLevelName, autoIncrementChallenge } from '@/lib/gamification'
 import type { CelebrationKind } from '@/components/celebration-modal'
 import { calculateBMR, calculateTDEE, calculateCalorieTarget, calculateMacros, calculateWaterTarget, applyClinicalFloors } from '@/lib/health-utils'
 import { supabase } from '@/lib/supabase'
@@ -751,7 +751,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     ])
     if (today.water) setTodayWater(today.water)
     if (today.meals.length) setTodayMeals(today.meals)
-    if (today.workouts.length) setAllWorkouts(today.workouts)
+    if (today.workouts.length) {
+      setAllWorkouts(prev => {
+        const todayDateStr = new Date().toDateString()
+        const notToday = prev.filter(w => new Date(w.date).toDateString() !== todayDateStr)
+        return [...notToday, ...today.workouts]
+      })
+    }
     if (today.activeFasting) setActiveFasting(today.activeFasting)
     if (weights.length) {
       setWeightHistory(weights)
@@ -1163,6 +1169,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     // Gamificação: registra ao cruzar a meta de água (uma vez por dia)
     if (todayWater.target > 0 && todayWater.consumed < todayWater.target && newConsumed >= todayWater.target) {
       registerActivity('water')
+      // Auto-progressão de desafio de hidratação
+      autoIncrementChallenge('hidratacao', localDateStr())
     }
   }
 
@@ -1212,6 +1220,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (uid) deferDbCall(() => insertWorkoutDb(uid, workout))
     // Gamificação: registra atividade de treino
     registerActivity('workout')
+    // Auto-progressão de desafio de treino
+    autoIncrementChallenge('treino', localDateStr())
   }
 
   const addSleepEntry = (entry: SleepEntry) => {
@@ -1220,6 +1230,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (uid) deferDbCall(() => insertSleepDb(uid, entry))
     // Gamificação: registra atividade de sono
     registerActivity('sleep')
+    // Auto-progressão de desafio de sono (apenas se >= 7h)
+    if (entry.duration >= 7) {
+      autoIncrementChallenge('sono', entry.date)
+    }
   }
 
   const deleteSleepEntry = (id: string) => {
@@ -1449,6 +1463,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (uid) {
       upsertCheckInDb(uid, updated)
     }
+
+    // Auto-progressão de desafio de check-in
+    autoIncrementChallenge('progresso', today)
 
     return newBadges
   }

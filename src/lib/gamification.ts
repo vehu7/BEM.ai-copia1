@@ -524,6 +524,24 @@ export interface WeeklyChallenge {
   badgeId?: string
 }
 
+// ── Participantes fictícios ───────────────────────────────────────────────────
+
+/** Retorna o número (pseudo-aleatório mas estável) de participantes do desafio nesta semana */
+export function getChallengeParticipants(challengeId: string): number {
+  const week = Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000))
+  // seed determinístico por desafio + semana
+  const seed = challengeId.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0) + week
+  const bases: Record<string, number> = {
+    water_5days: 1420,
+    workout_3week: 980,
+    protein_4days: 870,
+    sleep_5nights: 1100,
+    checkin_7days: 1650,
+  }
+  const base = bases[challengeId] ?? 1000
+  return base + ((seed * 37 + week * 13) % 200)
+}
+
 export const WEEKLY_CHALLENGES: WeeklyChallenge[] = [
   {
     id: 'water_5days',
@@ -586,6 +604,65 @@ export function getWeeklyChallenges(): WeeklyChallenge[] {
     WEEKLY_CHALLENGES[(start + 1) % WEEKLY_CHALLENGES.length],
     WEEKLY_CHALLENGES[(start + 2) % WEEKLY_CHALLENGES.length],
   ]
+}
+
+// ── Auto-progressão de desafios ───────────────────────────────────────────────
+
+interface ChallengeState {
+  accepted: boolean
+  progress: number
+  completed: boolean
+  dates?: string[] // datas que já contribuíram (evita dupla contagem)
+}
+
+type WeekStorage = Record<string, ChallengeState>
+
+function getChallengeStorageKey(): string {
+  return `bem_challenges_${Math.floor(Date.now() / (7 * 24 * 60 * 60 * 1000))}`
+}
+
+function readChallengeStorage(): WeekStorage {
+  try {
+    const raw = localStorage.getItem(getChallengeStorageKey())
+    return raw ? (JSON.parse(raw) as WeekStorage) : {}
+  } catch {
+    return {}
+  }
+}
+
+function writeChallengeStorage(data: WeekStorage): void {
+  try {
+    localStorage.setItem(getChallengeStorageKey(), JSON.stringify(data))
+  } catch { /* quota */ }
+}
+
+/**
+ * Incrementa automaticamente os desafios da semana com base em uma categoria e data.
+ * Retorna os desafios concluídos nesta chamada (para disparar celebração).
+ */
+export function autoIncrementChallenge(
+  category: AchievementCategory,
+  dateStr: string,
+): Array<WeeklyChallenge & { justCompleted: boolean }> {
+  const storage = readChallengeStorage()
+  const activeChallenges = getWeeklyChallenges()
+  const results: Array<WeeklyChallenge & { justCompleted: boolean }> = []
+
+  for (const challenge of activeChallenges) {
+    if (challenge.category !== category) continue
+    const state: ChallengeState = storage[challenge.id] ?? { accepted: false, progress: 0, completed: false, dates: [] }
+    if (!state.accepted || state.completed) continue
+    const dates = state.dates ?? []
+    if (dates.includes(dateStr)) continue // já contou hoje
+
+    const newProgress = Math.min(state.progress + 1, challenge.goal)
+    const justCompleted = newProgress >= challenge.goal
+    storage[challenge.id] = { ...state, progress: newProgress, completed: justCompleted, dates: [...dates, dateStr] }
+    results.push({ ...challenge, justCompleted })
+  }
+
+  if (results.length) writeChallengeStorage(storage)
+  return results
 }
 
 /** Retorna quantos dias faltam para a semana atual terminar (segunda a domingo) */

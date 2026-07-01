@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { useApp } from '@/contexts/AppContext'
-import { getWeeklyChallenges, daysUntilWeekEnd, type WeeklyChallenge } from '@/lib/gamification'
+import { getWeeklyChallenges, daysUntilWeekEnd, getChallengeParticipants, type WeeklyChallenge } from '@/lib/gamification'
 
 // ── Tipos de persistência ─────────────────────────────────────────────────────
 
@@ -11,6 +11,7 @@ interface ChallengeState {
   accepted: boolean
   progress: number
   completed: boolean
+  dates?: string[]
 }
 
 type WeekStorage = Record<string, ChallengeState>
@@ -50,9 +51,39 @@ export function WeeklyChallengeCard() {
 
   const [storage, setStorage] = useState<WeekStorage>(loadStorage)
 
+  // Re-lê o storage ao montar (pode ter sido atualizado pelo autoIncrementChallenge)
+  useEffect(() => {
+    setStorage(loadStorage())
+    // Verifica a cada 5s se houve auto-progressão externa
+    const interval = setInterval(() => setStorage(loadStorage()), 5000)
+    return () => clearInterval(interval)
+  }, [])
+
   // Sincroniza storage → localStorage sempre que muda
   useEffect(() => {
     saveStorage(storage)
+  }, [storage])
+
+  // Dispara celebração se algum desafio acabou de ser completado por auto-progressão
+  useEffect(() => {
+    for (const challenge of challenges) {
+      const state = storage[challenge.id]
+      if (state?.completed && !state.dates?.includes('__celebrated__')) {
+        awardXP('COMPLETE_WEEKLY_CHALLENGE')
+        triggerCelebration?.({
+          kind: 'challenge',
+          title: 'Desafio concluído! 🏆',
+          subtitle: challenge.title,
+          xpGained: challenge.xpReward,
+        })
+        // Marca como celebrado para não disparar de novo
+        setStorage(prev => ({
+          ...prev,
+          [challenge.id]: { ...prev[challenge.id], dates: [...(prev[challenge.id]?.dates ?? []), '__celebrated__'] },
+        }))
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [storage])
 
   const getState = useCallback(
@@ -64,7 +95,7 @@ export function WeeklyChallengeCard() {
   const accept = (challenge: WeeklyChallenge) => {
     setStorage(prev => ({
       ...prev,
-      [challenge.id]: { accepted: true, progress: 0, completed: false },
+      [challenge.id]: { accepted: true, progress: 0, completed: false, dates: [] },
     }))
   }
 
@@ -77,7 +108,7 @@ export function WeeklyChallengeCard() {
 
     setStorage(prev => ({
       ...prev,
-      [challenge.id]: { accepted: true, progress: newProgress, completed: nowCompleted },
+      [challenge.id]: { ...prev[challenge.id], accepted: true, progress: newProgress, completed: nowCompleted },
     }))
 
     if (nowCompleted) {
@@ -88,6 +119,11 @@ export function WeeklyChallengeCard() {
         subtitle: challenge.title,
         xpGained: challenge.xpReward,
       })
+      // Marca celebração para evitar duplo disparo
+      setStorage(prev => ({
+        ...prev,
+        [challenge.id]: { ...prev[challenge.id], dates: [...(prev[challenge.id]?.dates ?? []), '__celebrated__'] },
+      }))
     }
   }
 
@@ -138,6 +174,8 @@ function ChallengeRow({ challenge, state, onAccept, onIncrement }: ChallengeRowP
     ? Math.round((state.progress / challenge.goal) * 100)
     : 0
 
+  const participants = getChallengeParticipants(challenge.id)
+
   return (
     <div className="flex flex-col gap-1.5">
       <div className="flex items-start justify-between gap-2">
@@ -147,6 +185,9 @@ function ChallengeRow({ challenge, state, onAccept, onIncrement }: ChallengeRowP
             <p className="text-sm font-medium leading-tight">{challenge.title}</p>
             <p className="text-xs text-muted-foreground leading-snug mt-0.5">
               {challenge.description}
+            </p>
+            <p className="text-xs text-muted-foreground/70 mt-0.5">
+              👥 {participants.toLocaleString('pt-BR')} participantes esta semana
             </p>
           </div>
         </div>
