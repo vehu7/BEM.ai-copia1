@@ -5,26 +5,33 @@
 
 // ── Definição de Níveis ───────────────────────────────────────────────────────
 
-/** Nomes dos níveis em duas formas: feminino e masculino (neutro = mesmo nome) */
-export const LEVEL_NAMES: { f: string; m: string; emoji: string; xpRequired: number }[] = [
-  { f: 'Desperta',     m: 'Desperto',     emoji: '🌙', xpRequired: 0 },
-  { f: 'Ativa',        m: 'Ativo',        emoji: '⚡', xpRequired: 200 },
-  { f: 'Focada',       m: 'Focado',       emoji: '🔥', xpRequired: 500 },
-  { f: 'Determinada',  m: 'Determinado',  emoji: '💪', xpRequired: 1000 },
-  { f: 'Transformada', m: 'Transformado', emoji: '✨', xpRequired: 2000 },
-  { f: 'Guerreira',    m: 'Guerreiro',    emoji: '🏅', xpRequired: 4000 },
-  { f: 'Renascida',    m: 'Renascido',    emoji: '🦋', xpRequired: 7500 },
-  { f: 'Lendária',     m: 'Lendário',     emoji: '👑', xpRequired: 12000 },
-  { f: 'BEM Elite',    m: 'BEM Elite',    emoji: '💎', xpRequired: 20000 },
+/** Nomes dos níveis em três formas: feminino, masculino e neutro */
+export const LEVEL_NAMES: { f: string; m: string; n: string; emoji: string; xpRequired: number }[] = [
+  { f: 'Desperta',     m: 'Desperto',     n: 'Desperto(a)',     emoji: '🌙', xpRequired: 0 },
+  { f: 'Ativa',        m: 'Ativo',        n: 'Ativo(a)',        emoji: '⚡', xpRequired: 200 },
+  { f: 'Focada',       m: 'Focado',       n: 'Focado(a)',       emoji: '🔥', xpRequired: 500 },
+  { f: 'Determinada',  m: 'Determinado',  n: 'Determinado(a)',  emoji: '💪', xpRequired: 1000 },
+  { f: 'Transformada', m: 'Transformado', n: 'Transformado(a)', emoji: '✨', xpRequired: 2000 },
+  { f: 'Guerreira',    m: 'Guerreiro',    n: 'Guerreiro(a)',    emoji: '🏅', xpRequired: 4000 },
+  { f: 'Renascida',    m: 'Renascido',    n: 'Renascido(a)',    emoji: '🦋', xpRequired: 7500 },
+  { f: 'Lendária',     m: 'Lendário',     n: 'Lendário(a)',     emoji: '👑', xpRequired: 12000 },
+  { f: 'BEM Elite',    m: 'BEM Elite',    n: 'BEM Elite',       emoji: '💎', xpRequired: 20000 },
 ]
 
-/** Retorna o nome do nível adaptado ao gênero informado no perfil */
+/**
+ * Retorna o nome do nível adaptado ao gênero do perfil.
+ * - 'feminino'  → forma feminina
+ * - 'masculino' → forma masculina
+ * - qualquer outro valor (null, 'outro', 'prefiro_nao_informar') → forma neutra com (a/o)
+ */
 export function getLevelName(
   levelIndex: number,
   gender?: string | null,
 ): string {
   const entry = LEVEL_NAMES[levelIndex] ?? LEVEL_NAMES[LEVEL_NAMES.length - 1]
-  return gender === 'masculino' ? entry.m : entry.f
+  if (gender === 'feminino') return entry.f
+  if (gender === 'masculino') return entry.m
+  return entry.n
 }
 
 export const LEVELS = LEVEL_NAMES.map((l, i) => ({
