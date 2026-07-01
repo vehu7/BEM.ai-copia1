@@ -1,4 +1,5 @@
 import type { UserProfile, MealStructure, MenuPreferences } from '@/types'
+import { getNutritionistPersona } from '@/lib/nutritionist-personas'
 
 /** Converte as preferências persistidas do cardápio nas options de generateWeeklyMenu.
  * Usado pelas gerações automáticas (cadastro/boot) para respeitar o que o usuário já escolheu. */
@@ -1692,18 +1693,21 @@ export async function generateWeeklyMenu(user: UserProfile, options?: {
   const CULINARY: Record<string, string> = {
     italia: 'massas integrais, azeite, tomate, peixe, ricota, polenta, vegetais mediterrâneos',
     japao: 'arroz japonês, peixe grelhado/cru, tofu, missô, edamame, algas, vegetais refogados',
-    'estados unidos': 'frango assado, batata-doce, ovos, pão integral, manteigas de oleaginosas, saladas compostas',
-    eua: 'frango assado, batata-doce, ovos, pão integral, manteigas de oleaginosas, saladas compostas',
+    'estados unidos': 'frango grelhado/assado, ovos mexidos/cozidos, aveia (oatmeal), pão integral, arroz integral, batata-doce, feijão em lata, atum em lata, iogurte grego natural, maçã, banana, brócolis, cenoura, espinafre — tudo de supermercado comum (Walmart/Kroger/Aldi)',
+    eua: 'frango grelhado/assado, ovos mexidos/cozidos, aveia (oatmeal), pão integral, arroz integral, batata-doce, feijão em lata, atum em lata, iogurte grego natural, maçã, banana, brócolis, cenoura, espinafre — tudo de supermercado comum (Walmart/Kroger/Aldi)',
+    'reino unido': 'frango grelhado, ovos, aveia (porridge), pão integral, arroz integral, batata normal/doce, atum em lata, sardinha em lata, feijão assado (baked beans), lentilhas, iogurte grego, queijo cottage, maçã, banana, brócolis, ervilhas congeladas — tudo de Tesco/Asda/Lidl/Aldi',
+    uk: 'frango grelhado, ovos, aveia (porridge), pão integral, arroz integral, batata normal/doce, atum em lata, sardinha em lata, feijão assado (baked beans), lentilhas, iogurte grego, queijo cottage, maçã, banana, brócolis, ervilhas congeladas — tudo de Tesco/Asda/Lidl/Aldi',
     mexico: 'tortilhas integrais, feijão preto, frango, guacamole, vegetais coloridos',
-    franca: 'pão integral, queijos com moderação, peixe, aves, vegetais, iogurte',
+    franca: 'blanc de poulet grillé, œufs, flocons d\'avoine, pain complet, riz, pommes de terre, thon en boîte, sardines en boîte, lentilles, yaourt nature, fromage blanc 0%, pomme, banane, brocoli, carottes, épinards, tomates concassées en boîte, huile d\'olive — disponibles chez Lidl/Aldi/Carrefour',
+    espanha: 'pechuga de pollo a la plancha, huevos, copos de avena, pan integral, arroz, patata, boniato, atún en conserva, sardinas en conserva, lentejas, garbanzos, yogur natural, queso fresco, plátano, naranja, manzana, brócoli, zanahoria, espinacas, tomate triturado en conserva, aceite de oliva — todo de Mercadona/Lidl/Aldi',
     argentina: 'carnes grelhadas, chimichurri, vegetais assados, empanadas integrais',
-    portugal: 'bacalhau, arroz, leguminosas, azeite, vegetais cozidos',
+    portugal: 'frango grelhado, ovos, aveia, pão integral, arroz, batata, batata-doce, atum em conserva, sardinhas em conserva, bacalhau, lentilhas, grão-de-bico, feijão, iogurte natural, queijo fresco, banana, laranja, maçã, brócolos, cenoura, espinafres, tomate pelado em lata, azeite — tudo de Pingo Doce/Continente/Lidl/Aldi',
   }
   const culinaryGuide = isBrazil
     ? brazilianFoodGuide
     : (CULINARY[norm(country)]
-        ? `\nCULINÁRIA DE ${country}: use ${CULINARY[norm(country)]}. Pratos típicos variados desse país (tabela nutricional local). NÃO adapte pratos brasileiros.`
-        : `\nUse alimentos típicos, acessíveis e do dia a dia de ${country}.`)
+        ? `\nCULINÁRIA DE ${country}: use EXCLUSIVAMENTE ${CULINARY[norm(country)]}. Pratos típicos do dia a dia desse país — comida acessível que qualquer pessoa compra no supermercado comum. NÃO adapte pratos brasileiros. NÃO use ingredientes importados ou caros. Cada refeição deve parecer o que uma família normal desse país come em casa.`
+        : `\nUse alimentos típicos, simples e acessíveis do dia a dia de ${country} — disponíveis em qualquer supermercado comum, com orçamento familiar normal. Sem ingredientes importados ou caros.`)
 
   // Estratégia nutricional clínica por objetivo — usada no prompt e no preenchimento de dias faltantes
   const goalStrategy = user.goal === 'perder_peso'
@@ -1742,7 +1746,11 @@ export async function generateWeeklyMenu(user: UserProfile, options?: {
 • Comida brasileira tradicional como base: arroz + feijão + proteína + salada — modelo nutricional completo
 • Variedade semanal: rodar proteínas (frango, peixe, carne bovina, ovos, leguminosas) e vegetais`
 
-  const prompt = `Você é um nutricionista com 20 anos de experiência clínica em nutrição esportiva, emagrecimento e saúde feminina. Gera cardápios semanais de 7 dias com qualidade de prescrição profissional para o app BEM.ai. Leia e aplique TODOS os campos do perfil, TODAS as preferências e a ESTRATÉGIA CLÍNICA abaixo — nenhum campo pode ser ignorado.
+  const nutritionistPersona = getNutritionistPersona(country, user.goal ?? 'saude_geral')
+
+  const prompt = `${nutritionistPersona}
+
+Gera cardápios semanais de 7 dias com qualidade de prescrição profissional para o app BEM.ai. Leia e aplique TODOS os campos do perfil abaixo, TODAS as preferências e a ESTRATÉGIA CLÍNICA — nenhum campo pode ser ignorado.
 
 ${goalStrategy}
 
