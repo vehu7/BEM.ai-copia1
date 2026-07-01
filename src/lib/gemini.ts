@@ -572,11 +572,18 @@ function enforceDayTargets(parsed: any, target?: number, highCalDays: string[] =
   }
 }
 
-/** Arredonda uma quantidade caseira para um valor humano (colher/xícara em passos de 0,5; contáveis inteiros). */
+/** Arredonda uma quantidade caseira para um valor humano (colher/xícara em passos de 0,5; contáveis inteiros).
+ *  Nunca retorna frações decimais — apenas inteiros para contáveis, múltiplos de 0,5 para medidas volumétricas. */
 function humanizeQty(v: number, unit: string): number {
   if (!(v > 0)) return 0
-  if (/colher|x[ií]cara|concha|copo|pote/.test(unit)) { const r = Math.round(v * 2) / 2; return r < 0.5 ? 0.5 : r }
-  const r = Math.round(v); return r < 1 ? 1 : r // contáveis (unidade, fatia, filé, etc.): inteiro mínimo 1
+  if (/colher|x[ií]cara|concha|copo|pote/.test(unit)) {
+    // Para medidas volumétricas: mínimo 1 col. sopa (ou ½ xícara/copo/pote)
+    const minVal = /colher/.test(unit) ? 1 : 0.5
+    const r = Math.round(v * 2) / 2
+    return r < minVal ? minVal : r
+  }
+  // Contáveis (unidade, fatia, filé, posta, bife, ovo, etc.): sempre inteiro ≥ 1
+  const r = Math.round(v); return r < 1 ? 1 : r
 }
 
 /** Concorda a unidade de medida em número (ex.: "xícara" -> "xícaras" quando n != 1). */
@@ -623,6 +630,39 @@ function humanizePortions(parsed: any): void {
   }
 }
 
+/**
+ * Segunda passagem de humanização: converte decimais que sobreviveram a enforceDayTargets ou enforceProteinFiber.
+ * Exemplo: "0,7 fatias" → "1 fatia", "1,6 ovos" → "2 ovos", "0,1 xícara" → "½ xícara"
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function enforceRealisticPortions(parsed: any): void {
+  const DECIMAL_UNIT = /(\d+[.,]\d+)\s*(fatias?|unidades?|colheres?|conchas?|x[ií]caras?|copos?|potes?|fil[ée]s?|postas?|bifes?|ovos?|p[ãa]ezinhos?|rodelas?|punhados?)/gi
+  for (const day of parsed?.days ?? []) {
+    for (const meal of day?.meals ?? []) {
+      for (const f of meal?.foods ?? []) {
+        if (!f || typeof f.name !== 'string') continue
+        f.name = f.name.replace(DECIMAL_UNIT, (_match: string, qty: string, unit: string) => {
+          const v = parseFloat(qty.replace(',', '.'))
+          const humanized = humanizeQty(v, unit.toLowerCase())
+          if (humanized === v) return _match
+          const eff = humanized / v
+          f.calories = Math.round((f.calories || 0) * eff)
+          f.protein = Math.round((f.protein || 0) * eff * 10) / 10
+          f.carbs = Math.round((f.carbs || 0) * eff * 10) / 10
+          f.fat = Math.round((f.fat || 0) * eff * 10) / 10
+          f.fiber = Math.round((f.fiber || 0) * eff * 10) / 10
+          // Ajusta gramas inline
+          const gramStr = humanized.toString().replace('.', ',')
+          const unitFinal = humanized === 1
+            ? unit.replace(/s$/i, '').replace(/es$/i, '')
+            : unit
+          return `${gramStr} ${unitFinal}`
+        })
+      }
+    }
+  }
+}
+
 // Açúcar/doces/bebidas açucaradas — removidos no reparo (não têm equivalente saudável de mesmos macros).
 // "mel " com espaço de propósito (não casar "melancia"/"caramelo"); "refri " idem.
 const SUGAR_REMOVE = ['acucar', 'rapadura', 'melado', 'mel ', 'refrigerante', 'refri ', 'doce de leite', 'brigadeiro', 'pudim', 'sorvete', 'bala ', 'pirulito', 'bombom', 'chocolate ao leite', 'leite condensado', 'geleia', 'bolo', 'biscoito recheado', 'suco', 'goiabada', 'pacoca', 'paçoca', 'cocada', 'quindim', 'beijinho', 'mousse', 'manjar', 'arroz doce', 'canjica', 'curau', 'marmelada', 'bananada', 'nutella', 'achocolatado']
@@ -632,9 +672,9 @@ const MEAT_CUTS = ['suíno', 'suino', 'lombo', 'pernil', 'bisteca', 'costela', '
 const DAIRY_EXTRA = ['catupiry', 'cream cheese', 'requeijão cremoso', 'requeijao cremoso', 'provolone', 'gorgonzola', 'cheddar', 'cottage', 'queijo prato', 'coalho', 'gouda', 'brie', 'muzarela', 'achocolatado', 'chantilly', 'bechamel', 'molho branco', 'leite ninho', 'iogurte grego']
 const GLUTEN_PRODUCTS = ['pizza', 'lasanha', 'nhoque', 'panqueca', 'bolacha', 'biscoito', 'torrada', 'bolo', 'pastel', 'esfiha', 'coxinha', 'empada', 'macarrão', 'macarrao', 'espaguete', 'talharim', 'penne', 'farinha de rosca', 'cerveja']
 const EGG_FORMS = ['omelete', 'gema', 'clara de ovo', 'mexido de ovo'] // só vegano (ovo é ok p/ vegetariano)
-// Proibido no café da manhã (regra da nutricionista): carnes vermelhas + sardinha + atum + salmão.
-// Frango (carne branca) e peixe branco continuam permitidos no café.
-const BREAKFAST_BANNED = ['carne', 'bovina', 'bife', 'patinho', 'alcatra', 'picanha', 'contrafile', 'contrafilé', 'file mignon', 'filé mignon', 'fraldinha', 'maminha', 'cupim', 'costela', 'acem', 'porco', 'suino', 'suíno', 'lombo', 'pernil', 'bisteca', 'bacon', 'linguica', 'linguiça', 'presunto', 'mortadela', 'salame', 'sardinha', 'atum', 'salmao', 'salmão']
+// Proibido no café da manhã: carnes em geral (incluindo frango) + embutidos + peixe.
+// Café da manhã = ovos, queijo, iogurte, requeijão, pão, tapioca, aveia, fruta.
+const BREAKFAST_BANNED = ['frango', 'peito de frango', 'filé de frango', 'file de frango', 'carne', 'bovina', 'bife', 'patinho', 'alcatra', 'picanha', 'contrafile', 'contrafilé', 'file mignon', 'filé mignon', 'fraldinha', 'maminha', 'cupim', 'costela', 'acem', 'porco', 'suino', 'suíno', 'lombo', 'pernil', 'bisteca', 'bacon', 'linguica', 'linguiça', 'presunto', 'mortadela', 'salame', 'sardinha', 'atum', 'salmao', 'salmão', 'tilapia', 'tilápia', 'peixe', 'merluza', 'pescada']
 
 // ALLOWLIST de comida brasileira: tokens (radicais de alimentos do dia a dia). Um alimento é
 // considerado brasileiro se ALGUMA palavra significativa dele estiver aqui. O que não tiver NENHUMA
@@ -1780,10 +1820,12 @@ ${cycleText ? `- ${cycleText}` : ''}
 REGRAS (gere o cardápio direto, sem explicar o raciocínio):
 ${isGlp1 ? '- GLP-1: refeições pequenas e densas em proteína, no máx ~400 kcal cada, fibra alta, hidratação.\n' : ''}${isBariatricMenu ? '- Pós-bariátrica: 6 refeições fracionadas, porções mínimas, proteína primeiro, zero açúcar, texturas macias.\n' : ''}- ESTRUTURA: ${mealEvents ? `EXATAMENTE estes ${mealEvents.length} eventos por dia, NESTA ordem (campo "type"): ${mealEvents.join(', ')}.${options?.fastingProtocol ? ' Todas dentro da janela do jejum, nada fora dela.' : fractioned ? ' Lanches e ceia leves (~80-180 kcal) mas SEMPRE com proteína.' : ' Sem lanches nem ceia.'}` : 'Café da Manhã, Almoço e Jantar (3 principais).'}
 - PROTEÍNA: cada dia ≥ ${effProteinFloor}g total e ≥ ${effFiberFloor}g de fibra. Por refeição: almoço/jantar ≥ ${isGlp1 ? 30 : 25}g, café ≥ 20g, lanche/ceia ≥ ${isGlp1 ? 12 : 10}g. NENHUMA refeição sem proteína (café só de pão é proibido).
-- CAFÉ DA MANHÃ sem carne vermelha, sardinha nem atum (use ovo, queijo, iogurte, requeijão, pão integral, tapioca, fruta, aveia).
+- CAFÉ DA MANHÃ: use APENAS ovos, queijo, iogurte, requeijão, pão integral, tapioca, fruta, aveia. PROIBIDO: frango, carne, peixe, atum, sardinha, salmão — café da manhã com frango é errado.
+- ALMOÇO E JANTAR: OBRIGATÓRIO incluir (1) proteína magra 80–150g, (2) salada/vegetal (alface, tomate, cenoura, brócolis, couve, abobrinha, etc.) mínimo 80g, (3) carboidrato (arroz, feijão, batata-doce, mandioca). Nunca sirva proteína sem acompanhamento vegetal.
 - VARIEDADE: não repita a proteína principal em dias seguidos (≥5 proteínas na semana); varie as saladas. Café preto e chá sem açúcar NÃO entram como alimento.
-${highCalDaysList.length > 0 ? `- Dias +20% (${highCalDaysList.join(', ')}) têm ~20% mais calorias que os demais.\n` : ''}${mealPriorityText ? '- A refeição principal escolhida é a mais calórica do dia.\n' : ''}${excludedText ? '- Exclusões e restrições têm prioridade ABSOLUTA sobre tudo.\n' : ''}- CONCISO: no MÁXIMO 3 alimentos por refeição principal e 2 por lanche/ceia, nomes curtos. Formato "Nome – medida caseira (Xg)" com o peso em gramas, e o campo "fiber" (g) em cada alimento e refeição (carne/ovo/laticínio ~0; pão/aveia/fruta/legume/leguminosa têm fibra).
-- Cada dia somando${user.targetCalories ? ` ~${user.targetCalories} kcal (entre ${Math.round(user.targetCalories * 0.95)} e ${Math.round(user.targetCalories * 1.05)})` : ' a meta calórica'}; o total de cada refeição é a soma dos alimentos. Inclua 5 dicas curtas${isGlp1 ? ' (2+ sobre GLP-1)' : ''}${isBariatricMenu ? ' (2+ sobre pós-bariátrica)' : ''}.
+${highCalDaysList.length > 0 ? `- Dias +20% (${highCalDaysList.join(', ')}) têm ~20% mais calorias que os demais.\n` : ''}${mealPriorityText ? '- A refeição principal escolhida é a mais calórica do dia.\n' : ''}${excludedText ? '- Exclusões e restrições têm prioridade ABSOLUTA sobre tudo.\n' : ''}- PORÇÕES: use SEMPRE números inteiros ou frações simples (½, ⅓). NUNCA escreva decimais na quantidade (PROIBIDO: 0,7 fatias / 1,6 ovos / 0,4 concha / 0,1 xícara). Se a quantidade certa for pequena, ajuste os GRAMAS mas mantenha a unidade inteira (ex: "1 fatia fina (20g)" em vez de "0,4 fatia"). Colheres e xícaras: mínimo 1 col. sopa / ½ xícara.
+- CONCISO: no MÁXIMO 4 alimentos por refeição principal e 2 por lanche/ceia, nomes curtos. Formato "Nome – medida caseira (Xg)" com o peso em gramas, e o campo "fiber" (g) em cada alimento e refeição (carne/ovo/laticínio ~0; pão/aveia/fruta/legume/leguminosa têm fibra).
+- Cada dia somando${user.targetCalories ? ` ~${user.targetCalories} kcal (entre ${Math.round(user.targetCalories * 0.95)} e ${Math.round(user.targetCalories * 1.05)})` : ' a meta calórica'}; o total de cada refeição é a soma dos alimentos. Inclua 5 dicas curtas${isGlp1 ? ' (2+ sobre GLP-1)' : ''}${isBariatricMenu ? ' (2+ sobre pós-bariátrica)' : ''} — as dicas devem ser relevantes ao objetivo específico do usuário, sem mencionar GLP-1 ou cirurgia bariátrica para usuários sem essa condição.
 
 Retorne APENAS um objeto JSON válido (sem markdown, sem receitas, sem campos além dos abaixo):
 {
@@ -1886,6 +1928,9 @@ ${dietaryText ? dietaryText + '\n\n' : ''}${medLimText ? medLimText + '\n\n' : '
 - Metas diárias (PISO): proteína ≥ ${effProteinFloor}g e fibra ≥ ${effFiberFloor}g; cada refeição com fonte de proteína (almoço/jantar ≥ ${isGlp1 ? 30 : 25}g, café ≥ 20g, lanche/ceia ≥ ${isGlp1 ? 12 : 10}g)
 - Cada novo dia DIFERENTE dos já existentes E diferente entre si
 - Use "Nome – medida caseira (Xg)" e inclua calories/protein/carbs/fat/fiber por alimento e por refeição
+- PORÇÕES: NUNCA use decimais (0,7 fatias, 1,6 ovos, 0,1 xícara são ERROS). Apenas inteiros ou frações simples (½, 1, 2).
+- CAFÉ DA MANHÃ: apenas ovos, queijo, iogurte, pão, tapioca, fruta, aveia. SEM frango, carne nem peixe.
+- ALMOÇO e JANTAR: SEMPRE incluir salada/vegetal + proteína + carboidrato. Nunca proteína sem vegetal.
 
 Retorne APENAS JSON: { "days": [ { "day": "Nome-do-dia", "meals": [ ...mesma estrutura com fiber... ] } ] }`
           const fillParsed = await callOpenAIMenuJson(apiKey, fillPrompt, 16384, 3, onMenuStream)
@@ -1981,6 +2026,9 @@ Retorne APENAS JSON: { "days": [ { "day": "Nome-do-dia", "meals": [ ...mesma est
     // CAFÉ DA MANHÃ SEM CARNE/ATUM (regra da nutricionista) — por ÚLTIMO, depois do carbCap (que sob
     // low_carb poderia re-inserir atum no café). Troca carne vermelha/sardinha/atum por ovo/queijo.
     enforceBreakfastNoMeat(parsed, { restrictions: enforcedRestrictions, excluded: allExcluded })
+    // PORÇÕES REALISTAS — última passagem: elimina decimais residuais que sobreviveram ao scaling
+    // (ex: enforceDayTargets gerou 0,7 fatias; enforceRealisticPortions corrige para 1 fatia).
+    enforceRealisticPortions(parsed)
     normalizeMenuTotals(parsed)
 
     // LISTA DE COMPRAS coerente: derivada dos alimentos FINAIS (após todos os reparos/swaps/boosters).
