@@ -20,7 +20,7 @@ function getTodayWaterGoalKey(): string {
 }
 
 export function WaterTracker() {
-  const { user, todayWater, addWater, resetWater, awardXP } = useApp()
+  const { user, todayWater, addWater, resetWater, awardXP, triggerCelebration } = useApp()
   const { t } = useTranslation()
 
   if (!user) return null
@@ -41,7 +41,12 @@ export function WaterTracker() {
     if (todayWater.target > 0 && newConsumed >= todayWater.target && !localStorage.getItem(key)) {
       localStorage.setItem(key, '1')
       awardXP('HIT_WATER_GOAL')
-      setTimeout(() => { toast.success('+20 XP — Meta hídrica atingida!', { icon: '💧' }) }, 1600)
+      setTimeout(() => triggerCelebration({
+        kind: 'goal',
+        title: 'Meta de hidratação! 💧',
+        subtitle: `Você bebeu ${todayWater.target}ml hoje. Seu corpo agradece!`,
+        xpGained: 20,
+      }), 400)
     }
   }
 

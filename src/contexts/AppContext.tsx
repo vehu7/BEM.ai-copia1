@@ -25,7 +25,8 @@ import type {
 } from '@/types'
 import { BADGES } from '@/data/badges'
 import { ACHIEVEMENTS } from '@/data/achievements'
-import { XP_ACTIONS, type XPAction, canUseStreakShield } from '@/lib/gamification'
+import { XP_ACTIONS, type XPAction, canUseStreakShield, getLevelForXP, getLevelName } from '@/lib/gamification'
+import type { CelebrationKind } from '@/components/celebration-modal'
 import { calculateBMR, calculateTDEE, calculateCalorieTarget, calculateMacros, calculateWaterTarget, applyClinicalFloors } from '@/lib/health-utils'
 import { supabase } from '@/lib/supabase'
 import {
@@ -152,6 +153,9 @@ interface AppContextType {
 
   // XP System
   awardXP: (action: import('@/lib/gamification').XPAction) => void
+  triggerCelebration: (opts: { kind: CelebrationKind; title: string; subtitle?: string; xpGained?: number }) => void
+  pendingCelebration: { kind: CelebrationKind; title: string; subtitle?: string; xpGained?: number } | null
+  dismissCelebration: () => void
 
   // Streak Shield
   streakShieldUsedAt: string | null
@@ -650,6 +654,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [pendingAchievements, setPendingAchievements] = useState<string[]>([])
   // Novo recorde de sequência aguardando celebração (parabéns)
   const [pendingRecord, setPendingRecord] = useState<{ kind: ActivityKind; streak: number } | null>(null)
+  // Celebração de meta / level-up / desafio
+  const [pendingCelebration, setPendingCelebration] = useState<{ kind: CelebrationKind; title: string; subtitle?: string; xpGained?: number } | null>(null)
+  const dismissCelebration = () => setPendingCelebration(null)
 
   const [biometricAvailable, setBiometricAvailable] = useState(false)
   const [biometricEnabled, setBiometricEnabled] = useState(isBiometricEnabledFn)
@@ -1479,8 +1486,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!user) return
     const gained = XP_ACTIONS[action] ?? 0
     if (gained === 0) return
-    const newTotal = (user.totalXP ?? 0) + gained
+    const prevTotal = user.totalXP ?? 0
+    const newTotal = prevTotal + gained
+    const prevLevel = getLevelForXP(prevTotal).level
+    const newLevel = getLevelForXP(newTotal).level
     setUser({ ...user, totalXP: newTotal, updatedAt: new Date() })
+    if (newLevel > prevLevel) {
+      const gender = (user.gender ?? 'neutro') as 'masculino' | 'feminino' | 'neutro'
+      const levelName = getLevelName(newLevel - 1, gender)
+      setTimeout(() => setPendingCelebration({
+        kind: 'level',
+        title: `Nível ${newLevel} desbloqueado!`,
+        subtitle: `Você agora é ${levelName}. Continue assim!`,
+        xpGained: gained,
+      }), 300)
+    }
+  }
+
+  const triggerCelebration = (opts: { kind: CelebrationKind; title: string; subtitle?: string; xpGained?: number }) => {
+    setPendingCelebration(opts)
   }
 
   // ── BIOMETRIA ──
@@ -1572,7 +1596,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         enableBiometric, disableBiometric, loginWithBiometric,
         checkInState, performCheckIn,
         gamification, registerActivity, pendingAchievements, dismissAchievements, pendingRecord, dismissRecord,
-        awardXP,
+        awardXP, triggerCelebration, pendingCelebration, dismissCelebration,
         streakShieldUsedAt, useStreakShield,
         isProfileComplete,
         updateSubscription,

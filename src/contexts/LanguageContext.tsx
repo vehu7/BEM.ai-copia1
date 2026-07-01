@@ -17,19 +17,18 @@ interface LanguageContextType {
   language: Language
   setLanguage: (lang: Language) => void
   t: TranslationKeys
+  /** true quando o idioma do dispositivo não é nenhum dos 4 suportados */
+  isLanguageUnknown: boolean
 }
 
 const LanguageContext = createContext<LanguageContextType | null>(null)
 
 /**
- * Mapeia `navigator.language` / `navigator.languages` (ex: "pt-BR", "en-US",
- * "es-MX", "fr-CA") para um dos 4 idiomas suportados. Fallback: inglês.
- *
- * Usa `navigator.languages` (array ordenado de preferências) além de
- * `navigator.language` para cobrir casos onde o primeiro idioma não é suportado
- * mas o segundo sim.
+ * Mapeia `navigator.language` / `navigator.languages` para um dos 4 idiomas
+ * suportados. Retorna `null` quando nenhum idioma do dispositivo é suportado,
+ * permitindo à UI exibir um seletor de idioma.
  */
-function detectBrowserLanguage(): Language {
+function detectBrowserLanguage(): Language | null {
   try {
     const candidates: string[] = []
     if (Array.isArray(navigator.languages)) {
@@ -45,7 +44,7 @@ function detectBrowserLanguage(): Language {
       if (lower.startsWith('en')) return 'en'
     }
   } catch { /* ignora */ }
-  return DEFAULT_LANGUAGE
+  return null
 }
 
 /**
@@ -55,55 +54,60 @@ function detectBrowserLanguage(): Language {
  * 2. Caso contrário, SEMPRE detecta do navegador/SO a cada carga.
  *    Isso garante que mudar o idioma no celular reflita no app imediatamente.
  */
-function resolveLanguage(): Language {
+function resolveLanguage(): { lang: Language; unknown: boolean } {
   try {
     const manual = localStorage.getItem(MANUAL_KEY) === '1'
     if (manual) {
       const saved = localStorage.getItem(STORAGE_KEY)
-      if (saved === 'pt-BR' || saved === 'en' || saved === 'fr' || saved === 'es') return saved
+      if (saved === 'pt-BR' || saved === 'en' || saved === 'fr' || saved === 'es') {
+        return { lang: saved, unknown: false }
+      }
     }
   } catch { /* ignora */ }
-  return detectBrowserLanguage()
+  const detected = detectBrowserLanguage()
+  return detected
+    ? { lang: detected, unknown: false }
+    : { lang: DEFAULT_LANGUAGE, unknown: true }
 }
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(resolveLanguage)
+  const initial = resolveLanguage()
+  const [language, setLanguageState] = useState<Language>(initial.lang)
+  const [isLanguageUnknown, setIsLanguageUnknown] = useState<boolean>(initial.unknown)
 
-  // Persiste o idioma detectado/escolhido em localStorage para consumo de outras
-  // partes do app (ex: prompts de IA que usam user.language).
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY, language) } catch {}
   }, [language])
 
-  /** Chamado quando usuário troca manualmente em Settings. Marca a flag. */
+  /** Chamado quando usuário troca manualmente (Settings ou seletor da LP). */
   const setLanguage = (lang: Language) => {
     setLanguageState(lang)
+    setIsLanguageUnknown(false)
     try {
       localStorage.setItem(STORAGE_KEY, lang)
       localStorage.setItem(MANUAL_KEY, '1')
     } catch { /* ignora */ }
   }
 
-  // Re-resolve o idioma quando a aba volta ao foco (usuário pode ter mudado o
-  // idioma do SO entre uma abertura e outra sem recarregar a página).
   useEffect(() => {
     const handleVisibility = () => {
       if (document.visibilityState === 'visible') {
         const next = resolveLanguage()
-        setLanguageState(prev => (prev === next ? prev : next))
+        setLanguageState(prev => (prev === next.lang ? prev : next.lang))
+        setIsLanguageUnknown(next.unknown)
       }
     }
     document.addEventListener('visibilitychange', handleVisibility)
     return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
 
-  // Sincroniza entre abas: se outra aba troca o idioma, esta recebe o evento.
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
       if (e.key === STORAGE_KEY && e.newValue) {
         const val = e.newValue as Language
         if (val === 'pt-BR' || val === 'en' || val === 'fr' || val === 'es') {
           setLanguageState(val)
+          setIsLanguageUnknown(false)
         }
       }
     }
@@ -114,7 +118,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
   const t = getTranslations(language)
 
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, isLanguageUnknown }}>
       {children}
     </LanguageContext.Provider>
   )

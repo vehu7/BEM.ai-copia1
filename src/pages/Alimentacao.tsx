@@ -108,7 +108,7 @@ function getTodayKey(suffix: string): string {
 }
 
 export function Alimentacao() {
-  const { user, todayMeals, addMeal, removeMeal, savedWeeklyMenu, awardXP } = useApp()
+  const { user, todayMeals, addMeal, removeMeal, savedWeeklyMenu, awardXP, triggerCelebration } = useApp()
   const { t } = useTranslation()
   const ta = t.alimentacao
 
@@ -309,14 +309,24 @@ export function Alimentacao() {
     if (user?.targetCalories && newCalories >= user.targetCalories && !localStorage.getItem(getTodayKey('calorie_goal'))) {
       localStorage.setItem(getTodayKey('calorie_goal'), '1')
       awardXP('HIT_CALORIE_GOAL')
-      setTimeout(() => { toast.success('+25 XP — Meta calórica atingida!', { icon: '🎯' }) }, 1600)
+      setTimeout(() => triggerCelebration({
+        kind: 'goal',
+        title: 'Meta calórica do dia! 🎯',
+        subtitle: 'Você atingiu sua meta de calorias. Plano seguido à risca!',
+        xpGained: 25,
+      }), 400)
     }
     // XP por meta de proteína (>=90%) só uma vez por dia
     const newProtein = todayMeals.reduce((s, m) => s + m.totalProtein, 0) + meal.totalProtein
     if (user?.targetProtein && newProtein >= user.targetProtein * 0.9 && !localStorage.getItem(getTodayKey('protein_goal'))) {
       localStorage.setItem(getTodayKey('protein_goal'), '1')
       awardXP('HIT_PROTEIN_GOAL')
-      setTimeout(() => { toast.success('+20 XP — Meta de proteína atingida!', { icon: '💪' }) }, 2400)
+      setTimeout(() => triggerCelebration({
+        kind: 'goal',
+        title: 'Meta de proteína atingida! 💪',
+        subtitle: 'Seu músculo agradece. Proteína em dia!',
+        xpGained: 20,
+      }), 800)
     }
 
     setSelectedFoods([])

@@ -894,6 +894,10 @@ const fr = {
         "cycle": {
           "title": "Cycle Menstruel",
           "desc": "Menu et entraînements adaptés à la phase du cycle. Support spécial pour le syndrome prémenstruel, la phase lutéale et l'ovulation."
+        },
+        "meditation": {
+          "title": "Méditation & Relaxation",
+          "desc": "Audios guidés et musique instrumentale pour réduire le cortisol, améliorer la concentration et préparer votre corps à un sommeil plus profond et réparateur."
         }
       }
     },

@@ -44,7 +44,7 @@ function saveStorage(data: WeekStorage): void {
 // ── Componente ────────────────────────────────────────────────────────────────
 
 export function WeeklyChallengeCard() {
-  const { awardXP } = useApp()
+  const { awardXP, triggerCelebration } = useApp()
 
   const challenges = getWeeklyChallenges()
   const daysLeft = daysUntilWeekEnd()
@@ -83,8 +83,11 @@ export function WeeklyChallengeCard() {
 
     if (nowCompleted) {
       awardXP('COMPLETE_WEEKLY_CHALLENGE')
-      toast.success(`🎉 Desafio concluído: ${challenge.title}!`, {
-        description: `+${challenge.xpReward} XP desbloqueados. Parabéns!`,
+      triggerCelebration?.({
+        kind: 'challenge',
+        title: 'Desafio concluído! 🏆',
+        subtitle: challenge.title,
+        xpGained: challenge.xpReward,
       })
     }
   }

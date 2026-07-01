@@ -28,6 +28,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
 import { AchievementCelebration } from '@/components/achievement-celebration'
 import { RecordCelebration } from '@/components/record-celebration'
+import { CelebrationModal } from '@/components/celebration-modal'
 import { TrialBanner } from '@/components/trial-banner'
 import { TrialExpiredScreen } from '@/components/trial-expired-screen'
 import { shouldShowTrialExpiredGate } from '@/lib/subscription'
@@ -57,7 +58,7 @@ function RequireProfile({ children }: { children: React.ReactNode }) {
 }
 
 export function App() {
-  const { isOnboarding, isAuthenticated, authLoading, user } = useApp()
+  const { isOnboarding, isAuthenticated, authLoading, user, pendingCelebration, dismissCelebration } = useApp()
   const location = useLocation()
   const [darkMode, setDarkMode] = useState(getThemeMode)
 
@@ -158,6 +159,16 @@ export function App() {
       <PwaInstallPrompt />
       <AchievementCelebration />
       <RecordCelebration />
+      {pendingCelebration && (
+        <CelebrationModal
+          open={true}
+          kind={pendingCelebration.kind}
+          title={pendingCelebration.title}
+          subtitle={pendingCelebration.subtitle}
+          xpGained={pendingCelebration.xpGained}
+          onClose={dismissCelebration}
+        />
+      )}
       <Toaster />
     </>
   )

@@ -894,6 +894,10 @@ const en = {
         "cycle": {
           "title": "Menstrual Cycle",
           "desc": "Menus and workouts adapted to the phase of the cycle. Special support for PMS, luteal phase, and ovulation."
+        },
+        "meditation": {
+          "title": "Meditation & Relaxation",
+          "desc": "Guided audios and instrumental music to reduce cortisol, improve focus, and prepare your body for deeper, more restorative sleep."
         }
       }
     },

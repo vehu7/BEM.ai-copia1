@@ -7,6 +7,7 @@ import {
   ArrowRight, Menu, X,
 } from 'lucide-react'
 import { useTranslation } from '@/contexts/LanguageContext'
+import { SUPPORTED_LANGUAGES } from '@/lib/i18n/types'
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -115,7 +116,7 @@ function StatsCarousel() {
           <div key={i} className="text-center px-6 flex-shrink-0" style={{ width: '25vw' }}>
             <p className="text-2xl font-black text-white">{s.v}</p>
             <p className="text-xs font-semibold mt-0.5 text-white/90">{s.l}</p>
-            <p className="text-xs mt-0.5 leading-tight text-white/50">{s.sub}</p>
+            <p className="text-xs mt-0.5 leading-tight text-white/75">{s.sub}</p>
           </div>
         ))}
       </div>
@@ -144,10 +145,10 @@ function Testimonials3D() {
   return (
     <section className="py-20 overflow-hidden" style={{ background: 'linear-gradient(160deg, #f0f9f0, #e8f4e8)' }}>
       <FadeIn className="text-center mb-14 px-5">
-        <p className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">{t.landingPage.testimonials.tag}</p>
-        <h2 className="text-3xl sm:text-4xl font-black leading-tight text-foreground">
+        <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#285B2C' }}>{t.landingPage.testimonials.tag}</p>
+        <h2 className="text-3xl sm:text-4xl font-black leading-tight" style={{ color: '#1a3d1e' }}>
           {t.landingPage.testimonials.title1}<br />
-          <span className="text-primary">{t.landingPage.testimonials.title2}</span>
+          <span style={{ color: '#285B2C' }}>{t.landingPage.testimonials.title2}</span>
         </h2>
       </FadeIn>
 
@@ -200,7 +201,7 @@ function Testimonials3D() {
         })}
       </div>
 
-      <p className="text-center text-xs mt-4 px-6 text-primary/60">
+      <p className="text-center text-xs mt-4 px-6" style={{ color: '#3d6e41' }}>
         {t.landingPage.testimonials.disclaimer}
       </p>
 
@@ -217,10 +218,12 @@ function Testimonials3D() {
 
 export function LandingPage() {
   const navigate = useNavigate()
-  const { t } = useTranslation()
+  const { t, language, setLanguage, isLanguageUnknown } = useTranslation()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [langPickerOpen, setLangPickerOpen] = useState(false)
+  const [unknownDismissed, setUnknownDismissed] = useState(false)
   const featuresRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -237,6 +240,29 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground font-sans overflow-x-hidden">
 
+      {/* ── LANGUAGE SELECTOR MODAL (idioma do dispositivo não reconhecido) ── */}
+      {isLanguageUnknown && !unknownDismissed && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-5 backdrop-blur-sm">
+          <div className="bg-card rounded-2xl p-7 max-w-xs w-full shadow-xl border border-border text-center">
+            <p className="text-3xl mb-4">🌐</p>
+            <h2 className="font-black text-lg text-foreground mb-1">Choose your language</h2>
+            <p className="text-sm text-muted-foreground mb-6">Select the language you prefer to continue.</p>
+            <div className="space-y-2">
+              {SUPPORTED_LANGUAGES.map(l => (
+                <button
+                  key={l.value}
+                  onClick={() => { setLanguage(l.value); setUnknownDismissed(true) }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl border border-border hover:border-primary hover:bg-primary/5 transition-colors text-sm font-semibold text-foreground"
+                >
+                  <span className="text-xl">{l.flag}</span>
+                  <span>{l.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── NAVBAR ── */}
       <header
         className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
@@ -244,13 +270,40 @@ export function LandingPage() {
       >
         <div className="max-w-6xl mx-auto px-5 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/alimentacao.png" alt="BEM.ai" className="w-8 h-8 object-contain" />
+            <img src="/logo.png" alt="BEM.ai" className="w-9 h-9 object-contain rounded-xl" />
             <span className="font-bold text-lg text-primary">BEM.ai</span>
           </div>
 
           <nav className="hidden md:flex items-center gap-6">
             <button onClick={() => scrollTo(featuresRef)} className="text-sm font-medium text-primary transition-colors hover:text-primary/80">{t.landingPage.nav.features}</button>
             <button onClick={() => navigate('/login')} className="text-sm font-medium text-primary transition-colors hover:text-primary/80">{t.landingPage.nav.login}</button>
+            {/* Language picker */}
+            <div className="relative">
+              <button
+                onClick={() => setLangPickerOpen(v => !v)}
+                className="flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+                aria-label="Select language"
+              >
+                <span>{SUPPORTED_LANGUAGES.find(l => l.value === language)?.flag ?? '🌐'}</span>
+                <span className="hidden lg:inline uppercase text-xs font-bold">{language === 'pt-BR' ? 'PT' : language.toUpperCase()}</span>
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+              {langPickerOpen && (
+                <div className="absolute right-0 top-full mt-2 w-44 rounded-xl bg-card border border-border shadow-lg overflow-hidden z-50">
+                  {SUPPORTED_LANGUAGES.map(l => (
+                    <button
+                      key={l.value}
+                      onClick={() => { setLanguage(l.value); setLangPickerOpen(false) }}
+                      className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left hover:bg-primary/5 transition-colors ${language === l.value ? 'font-semibold text-primary bg-primary/5' : 'text-foreground'}`}
+                    >
+                      <span>{l.flag}</span>
+                      <span>{l.label}</span>
+                      {language === l.value && <Check className="w-3.5 h-3.5 ml-auto text-primary" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button
               onClick={() => navigate('/onboarding')}
               className="px-5 py-2.5 rounded-full text-sm font-semibold bg-primary text-primary-foreground transition-all hover:opacity-90 active:scale-95"
@@ -260,6 +313,30 @@ export function LandingPage() {
           </nav>
 
           <div className="flex md:hidden items-center gap-3">
+            {/* Mobile language picker */}
+            <div className="relative">
+              <button
+                onClick={() => setLangPickerOpen(v => !v)}
+                className="text-primary text-sm font-bold"
+                aria-label="Select language"
+              >
+                {SUPPORTED_LANGUAGES.find(l => l.value === language)?.flag ?? '🌐'}
+              </button>
+              {langPickerOpen && (
+                <div className="absolute right-0 top-full mt-2 w-44 rounded-xl bg-card border border-border shadow-lg overflow-hidden z-50">
+                  {SUPPORTED_LANGUAGES.map(l => (
+                    <button
+                      key={l.value}
+                      onClick={() => { setLanguage(l.value); setLangPickerOpen(false) }}
+                      className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left hover:bg-primary/5 transition-colors ${language === l.value ? 'font-semibold text-primary' : 'text-foreground'}`}
+                    >
+                      <span>{l.flag}</span>
+                      <span>{l.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
             <button onClick={() => navigate('/login')} className="text-sm font-semibold px-3 py-1.5 rounded-full border border-primary text-primary">{t.landingPage.nav.login}</button>
             <button onClick={() => setMenuOpen(v => !v)} className="text-primary">
               {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -288,13 +365,12 @@ export function LandingPage() {
         </div>
 
         <div className="relative max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-tight mb-6 text-foreground">
+          {/* Todas as cores são hardcoded para garantir contraste no fundo claro (light ou dark mode) */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black leading-tight mb-6" style={{ color: '#1a3d1e' }}>
             {t.landingPage.hero.title1}{' '}
-            <span className="text-primary">{t.landingPage.hero.title2}</span>{' '}
+            <span style={{ color: '#285B2C' }}>{t.landingPage.hero.title2}</span>{' '}
             {t.landingPage.hero.title3}{' '}
-            <span
-              className="relative inline-block text-primary"
-            >
+            <span className="relative inline-block" style={{ color: '#285B2C' }}>
               {t.landingPage.hero.title4}
               <svg className="absolute -bottom-1 left-0 w-full" viewBox="0 0 200 8" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M2 6C50 2 150 2 198 6" stroke="#9BC89B" strokeWidth="3" strokeLinecap="round"/>
@@ -302,21 +378,23 @@ export function LandingPage() {
             </span>
           </h1>
 
-          <p className="text-lg sm:text-xl mb-10 max-w-xl mx-auto leading-relaxed text-primary/80">
+          <p className="text-lg sm:text-xl mb-10 max-w-xl mx-auto leading-relaxed" style={{ color: '#2d5c31' }}>
             {t.landingPage.hero.subtitle}
           </p>
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-12">
             <button
               onClick={() => navigate('/onboarding')}
-              className="flex items-center gap-2 px-8 py-4 rounded-full text-base font-bold bg-primary text-primary-foreground shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
+              className="flex items-center gap-2 px-8 py-4 rounded-full text-base font-bold shadow-lg transition-all hover:shadow-xl hover:-translate-y-0.5 active:scale-95"
+              style={{ backgroundColor: '#285B2C', color: '#ffffff' }}
             >
               {t.landingPage.hero.ctaStart}
               <ArrowRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => scrollTo(featuresRef)}
-              className="flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-primary transition-all hover:bg-white/50 border border-primary/25"
+              className="flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold transition-all hover:bg-white/50"
+              style={{ color: '#285B2C', border: '1.5px solid #285B2C80' }}
             >
               {t.landingPage.hero.ctaHow}
               <ChevronDown className="w-4 h-4" />
@@ -341,7 +419,7 @@ export function LandingPage() {
               <div className="flex gap-0.5">
                 {[1,2,3,4,5].map(i => <Star key={i} className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />)}
               </div>
-              <span className="text-xs text-primary/70">{t.landingPage.hero.socialProof}</span>
+              <span className="text-xs" style={{ color: '#3d6e41' }}>{t.landingPage.hero.socialProof}</span>
             </div>
           </div>
         </div>
@@ -381,10 +459,19 @@ export function LandingPage() {
               )
             })}
           </div>
-          <FadeIn delay={400} className="text-center mt-10">
-            <p className="text-lg font-semibold text-primary/80">
-              {t.landingPage.problem.solution}
-            </p>
+          <FadeIn delay={400} className="mt-12">
+            <div className="relative rounded-2xl overflow-hidden">
+              {/* fundo gradiente escuro com borda brilhante */}
+              <div className="absolute inset-0 rounded-2xl" style={{ background: 'linear-gradient(135deg, #285B2C 0%, #1a3d1e 100%)', border: '2px solid #4a9e50' }} />
+              {/* brilho sutil no topo */}
+              <div className="absolute top-0 left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, #9BC89B80, transparent)' }} />
+              <div className="relative px-8 py-8 text-center">
+                <span className="inline-block text-2xl mb-4">✨</span>
+                <p className="text-xl sm:text-2xl font-black text-white leading-snug">
+                  {t.landingPage.problem.solution}
+                </p>
+              </div>
+            </div>
           </FadeIn>
         </div>
       </section>
@@ -410,7 +497,7 @@ export function LandingPage() {
                       <Icon className="w-5 h-5" style={{ color }} />
                     </div>
                     <h3 className="font-bold text-sm mb-1.5 text-foreground">{data.title}</h3>
-                    <p className="text-xs leading-relaxed text-foreground/50">{data.desc}</p>
+                    <p className="text-xs leading-relaxed text-foreground/70">{data.desc}</p>
                   </div>
                 </FadeIn>
               )
@@ -419,14 +506,112 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ── GAMIFICAÇÃO + LEMBRETES ── */}
+      <section className="py-20 px-5" style={{ background: 'linear-gradient(160deg, #0f1a0f 0%, #1a2e1a 100%)' }}>
+        <div className="max-w-5xl mx-auto">
+          <FadeIn className="text-center mb-14">
+            <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest mb-3 text-primary">
+              <span>🎮</span>
+              <span>{t.landingPage.gamification?.tag ?? 'Hábitos que grudam'}</span>
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-white leading-tight mt-1">
+              {t.landingPage.gamification?.title1 ?? 'Saúde vira rotina'}{' '}
+              <span className="text-primary">{t.landingPage.gamification?.title2 ?? 'quando tem recompensa.'}</span>
+            </h2>
+            <p className="text-base mt-4 max-w-xl mx-auto text-white/70">
+              {t.landingPage.gamification?.subtitle ?? 'XP, sequências e conquistas que tornam cada hábito irresistível. Quanto mais você cuida de si, mais recompensas desbloqueiam.'}
+            </p>
+          </FadeIn>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+            {/* Streak */}
+            <FadeIn delay={0}>
+              <div className="rounded-2xl p-6" style={{ background: '#1e3320', border: '1px solid #2d5533' }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">🔥</span>
+                  <div>
+                    <p className="font-black text-2xl text-white">7 dias</p>
+                    <p className="text-xs font-semibold text-primary">Sequência ativa</p>
+                  </div>
+                </div>
+                <p className="text-sm text-white/70 leading-relaxed">
+                  {t.landingPage.gamification?.streakDesc ?? 'Cada dia que você registra algo, sua sequência cresce. Perca a sequência, perca o XP bônus. Simples assim.'}
+                </p>
+              </div>
+            </FadeIn>
+
+            {/* XP & Nível */}
+            <FadeIn delay={80}>
+              <div className="rounded-2xl p-6" style={{ background: '#1e3320', border: '1px solid #2d5533' }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">⭐</span>
+                  <div>
+                    <p className="font-black text-2xl text-white">+50 XP</p>
+                    <p className="text-xs font-semibold text-primary">Por meta batida</p>
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-white/60 font-medium">Nível 3 · Guerreiro</span>
+                    <span className="text-primary font-bold">780 / 1000</span>
+                  </div>
+                  <div className="h-2.5 rounded-full bg-white/10 overflow-hidden">
+                    <div className="h-full rounded-full bg-primary transition-all" style={{ width: '78%' }} />
+                  </div>
+                </div>
+                <p className="text-sm text-white/70 leading-relaxed">
+                  {t.landingPage.gamification?.xpDesc ?? 'Registrar refeição, beber água, dormir bem — cada ação gera XP e sobe seu nível.'}
+                </p>
+              </div>
+            </FadeIn>
+
+            {/* Conquistas */}
+            <FadeIn delay={160}>
+              <div className="rounded-2xl p-6" style={{ background: '#1e3320', border: '1px solid #2d5533' }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl">🏆</span>
+                  <div>
+                    <p className="font-black text-2xl text-white">38 badges</p>
+                    <p className="text-xs font-semibold text-primary">Para conquistar</p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {['💧','🥗','🏋️','😴','⚡','🧘'].map((e, i) => (
+                    <span key={i} className="text-lg w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: i < 3 ? '#285B2C' : '#ffffff15', border: i < 3 ? '1px solid #4a9e50' : '1px solid #ffffff20' }}>{e}</span>
+                  ))}
+                </div>
+                <p className="text-sm text-white/70 leading-relaxed">
+                  {t.landingPage.gamification?.badgesDesc ?? '6 categorias de conquistas. Desbloqueie ao atingir metas de hidratação, sono, treino e mais.'}
+                </p>
+              </div>
+            </FadeIn>
+          </div>
+
+          {/* Lembretes */}
+          <FadeIn delay={200}>
+            <div className="rounded-2xl p-7 flex flex-col sm:flex-row items-center gap-6" style={{ background: 'linear-gradient(135deg, #285B2C, #1a3d1e)', border: '1px solid #4a9e50' }}>
+              <div className="flex-shrink-0 w-16 h-16 rounded-2xl flex items-center justify-center text-3xl" style={{ background: '#ffffff15' }}>🔔</div>
+              <div className="text-center sm:text-left">
+                <p className="font-black text-lg text-white mb-1">
+                  {t.landingPage.gamification?.reminderTitle ?? 'A BEM lembra de você — do jeito certo'}
+                </p>
+                <p className="text-sm text-white/75 leading-relaxed">
+                  {t.landingPage.gamification?.reminderDesc ?? 'Lembretes inteligentes de água, refeições, treino e sono nos momentos certos do seu dia. Nada de spam, só o que você precisa, quando precisa.'}
+                </p>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
       {/* ── PARA QUEM É ── */}
       <section className="py-20 px-5" style={{ background: 'linear-gradient(160deg, #f0f9f0, #e8f4e8)' }}>
         <div className="max-w-5xl mx-auto">
           <FadeIn className="text-center mb-14">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">{t.landingPage.audiences.tag}</p>
-            <h2 className="text-3xl sm:text-4xl font-black leading-tight text-foreground">
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#285B2C' }}>{t.landingPage.audiences.tag}</p>
+            <h2 className="text-3xl sm:text-4xl font-black leading-tight" style={{ color: '#1a3d1e' }}>
               {t.landingPage.audiences.title1}<br />
-              <span className="text-primary">{t.landingPage.audiences.title2}</span>
+              <span style={{ color: '#285B2C' }}>{t.landingPage.audiences.title2}</span>
             </h2>
           </FadeIn>
           <div className="grid sm:grid-cols-2 gap-5">
@@ -441,7 +626,7 @@ export function LandingPage() {
                     </div>
                     <h3 className="font-bold text-base mb-0.5 text-foreground">{data.title}</h3>
                     <p className="text-xs mb-3 font-medium text-primary">{data.subtitle}</p>
-                    <p className="text-sm leading-relaxed text-foreground/50">{data.desc}</p>
+                    <p className="text-sm leading-relaxed text-foreground/70">{data.desc}</p>
                   </div>
                 </FadeIn>
               )
@@ -469,7 +654,7 @@ export function LandingPage() {
                       {STEP_NUMS[k]}
                     </div>
                     <h3 className="font-bold text-base mb-2 text-foreground">{data.title}</h3>
-                    <p className="text-sm leading-relaxed text-foreground/50">{data.desc}</p>
+                    <p className="text-sm leading-relaxed text-foreground/70">{data.desc}</p>
                   </div>
                 </FadeIn>
               )
@@ -536,7 +721,7 @@ export function LandingPage() {
                     </button>
                     {openFaq === i && (
                       <div className="px-5 pb-4">
-                        <p className="text-sm leading-relaxed text-foreground/50">{faq.a}</p>
+                        <p className="text-sm leading-relaxed text-foreground/70">{faq.a}</p>
                       </div>
                     )}
                   </div>
@@ -596,7 +781,7 @@ export function LandingPage() {
       <footer className="py-10 px-5" style={{ backgroundColor: '#0f1a0f', borderTop: '1px solid #1e2e1e' }}>
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <img src="https://vmfhhwbbwnotugnrdjpm.supabase.co/storage/v1/object/public/icons_app/alimentacao.png" alt="BEM.ai" className="w-7 h-7 object-contain" />
+            <img src="/logo.png" alt="BEM.ai" className="w-8 h-8 object-contain rounded-xl" />
             <span className="font-bold text-sm text-white">BEM.ai</span>
           </div>
           <p className="text-xs text-center text-white/40">
