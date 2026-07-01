@@ -7,12 +7,72 @@ import { hasAccess } from '@/lib/subscription'
 import { UpgradeGate } from '@/components/upgrade-gate'
 import { useTranslation } from '@/contexts/LanguageContext'
 import type { Language } from '@/lib/i18n'
+import type { UserProfile, Meal, WaterIntake, SleepEntry, WorkoutSession, CycleConfig } from '@/types'
 
 interface Message {
   id: string
   role: 'user' | 'assistant'
   content: string
   timestamp: Date
+}
+
+function buildUserContext(
+  user: UserProfile | null,
+  todayMeals: Meal[],
+  todayWater: WaterIntake,
+  sleepHistory: SleepEntry[],
+  todayWorkouts: WorkoutSession[],
+  cycleConfig: CycleConfig | null,
+): string {
+  if (!user) return ''
+
+  const totalCalories = todayMeals.reduce((sum, m) => sum + (m.calories ?? 0), 0)
+  const totalProtein = todayMeals.reduce((sum, m) => sum + (m.protein ?? 0), 0)
+  const totalCarbs = todayMeals.reduce((sum, m) => sum + (m.carbs ?? 0), 0)
+  const totalFat = todayMeals.reduce((sum, m) => sum + (m.fat ?? 0), 0)
+  const waterConsumed = todayWater.consumed
+  const waterTarget = todayWater.target
+  const lastSleep = sleepHistory[0]
+  const todayWorkoutCount = todayWorkouts.length
+
+  const lines: string[] = [
+    `## Dados do usuário hoje (${new Date().toLocaleDateString('pt-BR')})`,
+    `Nome: ${user.name}`,
+    `Objetivo: ${user.goal}`,
+    `Peso atual: ${user.currentWeight}kg | Meta: ${user.targetWeight}kg`,
+    `Calorias: ${totalCalories}kcal consumidas de ${user.targetCalories ?? '?'}kcal alvo`,
+    `Proteína: ${totalProtein.toFixed(0)}g de ${user.targetProtein ?? '?'}g alvo`,
+    `Carboidratos: ${totalCarbs.toFixed(0)}g | Gordura: ${totalFat.toFixed(0)}g`,
+    `Água: ${waterConsumed}ml de ${waterTarget}ml (${waterTarget > 0 ? Math.round((waterConsumed / waterTarget) * 100) : 0}%)`,
+    `Treinos hoje: ${todayWorkoutCount}`,
+    lastSleep
+      ? `Último sono: ${lastSleep.duration}h (qualidade: ${lastSleep.quality})`
+      : 'Sono: não registrado hoje',
+  ]
+
+  if (user.gender === 'feminino' && cycleConfig) {
+    const daysSinceStart = Math.floor(
+      (Date.now() - new Date(cycleConfig.lastPeriodStart).getTime()) / (1000 * 60 * 60 * 24),
+    )
+    const cycleDay = (daysSinceStart % (cycleConfig.cycleLength ?? 28)) + 1
+    let phase = 'folicular'
+    if (cycleDay <= 5) phase = 'menstrual'
+    else if (cycleDay <= 13) phase = 'folicular'
+    else if (cycleDay <= 16) phase = 'ovulatória'
+    else phase = 'lútea'
+    lines.push(`Fase do ciclo: dia ${cycleDay} (fase ${phase})`)
+  }
+
+  if (user.medication && user.medication !== 'nenhum') {
+    lines.push(
+      `Medicação: ${user.medication}${user.medicationDosage ? ` (${user.medicationDosage})` : ''}`,
+    )
+  }
+  if (user.hadBariatricSurgery) {
+    lines.push('Pós-cirurgia bariátrica: sim')
+  }
+
+  return lines.join('\n')
 }
 
 function getCountryFromLocale(): string {
@@ -90,7 +150,7 @@ export function ChatBem() {
 }
 
 function ChatBemContent() {
-  const { user } = useApp()
+  const { user, todayMeals, todayWater, sleepHistory, todayWorkouts, cycleConfig } = useApp()
   const { t, language } = useTranslation()
   const tc = t.chatBem
   const country = getCountryFromLocale()
@@ -164,6 +224,11 @@ function ChatBemContent() {
     try {
       const apiKey = import.meta.env.VITE_OPENAI_API_KEY
 
+      const userContext = buildUserContext(user, todayMeals, todayWater, sleepHistory, todayWorkouts, cycleConfig)
+      const fullSystemPrompt = userContext
+        ? `${SYSTEM_PROMPT}\n\n${userContext}`
+        : SYSTEM_PROMPT
+
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -174,7 +239,7 @@ function ChatBemContent() {
           model: 'gpt-4o-mini',
           stream: true,
           messages: [
-            { role: 'system', content: SYSTEM_PROMPT },
+            { role: 'system', content: fullSystemPrompt },
             ...updatedMessages.map(m => ({ role: m.role, content: m.content })),
           ],
           max_tokens: 400,
