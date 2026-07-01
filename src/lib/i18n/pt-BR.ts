@@ -868,7 +868,7 @@ const ptBR = {
     },
     features: {
       tag: 'Tudo integrado, tudo personalizado',
-      title1: '8 módulos que trabalham juntos',
+      title1: '9 módulos que trabalham juntos',
       title2: 'pelo seu resultado',
       items: {
         nutrition: { title: 'Nutrição Inteligente', desc: 'Cardápio semanal gerado por IA para o seu perfil. Registre refeições com foto ou busca e veja calorias, proteínas e macros em tempo real.' },
@@ -879,32 +879,33 @@ const ptBR = {
         fasting: { title: 'Jejum Intermitente', desc: 'Timer com protocolos 12:12, 14:10, 16:8, 18:6, 20:4 e OMAD. O cardápio é gerado dentro da sua janela alimentar automaticamente.' },
         progress: { title: 'Progresso Visível', desc: 'Gráfico de peso, medidas corporais, fotos de antes e depois, e análise de progresso por IA. Veja o quanto você evoluiu — em números e imagens.' },
         cycle: { title: 'Ciclo Menstrual', desc: 'Na fase lútea você come mais — e faz sentido. O BEM.ai adapta cardápio e treino à fase do seu ciclo para trabalhar a favor do seu corpo.' },
+        meditation: { title: 'Meditação & Relaxamento', desc: 'Áudios guiados e músicas instrumentais para reduzir cortisol, melhorar o foco e preparar o corpo para um sono mais profundo e reparador.' },
       },
     },
     audiences: {
       tag: 'Criado para o seu contexto específico',
       title1: 'Seu corpo tem uma história.',
-      title2: 'O BEM.ai a leva a sério.',
+      title2: 'O BEM.ai te leva a sério.',
       items: {
-        glp1: { title: 'Usuárias de GLP-1', subtitle: 'Ozempic, Saxenda, Mounjaro, Wegovy', desc: 'Porções menores, proteína elevada e fibras estratégicas para proteger massa muscular enquanto você emagrece — e reduzir náuseas e outros efeitos colaterais comuns das canetas.' },
+        glp1: { title: 'Usuários(as) de GLP-1', subtitle: 'Ozempic, Saxenda, Mounjaro, Wegovy', desc: 'Porções menores, proteína elevada e fibras estratégicas para proteger massa muscular enquanto você emagrece — e reduzir náuseas e outros efeitos colaterais comuns das canetas.' },
         bariatric: { title: 'Pós-Bariátrica', subtitle: 'Cuidado contínuo após a cirurgia', desc: 'Cardápio fracionado em até 6 refeições, proteína máxima em cada janela, carboidratos simples mínimos e foco em B12, ferro, cálcio e vitamina D — o que você precisa, no momento certo.' },
-        everyone: { title: 'Iniciantes e Avançadas', subtitle: 'Sem julgamento, no seu ritmo', desc: 'Começando do zero ou retomando depois de anos? O plano começa onde você está agora e evolui com você. Sem obrigações impossíveis, sem culpa.' },
+        everyone: { title: 'Iniciantes e Avançados(as)', subtitle: 'Sem julgamento, no seu ritmo', desc: 'Começando do zero ou retomando depois de anos? O plano começa onde você está agora e evolui com você. Sem obrigações impossíveis, sem culpa.' },
         fasting: { title: 'Jejum Intermitente', subtitle: '12:12, 14:10, 16:8, 18:6, OMAD', desc: 'O cardápio semanal é gerado dentro da sua janela alimentar. As calorias e macros do dia inteiro ficam concentradas nas horas que você escolheu comer.' },
       },
     },
     howItWorks: {
-      tag: 'Em 3 minutos você já tem um plano',
+      tag: 'Em menos de 2 minutos você já tem um plano',
       title: 'Simples de começar. Difícil de parar.',
       steps: {
-        onboarding: { title: 'Conte sobre você', desc: 'Peso, objetivo, rotina, restrições, medicações. Leva menos de 3 minutos — e cada resposta torna o plano mais preciso.' },
-        plan: { title: 'Seu plano pronto na hora', desc: 'O sistema calcula suas calorias, macros e metas de hidratação e gera um cardápio semanal personalizado — antes mesmo de você fechar o app.' },
-        progress: { title: 'Registre, veja, evolua', desc: 'Cada refeição registrada, cada peso salvo, cada noite de sono monitorada te mostra com clareza o quanto você está evoluindo.' },
+        onboarding: { title: 'Conte sobre você', desc: 'Peso, objetivo, rotina, restrições, medicações. Leva menos de 2 minutos — e cada resposta torna o plano mais preciso.' },
+        plan: { title: 'Seu plano pronto na hora', desc: 'O sistema calcula calorias, macros, hidratação e gera um cardápio semanal + plano de treino personalizado — antes mesmo de você fechar o app.' },
+        progress: { title: 'Registre, treine, evolua', desc: 'Acompanhe refeições, treinos, sono e peso. O BEM.ai cruza tudo e te mostra, com clareza, o quanto você está evoluindo em corpo e hábitos.' },
       },
     },
     testimonials: {
-      tag: 'Milhares de usuárias já transformaram sua saúde com o BEM.ai',
+      tag: 'Quem já usa o BEM.ai está transformando a própria saúde',
       title1: 'O que muda quando o plano',
-      title2: 'é realmente seu',
+      title2: 'é realmente seu:',
       disclaimer: '* Resultados individuais variam. Os relatos refletem experiências pessoais e não garantem resultados idênticos.',
       items: {
         ana: { name: 'Ana Paula S.', role: '−12kg em 4 meses · Objetivo: emagrecer', text: 'Tentei dezenas de dietas e nunca passei de duas semanas. O BEM.ai foi diferente porque o cardápio pareceu feito por uma nutricionista que me conhece de verdade. Não senti que estava me privando — senti que estava cuidando de mim.' },
@@ -926,7 +927,7 @@ const ptBR = {
       tag: 'Respostas rápidas',
       title: 'Dúvidas frequentes',
       items: {
-        free: { q: 'Preciso pagar para começar?', a: 'Não. Você tem 7 dias grátis no plano básico — sem precisar cadastrar cartão de crédito. O plano básico inclui nutrição, hidratação, sono, jejum, ciclo menstrual e progresso. Treinos personalizados e o Chat com a BEM fazem parte do plano Premium. Depois dos 7 dias, você escolhe se quer continuar com um plano pago.' },
+        free: { q: 'Preciso pagar para começar?', a: 'Não. Você tem 7 dias grátis no plano básico — sem precisar cadastrar cartão de crédito. O plano básico inclui nutrição, hidratação, sono, meditação, jejum, ciclo menstrual e progresso. Treinos personalizados e o Chat com a BEM fazem parte do plano Premium. Depois dos 7 dias, você escolhe se quer continuar com um plano pago.' },
         noExpert: { q: 'Preciso entender de nutrição?', a: 'Não. O app calcula calorias, macros, hidratação e adapta os cardápios automaticamente. Você só registra o que come — o BEM.ai faz o resto.' },
         glp1: { q: 'Funciona para quem usa Ozempic, Saxenda ou Mounjaro?', a: 'Sim — e é um dos nossos principais diferenciais. O app detecta o uso de GLP-1 no onboarding e adapta o plano: porções menores, proteína elevada, fibras estratégicas e hidratação otimizada para reduzir efeitos colaterais.' },
         bariatric: { q: 'E para pós-bariátrica?', a: 'Absolutamente. Há um campo específico no onboarding para histórico de cirurgia bariátrica. O plano é criado com cardápio fracionado, proteína máxima e foco em B12, ferro, cálcio e vitamina D.' },
@@ -938,12 +939,12 @@ const ptBR = {
     },
     finalCta: {
       title1: 'Seu plano está esperando.',
-      title2: 'Você está pronta?',
-      subtitle: 'Em menos de 3 minutos você tem um cardápio semanal, metas de macros e um plano de treino — tudo personalizado para o seu corpo e seus objetivos. Sem cartão. Sem complicação.',
+      title2: 'Você está pronto(a)?',
+      subtitle: 'Em menos de 2 minutos você tem um cardápio semanal, metas de macros e um plano de treino — tudo personalizado para o seu corpo e seus objetivos. Sem cartão. Sem complicação.',
       ctaButton: 'Criar meu plano grátis agora',
       benefits: {
         noCard: 'Sem cartão de crédito',
-        quick: 'Plano pronto em 3 minutos',
+        quick: 'Plano pronto em 2 minutos',
         cancel: 'Cancele quando quiser',
       },
     },

@@ -41,7 +41,7 @@ function FadeIn({ children, delay = 0, className = '' }: { children: React.React
 // ── Configs não-traduzíveis (icon / color / imagem) ──────────────────────
 // Textos (title/desc/etc) vêm do i18n via `t.landingPage.*`
 
-const FEATURE_KEYS = ['nutrition', 'chat', 'hydration', 'workout', 'sleep', 'fasting', 'progress', 'cycle'] as const
+const FEATURE_KEYS = ['nutrition', 'chat', 'hydration', 'workout', 'sleep', 'fasting', 'progress', 'cycle', 'meditation'] as const
 const FEATURE_CONFIG: Record<(typeof FEATURE_KEYS)[number], { icon: typeof Utensils; color: string; bg: string }> = {
   nutrition: { icon: Utensils, color: '#4a8c4e', bg: '#e8f4e8' },
   chat: { icon: Brain, color: '#8b5cf6', bg: '#ede9fe' },
@@ -51,6 +51,7 @@ const FEATURE_CONFIG: Record<(typeof FEATURE_KEYS)[number], { icon: typeof Utens
   fasting: { icon: Timer, color: '#10b981', bg: '#d1fae5' },
   progress: { icon: BarChart3, color: '#f59e0b', bg: '#fef3c7' },
   cycle: { icon: Heart, color: '#ec4899', bg: '#fce7f3' },
+  meditation: { icon: Zap, color: '#06b6d4', bg: '#cffafe' },
 }
 
 const AUDIENCE_KEYS = ['glp1', 'bariatric', 'everyone', 'fasting'] as const
