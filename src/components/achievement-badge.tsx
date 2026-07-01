@@ -105,28 +105,17 @@ export function AchievementBadge({ achievement, earned, size = 'md' }: Achieveme
           opacity={earned ? 0.35 : 0.2}
         />
 
-        {/* Emoji centralizado via foreignObject */}
-        <foreignObject
-          x={(outer - emojiSize * 1.4) / 2}
-          y={(outer - emojiSize * 1.4) / 2}
-          width={emojiSize * 1.4}
-          height={emojiSize * 1.4}
+        {/* Emoji centralizado via text SVG nativo — evita problemas de foreignObject com React HMR */}
+        <text
+          x={half}
+          y={half}
+          textAnchor="middle"
+          dominantBaseline="central"
+          fontSize={emojiSize}
+          style={{ userSelect: 'none' }}
         >
-          <div
-            style={{
-              fontSize: emojiSize,
-              lineHeight: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '100%',
-              height: '100%',
-              userSelect: 'none',
-            }}
-          >
-            {achievement.emoji}
-          </div>
-        </foreignObject>
+          {achievement.emoji}
+        </text>
       </svg>
     </div>
   )
