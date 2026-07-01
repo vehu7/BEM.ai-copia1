@@ -518,10 +518,12 @@ ${tipsHtml}
 </body>
 </html>`
 
-  const win = window.open('', '_blank', 'width=960,height=720')
+  // Usa Blob com UTF-8 explícito para garantir que emojis e acentos sejam renderizados corretamente
+  const blob = new Blob([html], { type: 'text/html; charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const win = window.open(url, '_blank', 'width=960,height=720')
   if (win) {
-    win.document.write(html)
-    win.document.close()
+    win.addEventListener('load', () => URL.revokeObjectURL(url), { once: true })
   }
 }
 
@@ -1064,36 +1066,68 @@ export function Workouts() {
   const tw = t.workouts
   const canGenerate = hasAccess(user, 'ai-workout')
 
+  // ── Workout form preferences — persisted in localStorage ──
+  function wfRead<T>(key: string, fallback: T): T {
+    try {
+      const v = localStorage.getItem(`bemai_wf_${key}`)
+      return v !== null ? (JSON.parse(v) as T) : fallback
+    } catch { return fallback }
+  }
+
   // Initial generation form state
-  const [selectedEnv, setSelectedEnv] = useState<WorkoutEnvironment>('casa')
-  const [selectedMistoHome, setSelectedMistoHome] = useState(1)
-  const [selectedMistoAcad, setSelectedMistoAcad] = useState(2)
-  const [selectedPreference, setSelectedPreference] = useState('misto')
-  const [selectedCount, setSelectedCount] = useState(3)
-  const [selectedAddAerobic, setSelectedAddAerobic] = useState(false)
-  const [selectedDuration, setSelectedDuration] = useState('50')
-  const [selectedMuscles, setSelectedMuscles] = useState<string[]>([])
-  const [selectedObjectives, setSelectedObjectives] = useState<string[]>([])
-  const [selectedEquipment, setSelectedEquipment] = useState<string[]>([])
-  const [selectedOtherEquip, setSelectedOtherEquip] = useState('')
+  const [selectedEnv, setSelectedEnv] = useState<WorkoutEnvironment>(() => wfRead('env', 'casa' as WorkoutEnvironment))
+  const [selectedMistoHome, setSelectedMistoHome] = useState(() => wfRead('mistoHome', 1))
+  const [selectedMistoAcad, setSelectedMistoAcad] = useState(() => wfRead('mistoAcad', 2))
+  const [selectedPreference, setSelectedPreference] = useState(() => wfRead('pref', 'misto'))
+  const [selectedCount, setSelectedCount] = useState(() => wfRead('count', 3))
+  const [selectedAddAerobic, setSelectedAddAerobic] = useState(() => wfRead('aerobic', false))
+  const [selectedDuration, setSelectedDuration] = useState(() => wfRead('duration', '50'))
+  const [selectedMuscles, setSelectedMuscles] = useState<string[]>(() => wfRead('muscles', []))
+  const [selectedObjectives, setSelectedObjectives] = useState<string[]>(() => wfRead('objectives', []))
+  const [selectedEquipment, setSelectedEquipment] = useState<string[]>(() => wfRead('equipment', []))
+  const [selectedOtherEquip, setSelectedOtherEquip] = useState(() => wfRead('otherEquip', ''))
 
   // Renewal form state
-  const [renewEnv, setRenewEnv] = useState<WorkoutEnvironment>('casa')
-  const [renewMistoHome, setRenewMistoHome] = useState(1)
-  const [renewMistoAcad, setRenewMistoAcad] = useState(2)
-  const [renewPreference, setRenewPreference] = useState('misto')
-  const [renewCount, setRenewCount] = useState(3)
-  const [renewAddAerobic, setRenewAddAerobic] = useState(false)
-  const [renewDuration, setRenewDuration] = useState('50')
-  const [renewMuscles, setRenewMuscles] = useState<string[]>([])
-  const [renewObjectives, setRenewObjectives] = useState<string[]>([])
-  const [renewEquipment, setRenewEquipment] = useState<string[]>([])
-  const [renewOtherEquip, setRenewOtherEquip] = useState('')
+  const [renewEnv, setRenewEnv] = useState<WorkoutEnvironment>(() => wfRead('renv', 'casa' as WorkoutEnvironment))
+  const [renewMistoHome, setRenewMistoHome] = useState(() => wfRead('rmistoHome', 1))
+  const [renewMistoAcad, setRenewMistoAcad] = useState(() => wfRead('rmistoAcad', 2))
+  const [renewPreference, setRenewPreference] = useState(() => wfRead('rpref', 'misto'))
+  const [renewCount, setRenewCount] = useState(() => wfRead('rcount', 3))
+  const [renewAddAerobic, setRenewAddAerobic] = useState(() => wfRead('raerobic', false))
+  const [renewDuration, setRenewDuration] = useState(() => wfRead('rduration', '50'))
+  const [renewMuscles, setRenewMuscles] = useState<string[]>(() => wfRead('rmuscles', []))
+  const [renewObjectives, setRenewObjectives] = useState<string[]>(() => wfRead('robjectives', []))
+  const [renewEquipment, setRenewEquipment] = useState<string[]>(() => wfRead('requipment', []))
+  const [renewOtherEquip, setRenewOtherEquip] = useState(() => wfRead('rotherEquip', ''))
   const [renewWeight, setRenewWeight] = useState('')
   const [renewWaist, setRenewWaist] = useState('')
   const [renewHips, setRenewHips] = useState('')
   const [renewChest, setRenewChest] = useState('')
   const [renewArm, setRenewArm] = useState('')
+
+  // Persist workout form preferences to localStorage
+  useEffect(() => { localStorage.setItem('bemai_wf_env', JSON.stringify(selectedEnv)) }, [selectedEnv])
+  useEffect(() => { localStorage.setItem('bemai_wf_mistoHome', JSON.stringify(selectedMistoHome)) }, [selectedMistoHome])
+  useEffect(() => { localStorage.setItem('bemai_wf_mistoAcad', JSON.stringify(selectedMistoAcad)) }, [selectedMistoAcad])
+  useEffect(() => { localStorage.setItem('bemai_wf_pref', JSON.stringify(selectedPreference)) }, [selectedPreference])
+  useEffect(() => { localStorage.setItem('bemai_wf_count', JSON.stringify(selectedCount)) }, [selectedCount])
+  useEffect(() => { localStorage.setItem('bemai_wf_aerobic', JSON.stringify(selectedAddAerobic)) }, [selectedAddAerobic])
+  useEffect(() => { localStorage.setItem('bemai_wf_duration', JSON.stringify(selectedDuration)) }, [selectedDuration])
+  useEffect(() => { localStorage.setItem('bemai_wf_muscles', JSON.stringify(selectedMuscles)) }, [selectedMuscles])
+  useEffect(() => { localStorage.setItem('bemai_wf_objectives', JSON.stringify(selectedObjectives)) }, [selectedObjectives])
+  useEffect(() => { localStorage.setItem('bemai_wf_equipment', JSON.stringify(selectedEquipment)) }, [selectedEquipment])
+  useEffect(() => { localStorage.setItem('bemai_wf_otherEquip', JSON.stringify(selectedOtherEquip)) }, [selectedOtherEquip])
+  useEffect(() => { localStorage.setItem('bemai_wf_renv', JSON.stringify(renewEnv)) }, [renewEnv])
+  useEffect(() => { localStorage.setItem('bemai_wf_rmistoHome', JSON.stringify(renewMistoHome)) }, [renewMistoHome])
+  useEffect(() => { localStorage.setItem('bemai_wf_rmistoAcad', JSON.stringify(renewMistoAcad)) }, [renewMistoAcad])
+  useEffect(() => { localStorage.setItem('bemai_wf_rpref', JSON.stringify(renewPreference)) }, [renewPreference])
+  useEffect(() => { localStorage.setItem('bemai_wf_rcount', JSON.stringify(renewCount)) }, [renewCount])
+  useEffect(() => { localStorage.setItem('bemai_wf_raerobic', JSON.stringify(renewAddAerobic)) }, [renewAddAerobic])
+  useEffect(() => { localStorage.setItem('bemai_wf_rduration', JSON.stringify(renewDuration)) }, [renewDuration])
+  useEffect(() => { localStorage.setItem('bemai_wf_rmuscles', JSON.stringify(renewMuscles)) }, [renewMuscles])
+  useEffect(() => { localStorage.setItem('bemai_wf_robjectives', JSON.stringify(renewObjectives)) }, [renewObjectives])
+  useEffect(() => { localStorage.setItem('bemai_wf_requipment', JSON.stringify(renewEquipment)) }, [renewEquipment])
+  useEffect(() => { localStorage.setItem('bemai_wf_rotherEquip', JSON.stringify(renewOtherEquip)) }, [renewOtherEquip])
 
   const [generating, setGenerating] = useState(false)
   const [showRenewal, setShowRenewal] = useState(false)

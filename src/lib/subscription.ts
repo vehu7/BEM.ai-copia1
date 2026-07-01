@@ -43,6 +43,15 @@ const DEV_PREMIUM_EMAILS: string[] = [
   'giovanni@lasy.ai',
 ]
 
+/**
+ * Whitelist de produção: emails com acesso premium garantido em qualquer ambiente.
+ * Uso: contas de admin/equipe que devem ter acesso total permanente.
+ */
+const PROD_PREMIUM_EMAILS: string[] = [
+  'veronicaresteves@gmail.com',
+  'hsilverio87@gmail.com',
+]
+
 function isDevPremiumUser(user: UserProfile | null): boolean {
   try {
     if (!import.meta.env.DEV) return false
@@ -53,6 +62,11 @@ function isDevPremiumUser(user: UserProfile | null): boolean {
   }
 }
 
+function isProdPremiumUser(user: UserProfile | null): boolean {
+  if (!user?.email) return false
+  return PROD_PREMIUM_EMAILS.includes(user.email.toLowerCase())
+}
+
 /**
  * Calcula o status do trial com base no perfil do usuário.
  * Fonte da verdade: `user.trialStartedAt` + `user.plan`.
@@ -60,8 +74,8 @@ function isDevPremiumUser(user: UserProfile | null): boolean {
 export function getTrialStatus(user: UserProfile | null): TrialStatus {
   const plan: SubscriptionPlan = user?.plan ?? 'free'
 
-  // Dev override: libera acesso premium total em localhost para emails whitelistados.
-  if (isDevPremiumUser(user)) {
+  // Bypass para contas admin/equipe (funciona em qualquer ambiente).
+  if (isProdPremiumUser(user) || isDevPremiumUser(user)) {
     return {
       isTrialActive: false,
       isTrialExpired: false,
@@ -109,7 +123,7 @@ export function getTrialStatus(user: UserProfile | null): TrialStatus {
  */
 export function hasAccess(user: UserProfile | null, feature: GatedFeature): boolean {
   if (isTrialGateDisabled()) return true
-  if (isDevPremiumUser(user)) return true
+  if (isProdPremiumUser(user) || isDevPremiumUser(user)) return true
   if (!user) return false
 
   const status = getTrialStatus(user)
@@ -125,7 +139,7 @@ export function hasAccess(user: UserProfile | null, feature: GatedFeature): bool
 /** True se o usuário está totalmente bloqueado e deve ver a tela de trial expirado. */
 export function shouldShowTrialExpiredGate(user: UserProfile | null): boolean {
   if (isTrialGateDisabled()) return false
-  if (isDevPremiumUser(user)) return false
+  if (isProdPremiumUser(user) || isDevPremiumUser(user)) return false
   if (!user) return false
   const status = getTrialStatus(user)
   return status.isTrialExpired && !status.isPremium

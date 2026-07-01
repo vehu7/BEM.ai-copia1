@@ -481,10 +481,37 @@ export function AppProvider({ children }: { children: ReactNode }) {
           // ou reabrir o app com o cache local ausente).
           const loaded = mapDbToProfile(existingRow)
           const profile = await ensureTrialInitialized(loaded)
-          // Preserva startingWeight do cache local (a coluna pode não existir no banco)
+
+          // Se o perfil no banco está incompleto (minimal — age/height/weight = 0),
+          // tenta recuperar o perfil completo do localStorage (pode ter sido preenchido
+          // via ProfileSetupModal enquanto o upsert para o banco falhou silenciosamente).
+          const isDbProfileIncomplete = !profile.height || !profile.currentWeight || !profile.age
           try {
             const localStr = localStorage.getItem(STORAGE_KEYS.USER)
-            if (localStr) { const local = JSON.parse(localStr); if (local.startingWeight) profile.startingWeight = local.startingWeight }
+            if (localStr) {
+              const local: UserProfile = JSON.parse(localStr)
+              const isLocalProfileComplete = !!(local.height && local.currentWeight && local.age && local.goal && local.activityLevel)
+              if (isDbProfileIncomplete && isLocalProfileComplete && local.email === email) {
+                // Prefere o perfil local completo e tenta re-salvar no banco
+                const mergedProfile = await ensureTrialInitialized({ ...local, id: userId, email })
+                setUserState(mergedProfile)
+                localStorage.setItem(STORAGE_KEYS.ONBOARDING, 'completed')
+                setIsOnboarding(false)
+                // Re-tenta salvar no banco em background
+                const accessToken = session?.access_token
+                if (accessToken) {
+                  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+                  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+                  fetch(`${supabaseUrl}/rest/v1/profiles?on_conflict=id`, {
+                    method: 'POST',
+                    headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
+                    body: JSON.stringify({ id: userId, ...mapProfileToDb(mergedProfile, email) }),
+                  }).catch(e => console.error('[profile] re-sync falhou:', e))
+                }
+                return
+              }
+              if (local.startingWeight) profile.startingWeight = local.startingWeight
+            }
           } catch { /* ignore */ }
           if (!profile.startingWeight) profile.startingWeight = profile.currentWeight
           setUserState(profile)
