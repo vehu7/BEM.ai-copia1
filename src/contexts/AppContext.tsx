@@ -1485,7 +1485,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const awardXP = (action: XPAction) => {
     if (!user) return
     const gained = XP_ACTIONS[action] ?? 0
-    if (gained === 0) return
+    if (!gained) return
     const prevTotal = user.totalXP ?? 0
     const newTotal = prevTotal + gained
     const prevLevel = getLevelForXP(prevTotal).level

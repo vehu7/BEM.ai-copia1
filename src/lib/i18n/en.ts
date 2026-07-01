@@ -550,7 +550,10 @@ const en = {
     "trackJourney": "Track your journey",
     "progressPhotos": "Progress Photos",
     "addPhoto": "Add",
-    "registerPhotos": "Register Progress Photos"
+    "registerPhotos": "Register Progress Photos",
+    "weightTip": "Weigh yourself at the same time every day, in the morning on an empty stomach, for more accurate comparisons.",
+    "measurementTip": "Weight may plateau while measurements keep changing. Track waist and hips weekly.",
+    "photoTip": "Monthly photos with the same clothes and lighting reveal changes the scale doesn't show."
   },
   "meditation": {
     "title": "Meditation & Relaxation",
@@ -976,7 +979,19 @@ const en = {
           "role": "Adapted diet to menstrual cycle",
           "text": "In the luteal phase, I always overate due to PMS. The app adapted the menu for this phase with more magnesium and less sodium. First month I didn't feel that uncontrolled hunger before my period."
         }
-      }
+      },
+      "disclaimer": "* Individual results may vary. Testimonials reflect personal experiences and do not guarantee identical results."
+    },
+    "gamification": {
+      "tag": "Habits that stick",
+      "title1": "Health becomes routine",
+      "title2": "when there's a reward.",
+      "subtitle": "XP, streaks and achievements that make every habit irresistible. The more you take care of yourself, the more rewards unlock.",
+      "streakDesc": "Every day you log something, your streak grows. Lose the streak, lose the bonus XP. Simple as that.",
+      "xpDesc": "Log a meal, drink water, sleep well — every action earns XP and levels you up.",
+      "badgesDesc": "6 achievement categories. Unlock by hitting hydration, sleep, workout and more goals.",
+      "reminderTitle": "BEM reminds you — the right way",
+      "reminderDesc": "Smart reminders for water, meals, workouts and sleep at the right moments of your day. No spam, just what you need, when you need it."
     },
     "mascots": {
       "title1": "A companion for every",
@@ -1337,12 +1352,19 @@ const en = {
         "poucoAcima": "A little overweight",
         "normal": "Normal weight",
         "emForma": "In shape"
+      },
+      "bemMessages": {
+        "muito_acima": "I understand. Many people in this situation have achieved incredible results with the right plan. 💚",
+        "pouco_acima": "Great starting point! With small consistent adjustments, the difference is huge. ✨",
+        "normal": "Amazing! Your focus now is body composition and energy. Let's go! 💪",
+        "em_forma": "You already have an excellent foundation! Let's take it to the next level. 🔥"
       }
     },
     "step3": {
       "title": "How is your metabolism?",
       "slow": "Slow — Hard to lose and easy to gain weight",
-      "fast": "Fast — Easy to lose and hard to gain weight"
+      "fast": "Fast — Easy to lose and hard to gain weight",
+      "unknown": "I don't know / It varies a lot"
     },
     "step4": {
       "title": "How many kilograms would you like to change?",
@@ -1354,6 +1376,13 @@ const en = {
         "e": "More than 21kg",
         "f": "I want to gain weight/mass",
         "g": "I want to maintain my weight / manage my routine"
+      },
+      "bemMessages": {
+        "a": "This is a very achievable goal! In 6-8 weeks you'll already feel the difference. 🎯",
+        "b": "Perfect. In 10-12 weeks with consistency, this result is real. 💪",
+        "above10": "Important: the journey is about health, not just weight. You'll get there. 🌟",
+        "f": "Great! Let's put together a personalized hypertrophy plan for you. 💪",
+        "g": "Maintenance requires as much as weight loss. Let's create your ideal routine. ✨"
       }
     },
     "step5": {
@@ -1418,7 +1447,8 @@ const en = {
       "goal": "Goal",
       "solution": "✅ But there is a solution! With the right plan for nutrition, exercise, and support, you can quickly reverse this situation.",
       "next": "Now let's personalize the solution for you 👇",
-      "ctaButton": "CONTINUE TO THE SOLUTION"
+      "ctaButton": "CONTINUE TO THE SOLUTION",
+      "bemMessage": "You made it this far, and that's already huge. The diagnosis is the first step — now let's build your solution. 💚"
     },
     "step13": {
       "title": "What is your daily routine like?",

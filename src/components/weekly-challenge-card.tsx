@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { Progress } from '@/components/ui/progress'
 import { useApp } from '@/contexts/AppContext'
 import { getWeeklyChallenges, daysUntilWeekEnd, type WeeklyChallenge } from '@/lib/gamification'
-import { toast } from 'sonner'
 
 // ── Tipos de persistência ─────────────────────────────────────────────────────
 

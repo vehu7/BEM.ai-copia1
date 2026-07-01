@@ -39,7 +39,7 @@ export const LEVELS = LEVEL_NAMES.map((l, i) => ({
   name: l.f, // fallback feminino — usar getLevelName() nos componentes
   emoji: l.emoji,
   xpRequired: l.xpRequired,
-})) as const
+}))
 
 export type Level = { level: number; name: string; emoji: string; xpRequired: number }
 

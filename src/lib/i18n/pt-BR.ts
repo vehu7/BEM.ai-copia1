@@ -915,6 +915,17 @@ const ptBR = {
         eduarda: { name: 'Eduarda T.', role: 'Ciclo menstrual integrado · −6kg', text: 'Na fase lútea eu sempre saía do plano por conta da fome e da TPM. O app ajustou o cardápio com mais magnésio e proteína nessa fase. Foi o primeiro mês na minha vida que não me senti descontrolada antes da menstruação.' },
       },
     },
+    gamification: {
+      tag: 'Hábitos que grudam',
+      title1: 'Saúde vira rotina',
+      title2: 'quando tem recompensa.',
+      subtitle: 'XP, sequências e conquistas que tornam cada hábito irresistível. Quanto mais você cuida de si, mais recompensas desbloqueiam.',
+      streakDesc: 'Cada dia que você registra algo, sua sequência cresce. Perca a sequência, perca o XP bônus. Simples assim.',
+      xpDesc: 'Registrar refeição, beber água, dormir bem — cada ação gera XP e sobe seu nível.',
+      badgesDesc: '6 categorias de conquistas. Desbloqueie ao atingir metas de hidratação, sono, treino e mais.',
+      reminderTitle: 'A BEM lembra de você — do jeito certo',
+      reminderDesc: 'Lembretes inteligentes de água, refeições, treino e sono nos momentos certos do seu dia. Nada de spam, só o que você precisa, quando precisa.',
+    },
     mascots: {
       title1: 'Uma equipe inteira cuidando',
       title2: 'de cada parte da sua saúde',

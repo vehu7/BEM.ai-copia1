@@ -550,7 +550,10 @@ const fr = {
     "trackJourney": "Suivez votre parcours",
     "progressPhotos": "Photos de Progrès",
     "addPhoto": "Ajouter",
-    "registerPhotos": "Enregistrer les Photos de Progrès"
+    "registerPhotos": "Enregistrer les Photos de Progrès",
+    "weightTip": "Pesez-vous toujours à la même heure, le matin à jeun, pour des comparaisons plus précises.",
+    "measurementTip": "Le poids peut se stabiliser pendant que les mesures continuent de changer. Suivez la taille et les hanches chaque semaine.",
+    "photoTip": "Les photos mensuelles avec les mêmes vêtements et éclairage révèlent des changements que la balance ne montre pas."
   },
   "meditation": {
     "title": "Méditation & Relaxation",
@@ -976,7 +979,19 @@ const fr = {
           "role": "A adapté son régime au cycle menstruel",
           "text": "Pendant la phase lutéale, je mangeais toujours trop à cause du syndrome prémenstruel. L'application a adapté le menu pour cette phase avec plus de magnésium et moins de sodium. Premier mois où je n'ai pas ressenti cette faim incontrôlable avant mes règles."
         }
-      }
+      },
+      "disclaimer": "* Les résultats individuels peuvent varier. Les témoignages reflètent des expériences personnelles et ne garantissent pas des résultats identiques."
+    },
+    "gamification": {
+      "tag": "Des habitudes qui restent",
+      "title1": "La santé devient routine",
+      "title2": "quand il y a des récompenses.",
+      "subtitle": "XP, séries et succès qui rendent chaque habitude irrésistible. Plus vous prenez soin de vous, plus des récompenses se débloquent.",
+      "streakDesc": "Chaque jour que vous enregistrez quelque chose, votre série grandit. Perdez la série, perdez le XP bonus. Simple comme ça.",
+      "xpDesc": "Enregistrer un repas, boire de l'eau, bien dormir — chaque action génère du XP et fait monter votre niveau.",
+      "badgesDesc": "6 catégories de succès. Débloquez en atteignant des objectifs d'hydratation, sommeil, entraînement et plus.",
+      "reminderTitle": "BEM vous rappelle — de la bonne façon",
+      "reminderDesc": "Des rappels intelligents pour l'eau, les repas, l'entraînement et le sommeil aux bons moments de votre journée. Pas de spam, juste ce dont vous avez besoin, quand vous en avez besoin."
     },
     "mascots": {
       "title1": "Un compagnon pour chaque",
@@ -1337,12 +1352,19 @@ const fr = {
         "poucoAcima": "Un peu au-dessus",
         "normal": "Poids normal",
         "emForma": "En forme"
+      },
+      "bemMessages": {
+        "muito_acima": "Je comprends. Beaucoup de personnes dans cette situation ont obtenu des résultats incroyables avec le bon plan. 💚",
+        "pouco_acima": "Excellent point de départ ! Avec de petits ajustements constants, la différence est énorme. ✨",
+        "normal": "Incroyable ! Votre objectif maintenant est la composition corporelle et l'énergie. Allons-y ! 💪",
+        "em_forma": "Vous avez déjà une excellente base ! Passons au niveau supérieur. 🔥"
       }
     },
     "step3": {
       "title": "Comment est votre métabolisme ?",
       "slow": "Lent — Difficile de perdre et facile de prendre du poids",
-      "fast": "Accéléré — Facile de perdre et difficile de prendre du poids"
+      "fast": "Accéléré — Facile de perdre et difficile de prendre du poids",
+      "unknown": "Je ne sais pas / Ça varie beaucoup"
     },
     "step4": {
       "title": "Combien de kilos aimeriez-vous changer ?",
@@ -1354,6 +1376,13 @@ const fr = {
         "e": "Plus de 21kg",
         "f": "Je veux prendre du poids/masse",
         "g": "Je veux maintenir mon poids / contrôler ma routine"
+      },
+      "bemMessages": {
+        "a": "C'est un objectif très atteignable ! En 6-8 semaines vous ressentirez déjà la différence. 🎯",
+        "b": "Parfait. En 10-12 semaines avec de la constance, ce résultat est réel. 💪",
+        "above10": "Important : le voyage est une question de santé, pas seulement de poids. Vous y arriverez. 🌟",
+        "f": "Super ! Préparons un plan d'hypertrophie personnalisé pour vous. 💪",
+        "g": "Le maintien demande autant que la perte de poids. Créons votre routine idéale. ✨"
       }
     },
     "step5": {
@@ -1418,7 +1447,8 @@ const fr = {
       "goal": "Objectif",
       "solution": "✅ Mais cela a une solution ! Avec le bon plan d'alimentation, d'exercices et de suivi, vous pouvez inverser cette situation rapidement.",
       "next": "Maintenant, personnalisons la solution pour vous 👇",
-      "ctaButton": "CONTINUER VERS LA SOLUTION"
+      "ctaButton": "CONTINUER VERS LA SOLUTION",
+      "bemMessage": "Vous êtes arrivé jusqu'ici, et c'est déjà énorme. Le diagnostic est la première étape — maintenant construisons votre solution. 💚"
     },
     "step13": {
       "title": "Comment se passe votre quotidien ?",

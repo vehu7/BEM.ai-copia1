@@ -550,7 +550,10 @@ const es = {
     "trackJourney": "Sigue tu viaje",
     "progressPhotos": "Fotos de Progreso",
     "addPhoto": "Añadir",
-    "registerPhotos": "Registrar Fotos de Progreso"
+    "registerPhotos": "Registrar Fotos de Progreso",
+    "weightTip": "Registra tu peso siempre a la misma hora, por la mañana en ayunas, para comparaciones más precisas.",
+    "measurementTip": "El peso puede estabilizarse mientras las medidas siguen cambiando. Sigue la cintura y las caderas semanalmente.",
+    "photoTip": "Las fotos mensuales con la misma ropa e iluminación revelan cambios que la balanza no muestra."
   },
   "meditation": {
     "title": "Meditación & Relajación",
@@ -976,7 +979,19 @@ const es = {
           "role": "Adaptó dieta al ciclo menstrual",
           "text": "En la fase lútea siempre comía en exceso por culpa del síndrome premenstrual. La app adaptó el menú para esta fase con más magnesio y menos sodio. Primer mes que no sentí esa hambre descontrolada antes de la menstruación."
         }
-      }
+      },
+      "disclaimer": "* Los resultados individuales pueden variar. Los testimonios reflejan experiencias personales y no garantizan resultados idénticos."
+    },
+    "gamification": {
+      "tag": "Hábitos que se quedan",
+      "title1": "La salud se vuelve rutina",
+      "title2": "cuando hay recompensas.",
+      "subtitle": "XP, rachas y logros que hacen cada hábito irresistible. Cuanto más te cuidas, más recompensas desbloqueas.",
+      "streakDesc": "Cada día que registras algo, tu racha crece. Pierde la racha, pierde el XP extra. Así de simple.",
+      "xpDesc": "Registrar comida, beber agua, dormir bien — cada acción genera XP y sube tu nivel.",
+      "badgesDesc": "6 categorías de logros. Desbloquea al alcanzar metas de hidratación, sueño, entrenamiento y más.",
+      "reminderTitle": "BEM te recuerda — de la manera correcta",
+      "reminderDesc": "Recordatorios inteligentes de agua, comidas, entrenamientos y sueño en los momentos correctos de tu día. Sin spam, solo lo que necesitas, cuando lo necesitas."
     },
     "mascots": {
       "title1": "Un compañero para cada",
@@ -1337,12 +1352,19 @@ const es = {
         "poucoAcima": "Un poco por encima",
         "normal": "Peso normal",
         "emForma": "En forma"
+      },
+      "bemMessages": {
+        "muito_acima": "Entiendo. Muchas personas en esta situación han logrado resultados increíbles con el plan correcto. 💚",
+        "pouco_acima": "¡Gran punto de partida! Con pequeños ajustes consistentes, la diferencia es enorme. ✨",
+        "normal": "¡Increíble! Tu enfoque ahora es composición corporal y energía. ¡Vamos! 💪",
+        "em_forma": "¡Ya tienes una base excelente! Vamos a llevar tu nivel más alto. 🔥"
       }
     },
     "step3": {
       "title": "¿Cómo es tu metabolismo?",
       "slow": "Lento — Difícil perder y fácil ganar peso",
-      "fast": "Acelerado — Fácil perder y difícil ganar peso"
+      "fast": "Acelerado — Fácil perder y difícil ganar peso",
+      "unknown": "No sé / Varía mucho"
     },
     "step4": {
       "title": "¿Cuántos kilos te gustaría cambiar?",
@@ -1354,6 +1376,13 @@ const es = {
         "e": "Más de 21kg",
         "f": "Quiero ganar peso/masa",
         "g": "Quiero mantener mi peso / controlar mi rutina"
+      },
+      "bemMessages": {
+        "a": "¡Este es un objetivo muy alcanzable! En 6-8 semanas ya sentirás la diferencia. 🎯",
+        "b": "Perfecto. En 10-12 semanas con consistencia, ese resultado es real. 💪",
+        "above10": "Importante: el viaje es de salud, no solo de peso. Lo vas a lograr. 🌟",
+        "f": "¡Genial! Vamos a armar un plan de hipertrofia personalizado para ti. 💪",
+        "g": "El mantenimiento requiere tanto como adelgazar. Vamos a crear tu rutina ideal. ✨"
       }
     },
     "step5": {
@@ -1418,7 +1447,8 @@ const es = {
       "goal": "Meta",
       "solution": "✅ ¡Pero esto tiene solución! Con el plan adecuado de alimentación, ejercicios y seguimiento, puedes revertir este escenario rápidamente.",
       "next": "Ahora vamos a personalizar la solución para ti 👇",
-      "ctaButton": "CONTINUAR HACIA LA SOLUCIÓN"
+      "ctaButton": "CONTINUAR HACIA LA SOLUCIÓN",
+      "bemMessage": "Llegaste hasta aquí, y eso ya es enorme. El diagnóstico es el primer paso — ahora vamos a armar tu solución. 💚"
     },
     "step13": {
       "title": "¿Cómo es tu día a día?",

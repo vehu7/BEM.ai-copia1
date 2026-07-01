@@ -26,10 +26,10 @@ function buildUserContext(
 ): string {
   if (!user) return ''
 
-  const totalCalories = todayMeals.reduce((sum, m) => sum + (m.calories ?? 0), 0)
-  const totalProtein = todayMeals.reduce((sum, m) => sum + (m.protein ?? 0), 0)
-  const totalCarbs = todayMeals.reduce((sum, m) => sum + (m.carbs ?? 0), 0)
-  const totalFat = todayMeals.reduce((sum, m) => sum + (m.fat ?? 0), 0)
+  const totalCalories = todayMeals.reduce((sum, m) => sum + (m.totalCalories ?? 0), 0)
+  const totalProtein = todayMeals.reduce((sum, m) => sum + (m.totalProtein ?? 0), 0)
+  const totalCarbs = todayMeals.reduce((sum, m) => sum + (m.totalCarbs ?? 0), 0)
+  const totalFat = todayMeals.reduce((sum, m) => sum + (m.totalFat ?? 0), 0)
   const waterConsumed = todayWater.consumed
   const waterTarget = todayWater.target
   const lastSleep = sleepHistory[0]
@@ -54,7 +54,7 @@ function buildUserContext(
     const daysSinceStart = Math.floor(
       (Date.now() - new Date(cycleConfig.lastPeriodStart).getTime()) / (1000 * 60 * 60 * 24),
     )
-    const cycleDay = (daysSinceStart % (cycleConfig.cycleLength ?? 28)) + 1
+    const cycleDay = (daysSinceStart % (cycleConfig.averageCycleDuration ?? 28)) + 1
     let phase = 'folicular'
     if (cycleDay <= 5) phase = 'menstrual'
     else if (cycleDay <= 13) phase = 'folicular'
