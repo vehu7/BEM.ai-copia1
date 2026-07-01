@@ -1786,7 +1786,11 @@ export async function generateWeeklyMenu(user: UserProfile, options?: {
 • Comida brasileira tradicional como base: arroz + feijão + proteína + salada — modelo nutricional completo
 • Variedade semanal: rodar proteínas (frango, peixe, carne bovina, ovos, leguminosas) e vegetais`
 
-  const nutritionistPersona = getNutritionistPersona(country, user.goal ?? 'saude_geral')
+  const nutritionistPersona = getNutritionistPersona(
+    country,
+    user.goal ?? 'saude_geral',
+    { isGlp1, isBariatric: isBariatricMenu }
+  )
 
   const prompt = `${nutritionistPersona}
 
@@ -1798,10 +1802,12 @@ ${dietaryText ? `${dietaryText}\n\n` : ''}${medLimText ? `${medLimText}\n\n` : '
 - Nome: ${user.name}
 - Sexo: ${user.gender === 'masculino' ? 'Masculino' : user.gender === 'feminino' ? 'Feminino' : 'Outro'}
 - Idade: ${user.age} anos
-- Peso atual: ${user.currentWeight} kg
-- Altura: ${user.height} cm${imc ? ` | IMC: ${imc} (${imcCtx})` : ''}
+- Peso atual: ${user.currentWeight} kg${user.startingWeight && user.startingWeight !== user.currentWeight ? ` (peso inicial: ${user.startingWeight} kg)` : ''}
+- Peso meta: ${user.targetWeight} kg${user.targetWeight && user.currentWeight ? ` (faltam ${Math.abs(user.targetWeight - user.currentWeight).toFixed(1)} kg)` : ''}
+- Altura: ${user.height} cm${imc ? ` | IMC: ${imc} (${imcCtx})` : ''}${user.bodyFatPercentage ? ` | Gordura corporal: ${user.bodyFatPercentage}%` : ''}
 - Objetivo: ${goalText}
 - Nível de atividade física: ${activityMap[user.activityLevel] || user.activityLevel}
+- Experiência com jejum intermitente: ${user.fastingExperience === 'nunca' ? 'nunca fez' : user.fastingExperience === 'iniciante' ? 'iniciante' : user.fastingExperience === 'intermediario' ? 'intermediário' : 'avançado'}${user.interestedInFasting ? ' (interessado em jejum)' : ''}
 - ${calorieTarget}
 - ${macroTarget}
 ${mealRoutineText ? `- ${mealRoutineText}` : ''}

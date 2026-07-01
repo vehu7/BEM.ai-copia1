@@ -514,6 +514,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
             }
           } catch { /* ignore */ }
           if (!profile.startingWeight) profile.startingWeight = profile.currentWeight
+          // Garante email da sessão no perfil — coluna email pode ser null no banco para contas antigas
+          if (!profile.email && email) profile.email = email
           setUserState(profile)
           localStorage.setItem(STORAGE_KEYS.ONBOARDING, 'completed')
           setIsOnboarding(false)
@@ -1079,6 +1081,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }
       } catch { /* ignore */ }
       if (!profile.startingWeight) profile.startingWeight = profile.currentWeight
+      // Garante email da sessão no perfil — coluna email pode ser null no banco para contas antigas
+      if (!profile.email && data.user?.email) profile.email = data.user.email
       // Usa setUser para garantir que BMR/TDEE/macros/água sejam sempre recalculados
       setUser(profile)
       localStorage.setItem(STORAGE_KEYS.ONBOARDING, 'completed')
@@ -1584,6 +1588,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
           }
         } catch { /* ignore */ }
         if (!profile.startingWeight) profile.startingWeight = profile.currentWeight
+        // Garante email da sessão no perfil — coluna email pode ser null no banco para contas antigas
+        if (!profile.email && data.user?.email) profile.email = data.user.email
         setUser(profile)
         localStorage.setItem(STORAGE_KEYS.ONBOARDING, 'completed')
         setIsOnboarding(false)
