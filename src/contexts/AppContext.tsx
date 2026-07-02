@@ -459,6 +459,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setSession(session)
 
       if (event === 'SIGNED_OUT') {
+        // Só limpa o estado se for logout explícito (loggingOut.current já cobre isso acima,
+        // mas TOKEN_REFRESH_FAILED também dispara SIGNED_OUT — nesse caso session vem null
+        // mas o token sb-* ainda pode existir no localStorage; não queremos mostrar tela vazia).
+        // Se ainda há um token Supabase guardado, ignoramos o SIGNED_OUT espúrio.
+        const hasStoredToken = Object.keys(localStorage).some(
+          k => k.startsWith('sb-') && k.endsWith('-auth-token')
+        )
+        if (hasStoredToken) return
         setUserState(null)
         return
       }
@@ -520,7 +528,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
           } catch { /* ignore */ }
           if (!profile.startingWeight) profile.startingWeight = profile.currentWeight
           // Garante email da sessão no perfil — coluna email pode ser null no banco para contas antigas
-          if (!profile.email && email) profile.email = email
+          if (!profile.email && email) {
+            profile.email = email
+            // Persiste email no banco para que futuras sessões não precisem deste patch
+            const accessToken = session?.access_token
+            if (accessToken) {
+              const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
+              const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+              fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}`, {
+                method: 'PATCH',
+                headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email }),
+              }).catch(() => {})
+            }
+          }
           setUserState(profile)
           localStorage.setItem(STORAGE_KEYS.ONBOARDING, 'completed')
           setIsOnboarding(false)
