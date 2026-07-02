@@ -58,7 +58,7 @@ function RequireProfile({ children }: { children: React.ReactNode }) {
 }
 
 export function App() {
-  const { isOnboarding, isAuthenticated, authLoading, user, pendingCelebration, dismissCelebration } = useApp()
+  const { isOnboarding, isAuthenticated, authLoading, user, sessionEmail, pendingCelebration, dismissCelebration } = useApp()
   const location = useLocation()
   const [darkMode, setDarkMode] = useState(getThemeMode)
 
@@ -120,7 +120,7 @@ export function App() {
   }
 
   // Autenticado — trial expirado bloqueia o app
-  if (shouldShowTrialExpiredGate(user)) {
+  if (shouldShowTrialExpiredGate(user, sessionEmail)) {
     return (
       <>
         <TrialExpiredScreen />

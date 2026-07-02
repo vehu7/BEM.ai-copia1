@@ -135,9 +135,9 @@ Se a pessoa perguntar algo fora dos temas de saúde e bem-estar, responda educad
 }
 
 export function ChatBem() {
-  const { user } = useApp()
+  const { user, sessionEmail } = useApp()
   const { t } = useTranslation()
-  if (!hasAccess(user, 'ai-chat')) {
+  if (!hasAccess(user, 'ai-chat', sessionEmail)) {
     return (
       <UpgradeGate
         featureName={t.trial.upgradeGate.chatFeatureName}

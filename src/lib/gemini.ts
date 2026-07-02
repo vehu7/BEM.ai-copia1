@@ -1427,6 +1427,73 @@ function enforceBreakfastNoMeat(parsed: any, ctx: { restrictions: string[]; excl
   }
 }
 
+/**
+ * LANCHES E CEIAS SEM VEGETAIS: brócolis, cenoura, vagem etc. não aparecem em lanches ou ceias.
+ * Substitui o alimento vegetal pelo substituto lanche correto (fruta ou iogurte).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function enforceLancheNoVegetables(parsed: any): void {
+  const VEGETAL_TERMS = ['brocolis', 'brocoli', 'cenoura', 'vagem', 'abobrinha', 'abobora', 'chuchu', 'quiabo', 'jilo', 'berinjela', 'pepino', 'tomate', 'alface', 'rucula', 'espinafre', 'couve', 'repolho', 'acelga', 'palmito', 'escarola', 'salada', 'legume', 'verdura', 'vinagrete', 'agriao']
+  const SNACK_SUBS = ['Banana', 'Mamão papaia', 'Iogurte natural']
+  const isVegetal = (name: string): boolean => {
+    const n = norm(name)
+    return VEGETAL_TERMS.some(v => n.includes(v))
+  }
+  let subIdx = 0
+  for (const day of parsed?.days ?? []) {
+    let changed = false
+    for (const meal of day?.meals ?? []) {
+      if (mealKind(meal.type) !== 'lanche') continue
+      const foods = meal.foods ?? []
+      for (let k = 0; k < foods.length; k++) {
+        const f = foods[k]
+        if (!f || typeof f !== 'object' || typeof f.name !== 'string') continue
+        if (!isVegetal(f.name)) continue
+        const subName = SNACK_SUBS[subIdx % SNACK_SUBS.length]
+        subIdx++
+        const cal = Number(f.calories) || 80
+        // Simples substituição mantendo caloria similar
+        foods.splice(k, 1, { name: subName, qty: 1, unit: 'unidade', calories: cal, protein: 1.5, carbs: cal / 5, fat: 0.3, fiber: 2 })
+        changed = true
+      }
+    }
+    if (changed) normalizeMenuTotals({ days: [day] })
+  }
+}
+
+/**
+ * CEIA LEVE: limita ceia a no máximo 2 alimentos e ~150 kcal total.
+ * Remove itens excedentes e escala as calorias dos que sobram.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function enforceCeiaLight(parsed: any): void {
+  const CEIA_MAX_KCAL = 150
+  const CEIA_MAX_ITEMS = 2
+  for (const day of parsed?.days ?? []) {
+    let changed = false
+    for (const meal of day?.meals ?? []) {
+      if (!meal?.type || !norm(meal.type).includes('ceia')) continue
+      const foods = (meal.foods ?? []).filter((f: any) => f && typeof f === 'object') // eslint-disable-line @typescript-eslint/no-explicit-any
+      // Limita a 2 itens (mantém os de maior proteína)
+      if (foods.length > CEIA_MAX_ITEMS) {
+        foods.sort((a: any, b: any) => (Number(b.protein) || 0) - (Number(a.protein) || 0)) // eslint-disable-line @typescript-eslint/no-explicit-any
+        foods.splice(CEIA_MAX_ITEMS)
+        meal.foods = foods
+        changed = true
+      }
+      // Escala para não ultrapassar 150 kcal
+      const totalCal = foods.reduce((s: number, f: any) => s + (Number(f.calories) || 0), 0) // eslint-disable-line @typescript-eslint/no-explicit-any
+      if (totalCal > CEIA_MAX_KCAL && totalCal > 0) {
+        const ratio = CEIA_MAX_KCAL / totalCal
+        for (const f of foods) scaleFoodInPlace(f, ratio)
+        meal.foods = foods
+        changed = true
+      }
+    }
+    if (changed) normalizeMenuTotals({ days: [day] })
+  }
+}
+
 // Equivalentes BRASILEIROS para a allowlist (carbo e fruta; proteína/fibra reusam os boosters).
 const BR_CARBS: Booster[] = [
   { name: 'Arroz integral', measure: '4 colheres de sopa', grams: 120, cal: 154, p: 3.2, c: 33, f: 1.2, fib: 2.7 },
@@ -1829,7 +1896,8 @@ ${isGlp1 ? '- GLP-1: refeições pequenas e densas em proteína, no máx ~400 kc
 - CAFÉ DA MANHÃ: use APENAS ovos, queijo, iogurte, requeijão, pão integral, tapioca, fruta, aveia. PROIBIDO: frango, carne, peixe, atum, sardinha, salmão — café da manhã com frango é errado.
 - ALMOÇO E JANTAR: OBRIGATÓRIO incluir (1) proteína magra 80–150g, (2) salada/vegetal (alface, tomate, cenoura, brócolis, couve, abobrinha, etc.) mínimo 80g, (3) carboidrato (arroz, feijão, batata-doce, mandioca). Nunca sirva proteína sem acompanhamento vegetal.
 - VARIEDADE: não repita a proteína principal em dias seguidos (≥5 proteínas na semana); varie as saladas. Café preto e chá sem açúcar NÃO entram como alimento.
-${highCalDaysList.length > 0 ? `- Dias +20% (${highCalDaysList.join(', ')}) têm ~20% mais calorias que os demais.\n` : ''}${mealPriorityText ? '- A refeição principal escolhida é a mais calórica do dia.\n' : ''}${excludedText ? '- Exclusões e restrições têm prioridade ABSOLUTA sobre tudo.\n' : ''}- PORÇÕES: use SEMPRE números inteiros ou frações simples (½, ⅓). NUNCA escreva decimais na quantidade (PROIBIDO: 0,7 fatias / 1,6 ovos / 0,4 concha / 0,1 xícara). Se a quantidade certa for pequena, ajuste os GRAMAS mas mantenha a unidade inteira (ex: "1 fatia fina (20g)" em vez de "0,4 fatia"). Colheres e xícaras: mínimo 1 col. sopa / ½ xícara.
+- LANCHES E CEIA: SOMENTE frutas, iogurte natural, queijo branco, castanhas, amendoim, pão integral, tapioca, vitamina. PROIBIDO nos lanches e ceia: brócolis, cenoura, vagem, couve, alface, tomate, abobrinha, qualquer vegetal ou salada. Ceia = NO MÁXIMO 2 alimentos leves, total ~100-150 kcal — semelhante a um copo de iogurte com fruta.
+${mealPriorityText ? `- REFEIÇÃO PRINCIPAL: ${mealPriorityText} Esta refeição DEVE ter MAIS calorias que todas as outras refeições do dia — é a maior e mais completa.\n` : ''}${highCalDaysList.length > 0 ? `- Dias +20% (${highCalDaysList.join(', ')}) têm ~20% mais calorias que os demais.\n` : ''}${excludedText ? '- Exclusões e restrições têm prioridade ABSOLUTA sobre tudo.\n' : ''}- PORÇÕES: use SEMPRE "colheres de sopa" em vez de "xícara" para arroz, feijão, farofa e similares. NUNCA escreva decimais na quantidade (PROIBIDO: 0,7 fatias / 1,6 ovos / 0,4 concha). Use números inteiros ou frações simples (½, ⅓). Se a quantidade certa for pequena, ajuste os GRAMAS mas mantenha a unidade inteira (ex: "1 fatia fina (20g)" em vez de "0,4 fatia"). Colheres: mínimo 1 col. sopa.
 - CONCISO: no MÁXIMO 4 alimentos por refeição principal e 2 por lanche/ceia, nomes curtos. Formato "Nome – medida caseira (Xg)" com o peso em gramas, e o campo "fiber" (g) em cada alimento e refeição (carne/ovo/laticínio ~0; pão/aveia/fruta/legume/leguminosa têm fibra).
 - Cada dia somando${user.targetCalories ? ` ~${user.targetCalories} kcal (entre ${Math.round(user.targetCalories * 0.95)} e ${Math.round(user.targetCalories * 1.05)})` : ' a meta calórica'}; o total de cada refeição é a soma dos alimentos. Inclua 5 dicas curtas${isGlp1 ? ' (2+ sobre GLP-1)' : ''}${isBariatricMenu ? ' (2+ sobre pós-bariátrica)' : ''} — as dicas devem ser relevantes ao objetivo específico do usuário, sem mencionar GLP-1 ou cirurgia bariátrica para usuários sem essa condição.
 
@@ -2032,6 +2100,10 @@ Retorne APENAS JSON: { "days": [ { "day": "Nome-do-dia", "meals": [ ...mesma est
     // CAFÉ DA MANHÃ SEM CARNE/ATUM (regra da nutricionista) — por ÚLTIMO, depois do carbCap (que sob
     // low_carb poderia re-inserir atum no café). Troca carne vermelha/sardinha/atum por ovo/queijo.
     enforceBreakfastNoMeat(parsed, { restrictions: enforcedRestrictions, excluded: allExcluded })
+    // LANCHES E CEIAS SEM VEGETAIS — brócolis, cenoura etc. substituídos por fruta/iogurte.
+    enforceLancheNoVegetables(parsed)
+    // CEIA LEVE — máx 2 itens e 150 kcal para ceia ser refeição leve de verdade.
+    enforceCeiaLight(parsed)
     // PORÇÕES REALISTAS — última passagem: elimina decimais residuais que sobreviveram ao scaling
     // (ex: enforceDayTargets gerou 0,7 fatias; enforceRealisticPortions corrige para 1 fatia).
     enforceRealisticPortions(parsed)

@@ -62,6 +62,7 @@ interface AppContextType {
 
   // Auth
   session: Session | null
+  sessionEmail: string
   isAuthenticated: boolean
   authLoading: boolean
   login: (email: string, password: string) => Promise<{ error: string | null }>
@@ -288,7 +289,10 @@ function getDailyMessage(): MotivationalMessage {
 }
 
 // Mapeia UserProfile (camelCase) → colunas do DB (snake_case)
-function mapProfileToDb(profile: UserProfile, email: string) {
+function mapProfileToDb(profile: UserProfile, _email?: string) {
+  // NOTA: `email` foi removido do payload principal para evitar falha de upsert
+  // quando a coluna não existe no banco. O email é salvo separadamente via PATCH
+  // dedicado (patchEmailToDb) que falha de forma silenciosa sem afetar o resto.
   return {
     name: profile.name,
     age: profile.age,
@@ -325,8 +329,19 @@ function mapProfileToDb(profile: UserProfile, email: string) {
       ? (profile.trialStartedAt instanceof Date ? profile.trialStartedAt : new Date(profile.trialStartedAt)).toISOString()
       : new Date().toISOString(),
     subscription_email: profile.subscriptionEmail ?? null,
-    email,
   }
+}
+
+/** Tenta salvar o email na coluna `email` do profiles. Falha silenciosamente se a coluna não existir. */
+function patchEmailToDb(userId: string, email: string, accessToken: string): void {
+  const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string ?? '').trim()
+  const supabaseKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string ?? '').trim()
+  if (!supabaseUrl || !supabaseKey) return
+  fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}`, {
+    method: 'PATCH',
+    headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  }).catch(() => {})
 }
 
 // Garante que o usuário tem trialStartedAt preenchido. Se não tiver
@@ -445,6 +460,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
     supabase.auth.getSession()
       .then(({ data: { session } }) => {
         setSession(session)
+        // Patch email from session into in-memory user BEFORE authLoading becomes false
+        // so that isProdPremiumUser() works immediately on first render (TrialBanner).
+        if (session?.user?.email) {
+          const authEmail = session.user.email
+          setUserState(prev => {
+            if (prev && !prev.email) return { ...prev, email: authEmail }
+            return prev
+          })
+        }
       })
       .catch(() => {})
       .finally(() => {
@@ -513,13 +537,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
                 // Re-tenta salvar no banco em background
                 const accessToken = session?.access_token
                 if (accessToken) {
-                  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-                  const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+                  const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string ?? '').trim()
+                  const supabaseKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string ?? '').trim()
                   fetch(`${supabaseUrl}/rest/v1/profiles?on_conflict=id`, {
                     method: 'POST',
                     headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-                    body: JSON.stringify({ id: userId, ...mapProfileToDb(mergedProfile, email) }),
-                  }).catch(e => console.error('[profile] re-sync falhou:', e))
+                    body: JSON.stringify({ id: userId, ...mapProfileToDb(mergedProfile) }),
+                  }).then(r => { if (!r.ok) console.error('[profile] re-sync falhou:', r.status) }).catch(e => console.error('[profile] re-sync falhou:', e))
+                  patchEmailToDb(userId, email, accessToken)
                 }
                 return
               }
@@ -527,20 +552,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
             }
           } catch { /* ignore */ }
           if (!profile.startingWeight) profile.startingWeight = profile.currentWeight
-          // Garante email da sessão no perfil — coluna email pode ser null no banco para contas antigas
+          // Garante email da sessão no perfil em memória
           if (!profile.email && email) {
             profile.email = email
-            // Persiste email no banco para que futuras sessões não precisem deste patch
             const accessToken = session?.access_token
-            if (accessToken) {
-              const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
-              const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string
-              fetch(`${supabaseUrl}/rest/v1/profiles?id=eq.${userId}`, {
-                method: 'PATCH',
-                headers: { 'apikey': supabaseKey, 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email }),
-              }).catch(() => {})
-            }
+            if (accessToken) patchEmailToDb(userId, email, accessToken)
           }
           setUserState(profile)
           localStorage.setItem(STORAGE_KEYS.ONBOARDING, 'completed')
@@ -554,10 +570,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
             plan: 'free',
             trialStartedAt: trialStart,
           }
-          await supabase.from('profiles').insert({
+          const insertRes = await supabase.from('profiles').insert({
             id: userId,
-            ...mapProfileToDb(pendingWithPlan, email),
+            ...mapProfileToDb(pendingWithPlan),
           })
+          if (insertRes.error) console.error('[profile] insert falhou:', insertRes.error.message)
+          else if (session?.access_token) patchEmailToDb(userId, email, session.access_token)
 
           const finalProfile: UserProfile = {
             ...pendingWithPlan,
@@ -952,12 +970,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // re-renders/desmontagens do React cancelem o promise pendente do client.
       const uid = session?.user?.id
       const accessToken = session?.access_token
-      const email = session?.user?.email ?? updated.email ?? ''
+      const authEmail = session?.user?.email ?? updated.email ?? ''
       if (uid && accessToken) {
         try {
-          const dbPayload = mapProfileToDb(updated, email)
-          const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-          const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+          const dbPayload = mapProfileToDb(updated)
+          const supabaseUrl = (import.meta.env.VITE_SUPABASE_URL as string ?? '').trim()
+          const supabaseKey = (import.meta.env.VITE_SUPABASE_ANON_KEY as string ?? '').trim()
           fetch(`${supabaseUrl}/rest/v1/profiles?on_conflict=id`, {
             method: 'POST',
             headers: {
@@ -972,6 +990,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
               if (!r.ok) {
                 const t = await r.text().catch(() => '')
                 console.error('Erro ao salvar perfil no Supabase:', r.status, t)
+              } else if (authEmail) {
+                // Email salvo separadamente (coluna opcional — falha silenciosa)
+                patchEmailToDb(uid, authEmail, accessToken)
               }
             })
             .catch(e => console.error('Erro de rede ao salvar perfil:', e))
@@ -1320,6 +1341,29 @@ export function AppProvider({ children }: { children: ReactNode }) {
     })
     const uid = session?.user?.id
     if (uid) deferDbCall(() => insertWeightEntryDb(uid, entry))
+
+    // Comemoração da BEM: verifica se atingiu a meta de peso
+    setUserState(prev => {
+      if (!prev) return prev
+      const goal = prev.goal
+      const target = prev.targetWeight
+      const celebKey = `bem_weight_goal_celebrated_${Math.round((target ?? 0) * 10)}`
+      if (!target || localStorage.getItem(celebKey)) return prev
+      const reachedGoal =
+        (goal === 'perder_peso' && entry.weight <= target) ||
+        (goal === 'ganhar_massa' && entry.weight >= target) ||
+        (goal === 'manter_peso' && Math.abs(entry.weight - target) <= 0.5)
+      if (reachedGoal) {
+        localStorage.setItem(celebKey, '1')
+        setTimeout(() => setPendingCelebration({
+          kind: 'weight_goal',
+          title: '🎉 META ATINGIDA!',
+          subtitle: `Você chegou a ${entry.weight} kg! A BEM está muito orgulhosa de você!`,
+          xpGained: 500,
+        }), 800)
+      }
+      return prev
+    })
   }
 
   const updatePrivacySettings = (settings: Partial<PrivacySettings>) => {
@@ -1653,6 +1697,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       value={{
         user, setUser, isOnboarding, completeOnboarding,
         session, isAuthenticated, authLoading, login, loginWithGoogle, logout, register, resetPassword, savePendingProfile,
+        sessionEmail: session?.user?.email ?? '',
         todayWater, addWater, resetWater,
         todayMeals, addMeal, removeMeal,
         activeFasting, startFasting, endFasting,

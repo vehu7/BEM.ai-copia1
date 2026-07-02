@@ -41,10 +41,10 @@ function formatBRL(value: number): string {
 
 export function Plans() {
   const navigate = useNavigate()
-  const { user } = useApp()
+  const { user, sessionEmail } = useApp()
   const { t } = useTranslation()
   const tp = t.plans
-  const status = getTrialStatus(user)
+  const status = getTrialStatus(user, sessionEmail)
 
   const [pendingPlan, setPendingPlan] = useState<Plan | null>(null)
   const [emailConfirmed, setEmailConfirmed] = useState(false)

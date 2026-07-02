@@ -2,11 +2,12 @@ import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
 
 export type CelebrationKind =
-  | 'badge'       // ganhou conquista/badge
-  | 'goal'        // bateu meta do dia (água, calorias, proteína)
-  | 'challenge'   // completou desafio semanal
-  | 'level'       // subiu de nível
-  | 'streak'      // streak milestone (7, 14, 30 dias)
+  | 'badge'        // ganhou conquista/badge
+  | 'goal'         // bateu meta do dia (água, calorias, proteína)
+  | 'challenge'    // completou desafio semanal
+  | 'level'        // subiu de nível
+  | 'streak'       // streak milestone (7, 14, 30 dias)
+  | 'weight_goal'  // atingiu a meta de peso
 
 interface CelebrationModalProps {
   open: boolean
@@ -52,6 +53,13 @@ const CONFIG: Record<CelebrationKind, { mascot: string; video?: string; bg: stri
     bg: 'from-rose-900 to-pink-900',
     accent: '#fb7185',
     emoji: '🔥',
+  },
+  weight_goal: {
+    mascot: '/mascots/bem-trofeu.png',
+    video: '/bem-celebration.mp4',
+    bg: 'from-teal-900 to-emerald-900',
+    accent: '#2dd4bf',
+    emoji: '🏆',
   },
 }
 
@@ -103,7 +111,7 @@ export function CelebrationModal({ open, kind, title, subtitle, xpGained, onClos
             src={cfg.video}
             muted
             playsInline
-            className="absolute inset-0 w-full h-full object-cover opacity-30"
+            className={`absolute inset-0 w-full h-full object-cover ${kind === 'weight_goal' ? 'opacity-80' : 'opacity-30'}`}
           />
         )}
 

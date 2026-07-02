@@ -1060,11 +1060,11 @@ function SetupForm({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export function Workouts() {
-  const { user, aiWorkoutPlan, saveAiWorkoutPlan, clearAiWorkoutPlan } = useApp()
+  const { user, sessionEmail, aiWorkoutPlan, saveAiWorkoutPlan, clearAiWorkoutPlan } = useApp()
   const navigate = useNavigate()
   const { t } = useTranslation()
   const tw = t.workouts
-  const canGenerate = hasAccess(user, 'ai-workout')
+  const canGenerate = hasAccess(user, 'ai-workout', sessionEmail)
 
   // ── Workout form preferences — persisted in localStorage ──
   function wfRead<T>(key: string, fallback: T): T {

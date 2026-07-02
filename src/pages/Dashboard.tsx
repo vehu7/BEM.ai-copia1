@@ -846,7 +846,7 @@ export function Dashboard() {
 
         {/* Dialog de registro de treino */}
         <Dialog open={isWorkoutDialogOpen} onOpenChange={setIsWorkoutDialogOpen}>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{t.dashboard.registerWorkout}</DialogTitle>
               <DialogDescription>{t.dashboard.addWorkoutDesc}</DialogDescription>

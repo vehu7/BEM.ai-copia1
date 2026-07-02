@@ -8,10 +8,10 @@ import { useTranslation } from '@/contexts/LanguageContext'
 const DISMISS_KEY_PREFIX = 'bemai_trial_banner_dismissed_'
 
 export function TrialBanner() {
-  const { user } = useApp()
+  const { user, sessionEmail } = useApp()
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const status = getTrialStatus(user)
+  const status = getTrialStatus(user, sessionEmail)
 
   // Dismiss do dia — reaparece no próximo dia
   const todayKey = DISMISS_KEY_PREFIX + new Date().toISOString().split('T')[0]

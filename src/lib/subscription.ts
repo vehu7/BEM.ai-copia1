@@ -62,20 +62,21 @@ function isDevPremiumUser(user: UserProfile | null): boolean {
   }
 }
 
-function isProdPremiumUser(user: UserProfile | null): boolean {
-  if (!user?.email) return false
-  return PROD_PREMIUM_EMAILS.includes(user.email.toLowerCase())
+function isProdPremiumUser(user: UserProfile | null, fallbackEmail?: string): boolean {
+  const email = user?.email || fallbackEmail
+  if (!email) return false
+  return PROD_PREMIUM_EMAILS.includes(email.toLowerCase())
 }
 
 /**
  * Calcula o status do trial com base no perfil do usuário.
  * Fonte da verdade: `user.trialStartedAt` + `user.plan`.
  */
-export function getTrialStatus(user: UserProfile | null): TrialStatus {
+export function getTrialStatus(user: UserProfile | null, fallbackEmail?: string): TrialStatus {
   const plan: SubscriptionPlan = user?.plan ?? 'free'
 
   // Bypass para contas admin/equipe (funciona em qualquer ambiente).
-  if (isProdPremiumUser(user) || isDevPremiumUser(user)) {
+  if (isProdPremiumUser(user, fallbackEmail) || isDevPremiumUser(user)) {
     return {
       isTrialActive: false,
       isTrialExpired: false,
@@ -121,12 +122,12 @@ export function getTrialStatus(user: UserProfile | null): TrialStatus {
  * - Free + trial expirado: acesso negado a tudo.
  * - Override global via `VITE_DISABLE_TRIAL_GATE=true` libera tudo.
  */
-export function hasAccess(user: UserProfile | null, feature: GatedFeature): boolean {
+export function hasAccess(user: UserProfile | null, feature: GatedFeature, fallbackEmail?: string): boolean {
   if (isTrialGateDisabled()) return true
-  if (isProdPremiumUser(user) || isDevPremiumUser(user)) return true
+  if (isProdPremiumUser(user, fallbackEmail) || isDevPremiumUser(user)) return true
   if (!user) return false
 
-  const status = getTrialStatus(user)
+  const status = getTrialStatus(user, fallbackEmail)
 
   if (status.isPremium) return true
   if (status.isTrialExpired) return false
@@ -137,10 +138,10 @@ export function hasAccess(user: UserProfile | null, feature: GatedFeature): bool
 }
 
 /** True se o usuário está totalmente bloqueado e deve ver a tela de trial expirado. */
-export function shouldShowTrialExpiredGate(user: UserProfile | null): boolean {
+export function shouldShowTrialExpiredGate(user: UserProfile | null, fallbackEmail?: string): boolean {
   if (isTrialGateDisabled()) return false
-  if (isProdPremiumUser(user) || isDevPremiumUser(user)) return false
+  if (isProdPremiumUser(user, fallbackEmail) || isDevPremiumUser(user)) return false
   if (!user) return false
-  const status = getTrialStatus(user)
+  const status = getTrialStatus(user, fallbackEmail)
   return status.isTrialExpired && !status.isPremium
 }
